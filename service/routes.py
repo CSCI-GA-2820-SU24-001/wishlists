@@ -23,7 +23,7 @@ and Delete Pets from the inventory of pets in the PetShop
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import YourResourceModel
+from service.models import Wishlist, WishlistItem
 from service.common import status  # HTTP Status Codes
 
 
@@ -33,6 +33,18 @@ from service.common import status  # HTTP Status Codes
 @app.route("/")
 def index():
     """ Root URL response """
+    info = {
+        "service": "Wishlist Service",
+        "version": "1.0",
+        "status": "running",
+        "description": "This service manages user wishlists and their items.",
+        "endpoints": [
+            {"path": "/wishlists", "methods": ["GET", "POST"]},
+            {"path": "/wishlists/<id>", "methods": ["GET", "PUT", "DELETE"]},
+            {"path": "/wishlists/<wishlist_id>/items", "methods": ["GET", "POST"]},
+            {"path": "/wishlists/<wishlist_id>/items/<item_id>", "methods": ["GET", "PUT", "DELETE"]},
+        ],
+    }
     return (
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
