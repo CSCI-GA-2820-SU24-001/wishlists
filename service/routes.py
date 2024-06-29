@@ -33,18 +33,6 @@ from service.common import status  # HTTP Status Codes
 @app.route("/", methods=["GET"])
 def index():
     """ Root URL response """
-    info = {
-        "service": "Wishlist Service",
-        "version": "1.0",
-        "status": "running",
-        "description": "This service manages user wishlists and their items.",
-        "endpoints": [
-            {"path": "/wishlists", "methods": ["GET", "POST"]},
-            {"path": "/wishlists/<id>", "methods": ["GET", "PUT", "DELETE"]},
-            {"path": "/wishlists/<wishlist_id>/items", "methods": ["GET", "POST"]},
-            {"path": "/wishlists/<wishlist_id>/items/<item_id>", "methods": ["GET", "PUT", "DELETE"]},
-        ],
-    }
     return (
         {
             "service name": "Wishlists Service",
