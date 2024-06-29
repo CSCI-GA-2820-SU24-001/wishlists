@@ -30,7 +30,7 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
+@app.route("/", methods="GET")
 def index():
     """ Root URL response """
     info = {
@@ -46,8 +46,63 @@ def index():
         ],
     }
     return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
+        {
+            "service name": "Wishlists Service",
+            "version": "1.0.0",
+            "endpoints": [
+                {
+                    "method": "GET",
+                    "url": "/wishlists",
+                    "description": "List all wishlists"
+                },
+                {
+                    "method": "POST",
+                    "url": "/wishlists",
+                    "description": "Create a wishlist"
+                },
+                {
+                    "method": "GET",
+                    "url": "/wishlists/{id}",
+                    "description": "Read a wishlist"
+                },
+                {
+                    "method": "PUT",
+                    "url": "/wishlists/{id}",
+                    "description": "Update a wishlist"
+                },
+                {
+                    "method": "DELETE",
+                    "url": "/wishlists/{id}",
+                    "description": "Delete a wishlist"
+                },
+                {
+                    "method": "GET",
+                    "url": "/wishlists/{id}/items",
+                    "description": "List all items in a wishlist"
+                },
+                {
+                    "method": "POST",
+                    "url": "/wishlists/{id}/items",
+                    "description": "Create an item in a wishlist"
+                },
+                {
+                    "method": "GET",
+                    "url": "/wishlists/{id}/items/{id}",
+                    "description": "Read an item in a wishlist"
+                },
+                {
+                    "method": "PUT",
+                    "url": "/wishlists/{id}/items/{id}",
+                    "description": "Update an item in a wishlist"
+                },
+                {
+                    "method": "DELETE",
+                    "url": "/wishlists/{id}/items/{id}",
+                    "description": "Delete an item in a wishlist"
+                }
+            ]
+        },
+        status.HTTP_200_OK
     )
 
 
