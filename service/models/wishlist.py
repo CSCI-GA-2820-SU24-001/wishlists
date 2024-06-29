@@ -3,11 +3,12 @@ Models for Wishlists
 
 The models for Wishlists are stored in this module
 """
-
+import logging
 from .persistent_base import db, PersistentBase, DataValidationError
 from .wishlist_item import WishlistItem
 import uuid
 
+logger = logging.getLogger("flask.app")
 
 ######################################################################
 #  W I S H L I S T    M O D E L
@@ -69,3 +70,12 @@ class Wishlist(db.Model, PersistentBase):
 
         return self
 
+    @classmethod
+    def find_by_name(cls, name):
+        """Returns all Wishlists with the given name
+
+        Args:
+            name (string): the name of the Wishlists you want to match
+        """
+        logger.info("Processing name query for %s ...", name)
+        return cls.query.filter(cls.name == name).all()
