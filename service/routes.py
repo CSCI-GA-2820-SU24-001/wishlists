@@ -98,4 +98,49 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# Todo: Place your REST API code here ...
+
+######################################################################
+# CREATE A NEW WISHLIST
+######################################################################
+@app.route("/wishlists", methods=["POST"])
+def create_wishlists():
+    """
+    Creates a Wishlist
+    This endpoint will create an Wishlist based the data in the body that is posted
+    """
+    app.logger.info("Request to create an Wishlist")
+    check_content_type("application/json")
+
+    # Create the wishlist
+    wishlist = Wishlist()
+    wishlist.deserialize(request.get_json())
+    wishlist.create()
+
+    # Create a message to return
+    message = wishlist.serialize()
+    location_url = "Unimplemented"
+
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
+    )
