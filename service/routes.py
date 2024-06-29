@@ -30,7 +30,7 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/", methods="GET")
+@app.route("/", methods=["GET"])
 def index():
     """ Root URL response """
     return (
