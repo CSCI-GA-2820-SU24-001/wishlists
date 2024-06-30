@@ -84,3 +84,42 @@ class TestWishlistItem(TestCase):
         self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
         self.assertEqual(new_wishlist_item.description, wishlist_item.description)
         self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
+
+
+
+
+    def test_get_wishlist_item(self):
+        """It should Get an existing Wishlist Item"""
+        # Create a Wishlist
+        wishlist = WishlistFactory()
+        wishlist.create()
+        wishlist_id = wishlist.id
+
+        # Add an item to the wishlist
+        item = WishlistItemFactory(wishlist_id=wishlist_id)
+        item.create()
+        item_id = item.id
+
+        # Get the item
+        resp = self.client.get(f"/wishlists/{wishlist_id}/items/{item_id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["wishlist_id"], wishlist_id)
+        self.assertEqual(data["product_id"], item.product_id)
+        self.assertEqual(data["description"], item.description)
+        self.assertAlmostEqual(data["price"], float(item.price))
+
+    def test_get_wishlist_item_not_found(self):
+        """It should not Get a Wishlist Item that does not exist"""
+        # Create a Wishlist
+        wishlist = WishlistFactory()
+        wishlist.create()
+        wishlist_id = wishlist.id
+
+        # Try to get a non-existent item
+        resp = self.client.get(f"/wishlists/{wishlist_id}/items/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
