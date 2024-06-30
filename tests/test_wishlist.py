@@ -76,3 +76,24 @@ class TestWishlist(TestCase):
         self.assertEqual(wishlist.items, [])
         self.assertEqual(wishlist.name, fake_wishlist.name)
         self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
+
+
+   def test_delete_a_wishlist(self):
+        """It should Delete a Wishlist"""
+        fake_wishlist = WishlistFactory()
+        wishlist = Wishlist(
+            name=fake_wishlist.name,
+            customer_id=fake_wishlist.customer_id,
+        )
+        wishlist.create()
+        self.assertEqual(len(Wishlist.all()), 1)
+        # delete the wishlist
+        wishlist.delete()
+        self.assertEqual(len(Wishlist.all()), 0)
+
+    def test_delete_wishlist_not_found(self):
+        """It should not delete a Wishlist that does not exist"""
+        wishlist = Wishlist()
+        self.assertIsNone(wishlist.id)
+        result = wishlist.delete()
+        self.assertIsNone(result)
