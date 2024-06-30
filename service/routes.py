@@ -186,6 +186,30 @@ def update_wishlist(wishlist_id):
 
 
 ######################################################################
+# DELETE A  WISHLIST
+######################################################################
+
+@app.route("/wishlists/<wishlist_id>", methods=["DELETE"])
+def delete_wishlist(wishlist_id):
+    """
+    Delete a Wishlist
+
+    This endpoint will delete a Wishlist based on the id specified in the path
+    """
+    app.logger.info("Request to delete wishlist with id: %s", wishlist_id)
+
+    # Retrieve the wishlist to delete and delete it if it exists
+    wishlist = Wishlist.find(wishlist_id)
+    if wishlist:
+        wishlist.delete()
+        return "", status.HTTP_204_NO_CONTENT
+    else:
+        return "", status.HTTP_404_NOT_FOUND
+
+
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def check_content_type(content_type):
