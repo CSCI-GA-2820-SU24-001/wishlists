@@ -19,9 +19,9 @@ class WishlistItem(db.Model, PersistentBase):
     ##################################################
     # Table Schema
     ##################################################
-    item_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     wishlist_id = db.Column(
-        db.String(36), db.ForeignKey("wishlist.wishlist_id", ondelete="CASCADE"), nullable=False
+        db.String(36), db.ForeignKey("wishlist.id", ondelete="CASCADE"), nullable=False
     )
     product_id = db.Column(db.String(36), nullable=False)
     description = db.Column(db.String(256))
@@ -38,7 +38,7 @@ class WishlistItem(db.Model, PersistentBase):
     def serialize(self) -> dict:
         """Converts a WishlistItem into a dictionary"""
         return {
-            "item_id": self.item_id,
+            "id": self.id,
             "wishlist_id": self.wishlist_id,
             "product_id": self.product_id,
             "description": self.description,

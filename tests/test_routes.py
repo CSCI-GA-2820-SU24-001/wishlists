@@ -1,6 +1,7 @@
 """
 WishlistModel API Service Test Suite
 """
+
 import os
 import logging
 from unittest import TestCase
@@ -15,12 +16,13 @@ DATABASE_URI = os.getenv(
 
 BASE_URL = "/wishlists"
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
 class WishlistService(TestCase):
-    """ REST API Server Tests """
+    """REST API Server Tests"""
 
     @classmethod
     def setUpClass(cls):
@@ -44,15 +46,15 @@ class WishlistService(TestCase):
         db.session.commit()
 
     def tearDown(self):
-        """ This runs after each test """
+        """This runs after each test"""
         db.session.remove()
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    #  WISHLIST TEST CASES HERE
     ######################################################################
 
     def test_index(self):
-        """ It should call the home page """
+        """It should call the home page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -72,7 +74,9 @@ class WishlistService(TestCase):
         new_wishlist = resp.get_json()
         self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
         self.assertEqual(
-            new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
+            new_wishlist["customer_id"],
+            wishlist.customer_id,
+            "customer id does not match",
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
@@ -87,7 +91,7 @@ class WishlistService(TestCase):
         # )
         # self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
-  def test_delete_wishlist(self):
+    def test_delete_wishlist(self):
         """It should delete a wishlist"""
         # create a wishlist to be deleted
         wishlist = WishlistFactory()
@@ -111,3 +115,48 @@ class WishlistService(TestCase):
         # try to delete a wishlist that doesn't exist
         resp = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def _create_wishlists(self, count):
+        """Factory method to create wishlists in bulk"""
+        wishlists = []
+        for _ in range(count):
+            wishlist = WishlistFactory()
+            resp = self.client.post(BASE_URL, json=wishlist.serialize())
+            self.assertEqual(
+                resp.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test Wishlist",
+            )
+            new_wishlist = resp.get_json()
+            wishlist.id = new_wishlist["id"]
+            wishlists.append(wishlist)
+        return wishlists
+
+    def test_get_wishlist_list(self):
+        """It should Get a list of Wishlists"""
+        self._create_wishlists(5)
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_update_wishlist(self):
+        """It should Update an existing Wishlist"""
+        # create a Wishlist to update
+        test_wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the wishlist
+        new_wishlist = resp.get_json()
+        new_wishlist["name"] = "Updated Wishlist Name"
+        new_wishlist_id = new_wishlist["id"]
+        resp = self.client.put(f"{BASE_URL}/{new_wishlist_id}", json=new_wishlist)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_wishlist = resp.get_json()
+        self.assertEqual(updated_wishlist["name"], "Updated Wishlist Name")
+
+
+    ######################################################################
+    #  WISHLIST ITEMS TEST CASES HERE
+    ######################################################################

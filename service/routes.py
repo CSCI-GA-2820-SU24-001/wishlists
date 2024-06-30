@@ -32,7 +32,7 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 @app.route("/", methods=["GET"])
 def index():
-    """ Root URL response """
+    """Root URL response"""
     return (
         {
             "service name": "Wishlists Service",
@@ -41,56 +41,56 @@ def index():
                 {
                     "method": "GET",
                     "url": "/wishlists",
-                    "description": "List all wishlists"
+                    "description": "List all wishlists",
                 },
                 {
                     "method": "POST",
                     "url": "/wishlists",
-                    "description": "Create a wishlist"
+                    "description": "Create a wishlist",
                 },
                 {
                     "method": "GET",
                     "url": "/wishlists/{id}",
-                    "description": "Read a wishlist"
+                    "description": "Read a wishlist",
                 },
                 {
                     "method": "PUT",
                     "url": "/wishlists/{id}",
-                    "description": "Update a wishlist"
+                    "description": "Update a wishlist",
                 },
                 {
                     "method": "DELETE",
                     "url": "/wishlists/{id}",
-                    "description": "Delete a wishlist"
+                    "description": "Delete a wishlist",
                 },
                 {
                     "method": "GET",
                     "url": "/wishlists/{id}/items",
-                    "description": "List all items in a wishlist"
+                    "description": "List all items in a wishlist",
                 },
                 {
                     "method": "POST",
                     "url": "/wishlists/{id}/items",
-                    "description": "Create an item in a wishlist"
+                    "description": "Create an item in a wishlist",
                 },
                 {
                     "method": "GET",
                     "url": "/wishlists/{id}/items/{id}",
-                    "description": "Read an item in a wishlist"
+                    "description": "Read an item in a wishlist",
                 },
                 {
                     "method": "PUT",
                     "url": "/wishlists/{id}/items/{id}",
-                    "description": "Update an item in a wishlist"
+                    "description": "Update an item in a wishlist",
                 },
                 {
                     "method": "DELETE",
                     "url": "/wishlists/{id}/items/{id}",
-                    "description": "Delete an item in a wishlist"
-                }
-            ]
+                    "description": "Delete an item in a wishlist",
+                },
+            ],
         },
-        status.HTTP_200_OK
+        status.HTTP_200_OK,
     )
 
 
@@ -123,6 +123,48 @@ def create_wishlists():
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
+######################################################################
+# LIST ALL ACCOUNTS
+######################################################################
+@app.route("/wishlists", methods=["GET"])
+def list_wishlists():
+    """Returns all of the Wishlists"""
+    app.logger.info("Request for Wishlist list")
+    wishlists = Wishlist.all()
+
+    # Return as an array of dictionaries
+    results = [wishlist.serialize() for wishlist in wishlists]
+
+    return jsonify(results), status.HTTP_200_OK
+
+######################################################################
+# UPDATE AN EXISTING WISHLIST
+#######################################################################
+@app.route("/wishlists/<string:wishlist_id>", methods=["PUT"])
+def update_wishlist(wishlist_id):
+    """
+    Update a Wishlist
+
+    This endpoint will update a Wishlist based on the body that is posted
+    """
+    app.logger.info("Request to update wishlist with id: %s", wishlist_id)
+    check_content_type("application/json")
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found."
+        )
+
+    # Update from the json in the body of the request
+    wishlist.deserialize(request.get_json())
+    wishlist.wishlist_id = wishlist_id
+    wishlist.update()
+
+    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+
+
 
 ######################################################################
 # DELETE A  WISHLIST
@@ -149,6 +191,7 @@ def delete_wishlist(wishlist_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
 
 def check_content_type(content_type):
     """Checks that the media type is correct"""
