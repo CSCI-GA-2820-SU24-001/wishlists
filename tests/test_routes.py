@@ -111,6 +111,31 @@ class WishlistService(TestCase):
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
     
+    def test_delete_wishlist(self):
+        """It should delete a wishlist"""
+        # create a wishlist to be deleted
+        wishlist = WishlistFactory()
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_wishlist = resp.get_json()
+        wishlist_id = new_wishlist["id"]
+
+        # delete the wishlist
+        resp = self.client.delete(f"{BASE_URL}/{wishlist_id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # check that the wishlist is deleted
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_wishlist_not_found(self):
+        """It should not delete a wishlist that does not exist"""
+        # try to delete a wishlist that doesn't exist
+        resp = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_get_wishlist_list(self):
         """It should Get a list of Wishlists"""
         self._create_wishlists(5)

@@ -24,7 +24,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
 from service.models import Wishlist, WishlistItem, DataValidationError, db
-from .factories import WishlistFactory,WishlistItemFactory
+from .factories import WishlistFactory, WishlistItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
@@ -67,7 +67,6 @@ class TestWishlist(TestCase):
     def test_create_a_wishlist(self):
         """It should Create an Wishlist and assert that it exists"""
         fake_wishlist = WishlistFactory()
-        # pylint: disable=unexpected-keyword-arg
         wishlist = Wishlist(
             name=fake_wishlist.name,
             customer_id=fake_wishlist.customer_id,
@@ -109,6 +108,26 @@ class TestWishlist(TestCase):
         self.assertEqual(wishlist.items, [])
         self.assertEqual(wishlist.name, fake_wishlist.name)
         self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
+
+    def test_delete_a_wishlist(self):
+        """It should Delete a Wishlist"""
+        fake_wishlist = WishlistFactory()
+        wishlist = Wishlist(
+            name=fake_wishlist.name,
+            customer_id=fake_wishlist.customer_id,
+        )
+        wishlist.create()
+        self.assertEqual(len(Wishlist.all()), 1)
+        # delete the wishlist
+        wishlist.delete()
+        self.assertEqual(len(Wishlist.all()), 0)
+
+    def test_delete_wishlist_not_found(self):
+        """It should not delete a Wishlist that does not exist"""
+        wishlist = WishlistFactory()
+        wishlist.id = "non-existent-id"  # Set an ID that does not exist in the database
+        self.assertRaises(DataValidationError, wishlist.delete)
+
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
