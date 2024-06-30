@@ -189,7 +189,7 @@ def update_wishlist(wishlist_id):
 # DELETE A  WISHLIST
 ######################################################################
 
-@app.route("/wishlists/<int:wishlist_id>", methods=["DELETE"])
+@app.route("/wishlists/<wishlist_id>", methods=["DELETE"])
 def delete_wishlist(wishlist_id):
     """
     Delete a Wishlist
@@ -202,8 +202,10 @@ def delete_wishlist(wishlist_id):
     wishlist = Wishlist.find(wishlist_id)
     if wishlist:
         wishlist.delete()
+        return "", status.HTTP_204_NO_CONTENT
+    else:
+        return "", status.HTTP_404_NOT_FOUND
 
-    return "", status.HTTP_204_NO_CONTENT
 
 
 
