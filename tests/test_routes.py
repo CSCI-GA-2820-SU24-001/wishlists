@@ -80,16 +80,15 @@ class WishlistService(TestCase):
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
-        # TODO: Uncomment this code when get_wishlists is implemented
-        # # Check that the location header was correct by getting it
-        # resp = self.client.get(location, content_type="application/json")
-        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # new_wishlist = resp.get_json()
-        # self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
-        # self.assertEqual(
-        #     new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
-        # )
-        # self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_wishlist = resp.get_json()
+        self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
+        self.assertEqual(
+            new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
+        )
+        self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
     def _create_wishlists(self, count):
         """Factory method to create wishlists in bulk"""

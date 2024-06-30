@@ -118,7 +118,7 @@ def create_wishlists():
 
     # Create a message to return
     message = wishlist.serialize()
-    location_url = "Unimplemented"
+    location_url = url_for("read_wishlists", wishlist_id=wishlist.id, _external=True)
 
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
@@ -127,7 +127,7 @@ def create_wishlists():
 # READ A WISHLIST
 ######################################################################
 @app.route("/wishlists/<string:wishlist_id>", methods=["GET"])
-def read_wishlist(wishlist_id):
+def read_wishlists(wishlist_id):
     """Read a Wishlist"""
     app.logger.info("Request to read a wishlist with id: %s", wishlist_id)
     
