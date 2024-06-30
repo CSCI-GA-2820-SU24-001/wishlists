@@ -28,6 +28,11 @@ from service.common import status  # HTTP Status Codes
 
 
 ######################################################################
+#  R E S T   A P I   E N D P O I N T S
+######################################################################
+
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/", methods=["GET"])
@@ -95,17 +100,12 @@ def index():
 
 
 ######################################################################
-#  R E S T   A P I   E N D P O I N T S
-######################################################################
-
-
-######################################################################
-# CREATE A NEW WISHLIST
+# CREATE A WISHLIST
 ######################################################################
 @app.route("/wishlists", methods=["POST"])
 def create_wishlists():
     """
-    Creates a Wishlist
+    Create a Wishlist
     This endpoint will create an Wishlist based the data in the body that is posted
     """
     app.logger.info("Request to create an Wishlist")
@@ -118,17 +118,36 @@ def create_wishlists():
 
     # Create a message to return
     message = wishlist.serialize()
-    location_url = "Unimplemented"
+    location_url = url_for("read_wishlists", wishlist_id=wishlist.id, _external=True)
 
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
-# LIST ALL ACCOUNTS
+# READ A WISHLIST
+######################################################################
+@app.route("/wishlists/<string:wishlist_id>", methods=["GET"])
+def read_wishlists(wishlist_id):
+    """Read a Wishlist"""
+    app.logger.info("Request to read a wishlist with id: %s", wishlist_id)
+    
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found."
+        )
+    result = wishlist.serialize()
+
+    return jsonify(result), status.HTTP_200_OK
+
+
+######################################################################
+# LIST ALL WISHLISTS
 ######################################################################
 @app.route("/wishlists", methods=["GET"])
 def list_wishlists():
-    """Returns all of the Wishlists"""
+    """Return all of the Wishlists"""
     app.logger.info("Request for Wishlist list")
     wishlists = Wishlist.all()
 
@@ -136,6 +155,7 @@ def list_wishlists():
     results = [wishlist.serialize() for wishlist in wishlists]
 
     return jsonify(results), status.HTTP_200_OK
+
 
 ######################################################################
 # UPDATE AN EXISTING WISHLIST
@@ -165,7 +185,6 @@ def update_wishlist(wishlist_id):
     return jsonify(wishlist.serialize()), status.HTTP_200_OK
 
 
-
 ######################################################################
 # DELETE A  WISHLIST
 ######################################################################
@@ -191,8 +210,6 @@ def delete_wishlist(wishlist_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
-
 def check_content_type(content_type):
     """Checks that the media type is correct"""
     if "Content-Type" not in request.headers:
