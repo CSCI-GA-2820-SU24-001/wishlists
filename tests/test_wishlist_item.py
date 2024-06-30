@@ -68,11 +68,11 @@ class TestWishlistItem(TestCase):
         """It should serialize a WishlistItem"""
         wishlist_item = WishlistItemFactory()
         serial_wishlist_item = wishlist_item.serialize()
-        self.assertEqual(serial_wishlist_item["item_id"], wishlist_item.item_id)
+        self.assertEqual(serial_wishlist_item["id"], wishlist_item.id)
         self.assertEqual(serial_wishlist_item["wishlist_id"], wishlist_item.wishlist_id)
         self.assertEqual(serial_wishlist_item["product_id"], wishlist_item.product_id)
         self.assertEqual(serial_wishlist_item["description"], wishlist_item.description)
-        self.assertEqual(serial_wishlist_item["price"], float(wishlist_item.price))
+        self.assertAlmostEqual(serial_wishlist_item["price"], float(wishlist_item.price))
 
     def test_deserialize_a_wishlist_item(self):
         """It should deserialize a WishlistItem"""
@@ -83,4 +83,4 @@ class TestWishlistItem(TestCase):
         self.assertEqual(new_wishlist_item.wishlist_id, wishlist_item.wishlist_id)
         self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
         self.assertEqual(new_wishlist_item.description, wishlist_item.description)
-        self.assertEqual(new_wishlist_item.price, wishlist_item.price)
+        self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))

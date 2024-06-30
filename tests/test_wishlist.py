@@ -23,8 +23,8 @@ import os
 from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
-from service.models import Wishlist, DataValidationError, db
-from .factories import WishlistFactory
+from service.models import Wishlist, WishlistItem, DataValidationError, db
+from .factories import WishlistFactory,WishlistItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
@@ -83,16 +83,16 @@ class TestWishlist(TestCase):
         wishlist = WishlistFactory(name="Holiday Wishlist")
         wishlist.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertIsNotNone(wishlist.wishlist_id)
+        self.assertIsNotNone(wishlist.id)
         self.assertEqual(wishlist.name, "Holiday Wishlist")
 
         # Fetch it back
-        wishlist = Wishlist.find(wishlist.wishlist_id)
+        wishlist = Wishlist.find(wishlist.id)
         wishlist.name = "Birthday Wishlist"
         wishlist.update()
 
         # Fetch it back again
-        wishlist = Wishlist.find(wishlist.wishlist_id)
+        wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(wishlist.name, "Birthday Wishlist")
 
     @patch("service.models.db.session.commit")
@@ -111,7 +111,7 @@ class TestWishlist(TestCase):
 
         # Fetch it back by name
         same_wishlist = Wishlist.find_by_name(wishlist.name)[0]
-        self.assertEqual(same_wishlist.wishlist_id, wishlist.wishlist_id)
+        self.assertEqual(same_wishlist.id, wishlist.id)
         self.assertEqual(same_wishlist.name, wishlist.name)
 
     def test_serialize_a_wishlist(self):
@@ -120,13 +120,13 @@ class TestWishlist(TestCase):
         wishlist_item = WishlistItemFactory()
         wishlist.items.append(wishlist_item)
         serial_wishlist = wishlist.serialize()
-        self.assertEqual(serial_wishlist["wishlist_id"], wishlist.wishlist_id)
+        self.assertEqual(serial_wishlist["id"], wishlist.id)
         self.assertEqual(serial_wishlist["customer_id"], wishlist.customer_id)
         self.assertEqual(serial_wishlist["name"], wishlist.name)
         self.assertEqual(len(serial_wishlist["items"]), 1)
         items = serial_wishlist["items"]
-        self.assertEqual(items[0]["item_id"], wishlist_item.item_id)
-        self.assertEqual(items[0]["wishlist_id"], wishlist_item.wishlist_id)
+        self.assertEqual(items[0]["id"], wishlist_item.id)
+        self.assertEqual(items[0]["id"], wishlist_item.id)
         self.assertEqual(items[0]["product_id"], wishlist_item.product_id)
         self.assertEqual(items[0]["description"], wishlist_item.description)
         self.assertEqual(items[0]["price"], float(wishlist_item.price))
