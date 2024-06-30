@@ -8,7 +8,7 @@ from unittest import TestCase
 from wsgi import app
 from service.common import status
 from service.models import db, Wishlist
-from .factories import WishlistFactory
+from .factories import WishlistFactory, WishlistItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -50,6 +50,27 @@ class WishlistService(TestCase):
         db.session.remove()
 
     ######################################################################
+    #  HELPER FUNCTIONS HERE
+    ######################################################################
+
+    def _create_wishlists(self, count):
+        """Factory method to create wishlists in bulk"""
+        wishlists = []
+        for _ in range(count):
+            wishlist = WishlistFactory()
+            resp = self.client.post(BASE_URL, json=wishlist.serialize())
+            self.assertEqual(
+                resp.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test Wishlist",
+            )
+            new_wishlist = resp.get_json()
+            wishlist.id = new_wishlist["id"]
+            wishlists.append(wishlist)
+        return wishlists
+
+
+    ######################################################################
     #  WISHLIST TEST CASES HERE
     ######################################################################
 
@@ -89,24 +110,7 @@ class WishlistService(TestCase):
             new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
-
-    def _create_wishlists(self, count):
-        """Factory method to create wishlists in bulk"""
-        wishlists = []
-        for _ in range(count):
-            wishlist = WishlistFactory()
-            resp = self.client.post(BASE_URL, json=wishlist.serialize())
-            self.assertEqual(
-                resp.status_code,
-                status.HTTP_201_CREATED,
-                "Could not create test Wishlist",
-            )
-            new_wishlist = resp.get_json()
-            wishlist.id = new_wishlist["id"]
-            wishlists.append(wishlist)
-        return wishlists
     
-
     def test_get_wishlist_list(self):
         """It should Get a list of Wishlists"""
         self._create_wishlists(5)
@@ -159,3 +163,42 @@ class WishlistService(TestCase):
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
+
+    def test_add_item(self):
+        """It should Add an item to an wishlist"""
+        wishlist = self._create_wishlists(1)[0]
+        item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["wishlist_id"], wishlist.id)
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(data["product_id"], item.product_id)
+
+        # TODO: uncomment after get_item_from_wishlist is implemented
+        # # Check that the location header was correct by getting it
+        # resp = self.client.get(location, content_type="application/json")
+        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # new_item = resp.get_json()
+        # self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")    
+
+    def test_add_item_bad_path(self):
+        """It cannot find the wishlist that does not exist, and return 404 """
+        wishlist_id = "wishlist_not_exist"
+        item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist_id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

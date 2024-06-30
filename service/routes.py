@@ -184,6 +184,50 @@ def update_wishlist(wishlist_id):
 
     return jsonify(wishlist.serialize()), status.HTTP_200_OK
 
+######################################################################
+# ADD AN ITEM TO A WISHLIST
+######################################################################
+@app.route("/wishlists/<wishlist_id>/items", methods=["POST"])
+def create_items(wishlist_id):
+    """
+    Create an Item on a Wishlist
+
+    This endpoint will add an item to a wishlist
+    """
+    app.logger.info("Request to create an Item for Wishlist with id: %s", wishlist_id)
+    check_content_type("application/json")
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+
+    # Create an item from the json data
+    item = WishlistItem()
+    item.deserialize(request.get_json())
+
+    # Append the item to the wishlist
+    wishlist.items.append(item)
+    wishlist.update()
+
+    # Prepare a message to return
+    message = item.serialize()
+
+    # TODO uncomment or modify this after implemented get_item feature
+    # # Send the location to GET the new item
+    # location_url = url_for(
+    #     "get_addresses",
+    #     wishlist_id=wishlist.id,
+    #     address_id=item.id,
+    #     _external=True
+    # )
+    location_url = "Unknown"
+
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
