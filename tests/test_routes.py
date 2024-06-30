@@ -50,7 +50,7 @@ class WishlistService(TestCase):
         db.session.remove()
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    #  WISHLIST TEST CASES HERE
     ######################################################################
 
     def test_index(self):
@@ -114,3 +114,24 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_update_wishlist(self):
+        """It should Update an existing Wishlist"""
+        # create a Wishlist to update
+        test_wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the wishlist
+        new_wishlist = resp.get_json()
+        new_wishlist["name"] = "Updated Wishlist Name"
+        new_wishlist_id = new_wishlist["wishlist_id"]
+        resp = self.client.put(f"{BASE_URL}/{new_wishlist_id}", json=new_wishlist)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_wishlist = resp.get_json()
+        self.assertEqual(updated_wishlist["name"], "Updated Wishlist Name")
+
+
+    ######################################################################
+    #  WISHLIST ITEMS TEST CASES HERE
+    ######################################################################
