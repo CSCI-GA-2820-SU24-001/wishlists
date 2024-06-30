@@ -64,7 +64,7 @@ class TestWishlist(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_create_an_wishlist(self):
+    def test_create_a_wishlist(self):
         """It should Create an Wishlist and assert that it exists"""
         fake_wishlist = WishlistFactory()
         # pylint: disable=unexpected-keyword-arg
@@ -77,6 +77,19 @@ class TestWishlist(TestCase):
         self.assertEqual(wishlist.name, fake_wishlist.name)
         self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
 
+    def test_read_a_wishlist(self):
+        """It should Read a Wishlist"""
+        fake_wishlist = WishlistFactory()
+        # pylint: disable=unexpected-keyword-arg
+        wishlist = Wishlist(
+            name=fake_wishlist.name,
+            customer_id=fake_wishlist.customer_id,
+            items=[]
+        )
+        self.assertIsNotNone(wishlist)
+        self.assertEqual(wishlist.items, [])
+        self.assertEqual(wishlist.name, fake_wishlist.name)
+        self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
@@ -102,8 +115,6 @@ class TestWishlist(TestCase):
         wishlist = WishlistFactory()
         self.assertRaises(DataValidationError, wishlist.update)
 
-    
-
     def test_find_by_name(self):
         """It should Find a Wishlist by name"""
         wishlist = WishlistFactory(name="Holiday Wishlist")
@@ -125,7 +136,6 @@ class TestWishlist(TestCase):
         self.assertEqual(serial_wishlist["name"], wishlist.name)
         self.assertEqual(len(serial_wishlist["items"]), 1)
         items = serial_wishlist["items"]
-        self.assertEqual(items[0]["id"], wishlist_item.id)
         self.assertEqual(items[0]["id"], wishlist_item.id)
         self.assertEqual(items[0]["product_id"], wishlist_item.product_id)
         self.assertEqual(items[0]["description"], wishlist_item.description)
