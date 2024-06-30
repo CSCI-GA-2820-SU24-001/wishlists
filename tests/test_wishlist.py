@@ -91,9 +91,9 @@ class TestWishlist(TestCase):
         wishlist.delete()
         self.assertEqual(len(Wishlist.all()), 0)
 
-    def test_delete_wishlist_not_found(self):
+def test_delete_wishlist_not_found(self):
         """It should not delete a Wishlist that does not exist"""
-        wishlist = Wishlist()
-        self.assertIsNone(wishlist.id)
+        wishlist = WishlistFactory()
+        wishlist.id = 0  # Set an ID that does not exist in the database
         result = wishlist.delete()
         self.assertIsNone(result)
