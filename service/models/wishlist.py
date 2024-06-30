@@ -21,18 +21,17 @@ class Wishlist(db.Model, PersistentBase):
     ##################################################
     # Table Schema
     ##################################################
-    wishlist_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))  # pylint: disable=invalid-name
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     items = db.relationship("WishlistItem", backref="wishlist", passive_deletes=True)
-
     def __repr__(self):
-        return f"<Wishlist id=[{self.wishlist_id}]>"
+        return f"<Wishlist id=[{self.id}]>"
 
     def serialize(self) -> dict:
         """Converts a Wishlist into a dictionary"""
         wishlist = {
-            "wishlist_id": self.wishlist_id,
+            "id": self.id,
             "customer_id": self.customer_id,
             "name": self.name,
             "items": [item.serialize() for item in self.items],

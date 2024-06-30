@@ -103,7 +103,7 @@ class WishlistService(TestCase):
                 "Could not create test Wishlist",
             )
             new_wishlist = resp.get_json()
-            wishlist.wishlist_id = new_wishlist["wishlist_id"]
+            wishlist.id = new_wishlist["id"]
             wishlists.append(wishlist)
         return wishlists
 
@@ -125,7 +125,7 @@ class WishlistService(TestCase):
         # update the wishlist
         new_wishlist = resp.get_json()
         new_wishlist["name"] = "Updated Wishlist Name"
-        new_wishlist_id = new_wishlist["wishlist_id"]
+        new_wishlist_id = new_wishlist["id"]
         resp = self.client.put(f"{BASE_URL}/{new_wishlist_id}", json=new_wishlist)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_wishlist = resp.get_json()
