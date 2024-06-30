@@ -192,7 +192,7 @@ class WishlistService(TestCase):
         # new_item = resp.get_json()
         # self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")    
 
-    def test_add_item_bad_path(self):
+    def test_add_item_wishlist_not_exist(self):
         """It cannot find the wishlist that does not exist, and return 404 """
         wishlist_id = "wishlist_not_exist"
         item = WishlistItemFactory()
