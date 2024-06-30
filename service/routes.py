@@ -206,6 +206,36 @@ def delete_wishlist(wishlist_id):
     else:
         return "", status.HTTP_404_NOT_FOUND
 
+######################################################################
+# UPDATE A WISHLIST ITEM
+######################################################################
+@app.route("/wishlists/<string:wishlist_id>/items/<string:item_id>", methods=["PUT"])
+def update_wishlist_item(wishlist_id, item_id):
+    """
+    Update a WishlistItem
+
+    This endpoint will update a WishlistItem based on the body that is posted
+    """
+    app.logger.info(
+        "Request to update WishlistItem %s for Wishlist id: %s", item_id, wishlist_id
+    )
+    check_content_type("application/json")
+
+    # See if the wishlist item exists and abort if it doesn't
+    wishlist_item = WishlistItem.find(item_id)
+    if not wishlist_item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"WishlistItem with id '{item_id}' could not be found.",
+        )
+
+    # Update from the json in the body of the request
+    wishlist_item.deserialize(request.get_json())
+    wishlist_item.id = item_id
+    wishlist_item.update()
+
+    return jsonify(wishlist_item.serialize()), status.HTTP_200_OK
+
 
 
 

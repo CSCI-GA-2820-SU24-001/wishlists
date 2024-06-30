@@ -184,3 +184,41 @@ class WishlistService(TestCase):
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
+
+    def test_update_wishlist_item(self):
+        """It should Update a wishlist item in a wishlist"""
+        # create a known wishlist and wishlist item
+        wishlist = self._create_wishlists(1)[0]
+        wishlist_item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=wishlist_item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+        data["description"] = "Updated description"
+
+        # send the update back
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            json=data,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["wishlist_id"], wishlist.id)
+        self.assertEqual(data["description"], "Updated description")
