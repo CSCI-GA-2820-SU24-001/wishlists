@@ -69,7 +69,6 @@ class WishlistService(TestCase):
             wishlists.append(wishlist)
         return wishlists
 
-
     ######################################################################
     #  WISHLIST TEST CASES HERE
     ######################################################################
@@ -184,11 +183,9 @@ class WishlistService(TestCase):
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
 
-
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
-
     def test_add_item(self):
         """It should Add an item to an wishlist"""
         wishlist = self._create_wishlists(1)[0]
@@ -224,6 +221,34 @@ class WishlistService(TestCase):
         resp = self.client.post(
             f"{BASE_URL}/{wishlist_id}/items",
             json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_item(self):
+        """It should Delete an Item"""
+        wishlist = self._create_wishlists(1)[0]
+        item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # send delete request
+        resp = self.client.delete(
+            f"{BASE_URL}/{wishlist.id}/addresses/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # retrieve it back and make sure address is not there
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/addresses/{item_id}",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

@@ -130,7 +130,6 @@ def create_wishlists():
 def read_wishlists(wishlist_id):
     """Read a Wishlist"""
     app.logger.info("Request to read a wishlist with id: %s", wishlist_id)
-    
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
@@ -187,6 +186,8 @@ def update_wishlist(wishlist_id):
 ######################################################################
 # ADD AN ITEM TO A WISHLIST
 ######################################################################
+
+
 @app.route("/wishlists/<wishlist_id>/items", methods=["POST"])
 def create_items(wishlist_id):
     """
@@ -230,8 +231,30 @@ def create_items(wishlist_id):
 
 
 ######################################################################
-# DELETE A  WISHLIST
+# DELETE AN ITEM
 ######################################################################
+@app.route("/wishlists/<wishlist_id>/addresses/<item_id>", methods=["DELETE"])
+def delete_items(wishlist_id, item_id):
+    """
+    Delete an Item
+
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info(
+        "Request to delete Item %s for Wishlist id: %s", (wishlist_id, item_id)
+    )
+
+    # See if the address exists and delete it if it does
+    item = WishlistItem.find(item_id)
+    if item:
+        item.delete()
+
+    return "", status.HTTP_204_NO_CONTENT
+
+######################################################################
+# DELETE A WISHLIST
+######################################################################
+
 
 @app.route("/wishlists/<wishlist_id>", methods=["DELETE"])
 def delete_wishlist(wishlist_id):

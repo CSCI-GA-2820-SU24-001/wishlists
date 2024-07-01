@@ -106,6 +106,29 @@ class TestWishlistItem(TestCase):
         item = WishlistItemFactory()
         self.assertRaises(DataValidationError, item.create)
 
+    def test_delete_wishlist_item(self):
+        """It should Delete an wishlist item"""
+        wishlists = Wishlist.all()
+        self.assertEqual(wishlists, [])
+
+        wishlist = WishlistFactory()
+        item = WishlistItemFactory(wishlist=wishlist)
+        wishlist.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(wishlist.id)
+        wishlists = Wishlist.all()
+        self.assertEqual(len(wishlists), 1)
+
+        # Fetch it back
+        wishlist = Wishlist.find(wishlist.id)
+        item = wishlist.items[0]
+        item.delete()
+        wishlist.update()
+
+        # Fetch it back again
+        wishlist = Wishlist.find(wishlist.id)
+        self.assertEqual(len(wishlist.items), 0)
+
     def test_serialize_a_wishlist_item(self):
         """It should serialize a WishlistItem"""
         wishlist_item = WishlistItemFactory()
