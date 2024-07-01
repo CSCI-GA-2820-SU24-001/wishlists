@@ -21,8 +21,9 @@ Test cases for WishlistItem Model
 import logging
 import os
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
-from service.models import Wishlist, WishlistItem, db
+from service.models import Wishlist, WishlistItem, db, DataValidationError
 from tests.factories import WishlistFactory, WishlistItemFactory
 
 DATABASE_URI = os.getenv(
@@ -63,6 +64,47 @@ class TestWishlistItem(TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
+
+    def test_add_wishlist_item(self):
+        """It should Create an wishlist with an item and add it to the database"""
+        wishlists = Wishlist.all()
+        self.assertEqual(wishlists, [])
+        wishlist = WishlistFactory()
+        item = WishlistItemFactory(wishlist=wishlist)
+        wishlist.items.append(item)
+        wishlist.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(wishlist.id)
+        wishlists = Wishlist.all()
+        self.assertEqual(len(wishlists), 1)
+
+        new_wishlist = Wishlist.find(wishlist.id)
+        self.assertEqual(new_wishlist.items[0].id, item.id)
+        self.assertEqual(new_wishlist.items[0].wishlist_id, item.wishlist_id)
+        self.assertEqual(new_wishlist.items[0].product_id, item.product_id)
+        self.assertEqual(new_wishlist.items[0].description, item.description)
+        self.assertEqual(new_wishlist.items[0].product_id, item.product_id)
+        self.assertAlmostEqual(float(new_wishlist.items[0].price), float(item.price))
+
+        item2 = WishlistItemFactory(wishlist=wishlist)
+        wishlist.items.append(item2)
+        wishlist.update()
+
+        new_wishlist = Wishlist.find(wishlist.id)
+        self.assertEqual(len(new_wishlist.items), 2)
+        self.assertEqual(new_wishlist.items[1].id, item2.id)
+        self.assertEqual(new_wishlist.items[1].wishlist_id, item2.wishlist_id)
+        self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
+        self.assertEqual(new_wishlist.items[1].description, item2.description)
+        self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
+        self.assertAlmostEqual(float(new_wishlist.items[1].price), float(item2.price))
+
+    @patch("service.models.db.session.commit")
+    def test_add_wishlist_item_failed(self, exception_mock):
+        """It should not add an item to wishlist on database error"""
+        exception_mock.side_effect = Exception()
+        item = WishlistItemFactory()
+        self.assertRaises(DataValidationError, item.create)
 
     def test_serialize_a_wishlist_item(self):
         """It should serialize a WishlistItem"""
