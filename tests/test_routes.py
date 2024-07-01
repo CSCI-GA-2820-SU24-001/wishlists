@@ -234,6 +234,13 @@ class WishlistService(TestCase):
         wishlist = self._create_wishlists(1)[0]
         item_list = WishlistItemFactory.create_batch(2)
 
+        # get the list back and make sure it is empty, since we haven't add item into wishlist yet
+        resp = self.client.get(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
+        
         # Create item 1
         resp = self.client.post(
             f"{BASE_URL}/{wishlist.id}/items", json=item_list[0].serialize()
@@ -252,3 +259,9 @@ class WishlistService(TestCase):
 
         data = resp.get_json()
         self.assertEqual(len(data), 2)
+
+    def test_get_item_list_not_exist(self):
+        """It cannot find the wishlist that does not exist, and return 404"""
+        wishlist_id = "wishlist_not_exist"
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
