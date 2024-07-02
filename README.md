@@ -21,8 +21,12 @@ pyproject.toml      - Poetry list of Python libraries required by your code
 service/                   - service python package
 ├── __init__.py            - package initializer
 ├── config.py              - configuration parameters
-├── models.py              - module with business models
 ├── routes.py              - module with service routes
+├── models                 - module with business models
+    |── __init__.py        - package initializer
+    |── persistent_base.py - Base class
+    |── wishlist_item.py   - Item class
+    |── wishlist.py        - Wishlist class
 └── common                 - common code package
     ├── cli_commands.py    - Flask command to recreate all tables
     ├── error_handlers.py  - HTTP error handling code
