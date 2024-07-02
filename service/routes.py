@@ -136,6 +136,7 @@ def read_wishlists(wishlist_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
+           
             f"Wishlist with id '{wishlist_id}' was not found.",
         )
     result = wishlist.serialize()
@@ -176,6 +177,7 @@ def update_wishlist(wishlist_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
+           
             f"Wishlist with id '{wishlist_id}' was not found.",
         )
 
@@ -190,6 +192,8 @@ def update_wishlist(wishlist_id):
 ######################################################################
 # ADD AN ITEM TO A WISHLIST
 ######################################################################
+
+
 @app.route("/wishlists/<wishlist_id>/items", methods=["POST"])
 def create_items(wishlist_id):
     """
@@ -233,7 +237,28 @@ def create_items(wishlist_id):
 
 
 ######################################################################
-# DELETE A  WISHLIST
+# DELETE AN ITEM
+######################################################################
+@app.route("/wishlists/<wishlist_id>/addresses/<item_id>", methods=["DELETE"])
+def delete_items(wishlist_id, item_id):
+    """
+    Delete an Item
+
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info(
+        "Request to delete Item %s for Wishlist id: %s", (wishlist_id, item_id)
+    )
+
+    # See if the address exists and delete it if it does
+    item = WishlistItem.find(item_id)
+    if item:
+        item.delete()
+
+    return "", status.HTTP_204_NO_CONTENT
+
+######################################################################
+# DELETE A WISHLIST
 ######################################################################
 
 
@@ -257,6 +282,8 @@ def delete_wishlist(wishlist_id):
 ######################################################################
 # UPDATE A WISHLIST ITEM
 ######################################################################
+
+
 @app.route("/wishlists/<string:wishlist_id>/items/<string:item_id>", methods=["PUT"])
 def update_wishlist_item(wishlist_id, item_id):
     """
