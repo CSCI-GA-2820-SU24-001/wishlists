@@ -190,6 +190,46 @@ class WishlistService(TestCase):
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
 
+
+    def test_update_wishlist_item(self):
+        """It should Update a wishlist item in a wishlist"""
+        # create a known wishlist and wishlist item
+        wishlist = self._create_wishlists(1)[0]
+        wishlist_item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=wishlist_item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+        data["description"] = "Updated description"
+
+        # send the update back
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            json=data,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["wishlist_id"], wishlist.id)
+        self.assertEqual(data["description"], "Updated description") 
+          
+
     def test_get_wishlist_item(self):
         """It should Get an existing Wishlist Item"""
         # Create a Wishlist
@@ -232,6 +272,7 @@ class WishlistService(TestCase):
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
 
+
     def test_add_item(self):
         """It should Add an item to an wishlist"""
         wishlist = self._create_wishlists(1)[0]
@@ -271,6 +312,7 @@ class WishlistService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_get_item_list(self):
         """It should Get a list of wishlist items"""
         # add two items to wishlist
@@ -308,3 +350,4 @@ class WishlistService(TestCase):
         wishlist_id = "wishlist_not_exist"
         resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
