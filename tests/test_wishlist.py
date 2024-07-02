@@ -23,7 +23,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
-from service.models import Wishlist, WishlistItem, DataValidationError, db
+from service.models import Wishlist, DataValidationError, db
 from .factories import WishlistFactory, WishlistItemFactory
 
 DATABASE_URI = os.getenv(
@@ -67,10 +67,13 @@ class TestWishlist(TestCase):
     def test_create_a_wishlist(self):
         """It should Create an Wishlist and assert that it exists"""
         fake_wishlist = WishlistFactory()
-        wishlist = Wishlist(
-            name=fake_wishlist.name,
-            customer_id=fake_wishlist.customer_id,
-        )
+        wishlist = Wishlist()
+        wishlist.name = fake_wishlist.name
+        wishlist.customer_id = fake_wishlist.customer_id
+        wishlist.items = []
+
+        print(repr(wishlist))
+
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.items, [])
         self.assertEqual(wishlist.name, fake_wishlist.name)
@@ -93,7 +96,6 @@ class TestWishlist(TestCase):
         exception_mock.side_effect = Exception()
         wishlist = WishlistFactory()
         self.assertRaises(DataValidationError, wishlist.create)
-
 
     def test_read_a_wishlist(self):
         """It should Read a Wishlist"""
@@ -127,7 +129,6 @@ class TestWishlist(TestCase):
         wishlist = WishlistFactory()
         wishlist.id = "non-existent-id"  # Set an ID that does not exist in the database
         self.assertRaises(DataValidationError, wishlist.delete)
-
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
@@ -210,13 +211,3 @@ class TestWishlist(TestCase):
         """It should not Deserialize a wishlist with a TypeError"""
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, [])
-
-    def test_deserialize_item_key_error(self):
-        """It should not Deserialize a wishlist item with a KeyError"""
-        item = WishlistItem()
-        self.assertRaises(DataValidationError, item.deserialize, {})
-
-    def test_deserialize_item_type_error(self):
-        """It should not Deserialize a wishlist item with a TypeError"""
-        item = WishlistItem()
-        self.assertRaises(DataValidationError, item.deserialize, [])

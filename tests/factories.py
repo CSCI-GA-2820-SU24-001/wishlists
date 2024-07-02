@@ -18,7 +18,7 @@
 Test Factory to make fake objects for testing
 """
 from factory import Factory, SubFactory, Sequence, Faker, post_generation
-from factory.fuzzy import FuzzyChoice, FuzzyFloat
+from factory.fuzzy import FuzzyFloat
 from service.models import Wishlist, WishlistItem
 
 
@@ -62,4 +62,3 @@ class WishlistItemFactory(Factory):
     description = Faker("sentence")
     price = FuzzyFloat(1.0, 100.0)
     wishlist = SubFactory(WishlistFactory)
-

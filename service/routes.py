@@ -136,7 +136,7 @@ def read_wishlists(wishlist_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
-           
+
             f"Wishlist with id '{wishlist_id}' was not found.",
         )
     result = wishlist.serialize()
@@ -177,7 +177,6 @@ def update_wishlist(wishlist_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
-           
             f"Wishlist with id '{wishlist_id}' was not found.",
         )
 
@@ -239,7 +238,7 @@ def create_items(wishlist_id):
 ######################################################################
 # DELETE AN ITEM
 ######################################################################
-@app.route("/wishlists/<wishlist_id>/addresses/<item_id>", methods=["DELETE"])
+@app.route("/wishlists/<wishlist_id>/items/<item_id>", methods=["DELETE"])
 def delete_items(wishlist_id, item_id):
     """
     Delete an Item
@@ -252,10 +251,11 @@ def delete_items(wishlist_id, item_id):
 
     # See if the address exists and delete it if it does
     item = WishlistItem.find(item_id)
-    if item:
-        item.delete()
+    if not item:
+        return {}, status.HTTP_404_NOT_FOUND
 
-    return "", status.HTTP_204_NO_CONTENT
+    item.delete()
+    return {}, status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # DELETE A WISHLIST
@@ -273,11 +273,11 @@ def delete_wishlist(wishlist_id):
 
     # Retrieve the wishlist to delete and delete it if it exists
     wishlist = Wishlist.find(wishlist_id)
-    if wishlist:
-        wishlist.delete()
-        return "", status.HTTP_204_NO_CONTENT
-    else:
+    if not wishlist:
         return "", status.HTTP_404_NOT_FOUND
+
+    wishlist.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # UPDATE A WISHLIST ITEM
@@ -370,7 +370,7 @@ def list_items(wishlist_id):
 ######################################################################
 def check_content_type(content_type):
     """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
+    if "Content-Type" not in request.headers:  # TODO: cannot cover with tests, since flask sets default Content-type parameter
         app.logger.error("No Content-Type specified.")
         abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,

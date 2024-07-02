@@ -107,11 +107,7 @@ class WishlistService(TestCase):
         new_wishlist = resp.get_json()
         self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
         self.assertEqual(
-            new_wishlist["customer_id"],
-           
-            wishlist.customer_id,
-           
-            "customer id does not match"
+            new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
@@ -163,6 +159,23 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_wishlist = resp.get_json()
         self.assertEqual(updated_wishlist["name"], "Updated Wishlist Name")
+
+    def test_update_wishlist_not_exist(self):
+        """It should not Update a Wishlist that does not exist"""
+        # create a Wishlist to update
+        test_wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the wishlist
+        new_wishlist = resp.get_json()
+        new_wishlist["name"] = "Updated Wishlist Name"
+        new_wishlist_id = "0"
+        resp = self.client.put(f"{BASE_URL}/{new_wishlist_id}", json=new_wishlist)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
 
     # ----------------------------------------------------------
     # TEST READ
@@ -228,7 +241,24 @@ class WishlistService(TestCase):
         logging.debug(data)
         self.assertEqual(data["id"], item_id)
         self.assertEqual(data["wishlist_id"], wishlist.id)
-        self.assertEqual(data["description"], "Updated description") 
+        self.assertEqual(data["description"], "Updated description")
+
+    def test_update_wishlist_item_not_exist(self):
+        """It should not Update a wishlist item that does not exist"""
+        # create a known wishlist and wishlist item
+        wishlist = self._create_wishlists(1)[0]
+        wishlist_item = WishlistItemFactory()
+
+        data = wishlist_item.serialize()
+        item_id = data["id"]
+
+        # send the update back
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            json=data,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_wishlist_item(self):
         """It should Get an existing Wishlist Item"""
@@ -260,10 +290,14 @@ class WishlistService(TestCase):
         """It should not Get a Wishlist Item that does not exist"""
         # Create a Wishlist
         wishlist = WishlistFactory()
+        wishlist_id = wishlist.id
+
+        # Try to get a item from non-existent wishlist
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
         resp = self.client.post(BASE_URL, json=wishlist.serialize(), content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_wishlist = resp.get_json()
-        wishlist_id = new_wishlist["id"]
 
         # Try to get a non-existent item
         resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items/0")
@@ -350,7 +384,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item(self):
-        """It should Delete an Item"""
+        """It should Delete an Item if the wishlist and the items exist, otherwise return 404"""
         wishlist = self._create_wishlists(1)[0]
         item = WishlistItemFactory()
         resp = self.client.post(
@@ -376,3 +410,34 @@ class WishlistService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # try delete again and should return 404
+        resp = self.client.delete(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_invalid_content_type(self):
+        """It should not Accept any request that have an invalid content type"""
+        wishlist = WishlistFactory()
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="bullshit"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_bad_request(self):
+        """It should not Accept any bad requests"""
+        data = {}
+        data["attr"] = "nonsense"  # malformed data that the server cannot parse
+        resp = self.client.post(
+            BASE_URL, json=data, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_request_method_not_supported(self):
+        """It should not Accept any requests with unsupported methods"""
+        resp = self.client.post(
+            "/", json={}, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
