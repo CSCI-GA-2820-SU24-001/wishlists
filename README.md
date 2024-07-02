@@ -5,29 +5,9 @@
 
 
 ## Overview
-This project is the back-end for an eCommerce website, designed as a RESTful microservice for managing wishlists and wishlist items. The microservice supports the Create, Read, Update, and Delete (CRUD) lifecycle for both wishlists and wishlist items.
-
-
-## Automatic Setup
-
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
-
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
-```
+This project implements the wishlists service, which allows customers to make a collection of products products that they wish they had the money to purchase. The service includes multiple REST APIs that provides CRUD operations for managing wishlists and wishlist items.
 
 ## Contents
-### File description
 The project contains the following:
 
 ```text
@@ -56,58 +36,42 @@ tests/                     - test cases package
 ├── test_models.py         - test suite for business models
 └── test_routes.py         - test suite for service routes
 ```
-### API description
-### Wishlists
+## API Endpoints
+The wishlists service provides the following API endpoints:
 
-- **GET /wishlists**
-  - **Description:** List all wishlists
+| Operation                         | Method | URL                                          |
+|-----------------------------------|--------|----------------------------------------------|
+| **List all wishlists**            | GET    | `/wishlists`                                 |
+| **Create a wishlist**             | POST   | `/wishlists`                                 |
+| **Read a wishlist**               | GET    | `/wishlists/{id}`                            |
+| **Update a wishlist**             | PUT    | `/wishlists/{id}`                            |
+| **Delete a wishlist**             | DELETE | `/wishlists/{id}`                            |
+| **List all items in a wishlist**  | GET    | `/wishlists/{id}/items`                      |
+| **Create an item in a wishlist**  | POST   | `/wishlists/{id}/items`                      |
+| **Read an item in a wishlist**    | GET    | `/wishlists/{id}/items/{id}`                 |
+| **Update an item in a wishlist**  | PUT    | `/wishlists/{id}/items/{id}`                 |
+| **Delete an item in a wishlist**  | DELETE | `/wishlists/{id}/items/{id}`                 |
 
-- **POST /wishlists**
-  - **Description:** Create a wishlist
 
-- **GET /wishlists/{wishlist_id}**
-  - **Description:** Read a wishlist
+## Running the Tests
 
-- **PUT /wishlists/{wishlist_id}**
-  - **Description:** Update a wishlist
+To run the tests for this project, you can use the following command:
 
-- **DELETE /wishlists/{wishlist_id}**
-  - **Description:** Delete a wishlist
-
-### Wishlist Items
-
-- **GET /wishlists/{wishlist_id}/items**
-  - **Description:** List all items in a wishlist
-
-- **POST /wishlists/{wishlist_id}/items**
-  - **Description:** Create an item in a wishlist
-
-- **GET /wishlists/{wishlist_id}/items/{item_id}**
-  - **Description:** Read an item in a wishlist
-
-- **PUT /wishlists/{wishlist_id}/items/{item_id}**
-  - **Description:** Update an item in a wishlist
-
-- **DELETE /wishlists/{wishlist_id}/items/{item_id}**
-  - **Description:** Delete an item in a wishlist
-
-## Running the tests
-
-Run the unit tests using `pytest`
-
-```shell
+```bash
 make test
 ```
 
-PyTest is configured via the included `setup.cfg` file to automatically include the `--pspec` flag so that red-green-refactor is meaningful. 
+This command will run the test suite using `pytest` and ensure that all the tests pass.
 
-To see what lines of code were not tested use:
+## Running the Service
 
-```shell
-coverage report -m
+To run the wishlists service locally, you can use the following command:
+
+```bash
+flask run
 ```
 
-It reports the line numbers for the code that have not been covered.
+The service will start and be accessible at `http://localhost:8000`. To change the port, update the environment variable in the `.flaskenv` file.
 
 
 ## License
