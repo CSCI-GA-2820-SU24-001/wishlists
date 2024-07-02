@@ -129,27 +129,6 @@ class TestWishlistItem(TestCase):
         wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(len(wishlist.items), 0)
 
-    def test_serialize_a_wishlist_item(self):
-        """It should serialize a WishlistItem"""
-        wishlist_item = WishlistItemFactory()
-        serial_wishlist_item = wishlist_item.serialize()
-        self.assertEqual(serial_wishlist_item["id"], wishlist_item.id)
-        self.assertEqual(serial_wishlist_item["wishlist_id"], wishlist_item.wishlist_id)
-        self.assertEqual(serial_wishlist_item["product_id"], wishlist_item.product_id)
-        self.assertEqual(serial_wishlist_item["description"], wishlist_item.description)
-        self.assertAlmostEqual(serial_wishlist_item["price"], float(wishlist_item.price))
-
-    def test_deserialize_a_wishlist_item(self):
-        """It should deserialize a WishlistItem"""
-        wishlist_item = WishlistItemFactory()
-        wishlist_item.create()
-        new_wishlist_item = WishlistItem()
-        new_wishlist_item.deserialize(wishlist_item.serialize())
-        self.assertEqual(new_wishlist_item.wishlist_id, wishlist_item.wishlist_id)
-        self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
-        self.assertEqual(new_wishlist_item.description, wishlist_item.description)
-        self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
-
     def test_update_wishlist_item(self):
         """It should Update a wishlist item"""
         wishlists = Wishlist.all()
@@ -176,3 +155,46 @@ class TestWishlistItem(TestCase):
         wishlist = Wishlist.find(wishlist.id)
         item = wishlist.items[0]
         self.assertEqual(item.description, "Updated description")
+
+    def test_serialize_a_wishlist_item(self):
+        """It should serialize a WishlistItem"""
+        wishlist_item = WishlistItemFactory()
+        serial_wishlist_item = wishlist_item.serialize()
+        self.assertEqual(serial_wishlist_item["id"], wishlist_item.id)
+        self.assertEqual(serial_wishlist_item["wishlist_id"], wishlist_item.wishlist_id)
+        self.assertEqual(serial_wishlist_item["product_id"], wishlist_item.product_id)
+        self.assertEqual(serial_wishlist_item["description"], wishlist_item.description)
+        self.assertAlmostEqual(serial_wishlist_item["price"], float(wishlist_item.price))
+
+    def test_deserialize_a_wishlist_item(self):
+        """It should deserialize a WishlistItem"""
+        wishlist_item = WishlistItemFactory()
+        wishlist_item.create()
+        new_wishlist_item = WishlistItem()
+        new_wishlist_item.deserialize(wishlist_item.serialize())
+        self.assertEqual(new_wishlist_item.wishlist_id, wishlist_item.wishlist_id)
+        self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
+        self.assertEqual(new_wishlist_item.description, wishlist_item.description)
+        self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
+
+    def test_deserialize_item_key_error(self):
+        """It should not Deserialize a wishlist item with a KeyError"""
+        item = WishlistItem()
+        self.assertRaises(DataValidationError, item.deserialize, {})
+
+    def test_deserialize_item_type_error(self):
+        """It should not Deserialize a wishlist item with a TypeError"""
+        item = WishlistItem()
+        self.assertRaises(DataValidationError, item.deserialize, [])
+
+    def test_deserialize_item_bad_price_type(self):
+        """It should not Deserialize a wishlist item with a TypeError because bad price type"""
+        item = WishlistItem()
+
+        data = {}
+        data['wishlist_id'] = "0"
+        data["product_id"] = "0"
+        data["description"] = "desc"
+        data["price"] = "123456"  # should be int / float, but set to string here
+
+        self.assertRaises(DataValidationError, item.deserialize, data)

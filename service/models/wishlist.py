@@ -4,15 +4,17 @@ Models for Wishlists
 The models for Wishlists are stored in this module
 """
 import logging
+import uuid
 from .persistent_base import db, PersistentBase, DataValidationError
 from .wishlist_item import WishlistItem
-import uuid
 
 logger = logging.getLogger("flask.app")
 
 ######################################################################
 #  W I S H L I S T    M O D E L
 ######################################################################
+
+
 class Wishlist(db.Model, PersistentBase):
     """
     Class that represents a Wishlist
@@ -25,6 +27,7 @@ class Wishlist(db.Model, PersistentBase):
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     items = db.relationship("WishlistItem", backref="wishlist", passive_deletes=True)
+
     def __repr__(self):
         return f"<Wishlist id=[{self.id}]>"
 
