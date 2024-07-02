@@ -106,10 +106,12 @@ class WishlistService(TestCase):
         new_wishlist = resp.get_json()
         self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
         self.assertEqual(
-            new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
+            new_wishlist["customer_id"],
+            wishlist.customer_id,
+            "customer id does not match",
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
-    
+
     def test_delete_wishlist(self):
         """It should delete a wishlist"""
         # create a wishlist to be deleted
@@ -163,7 +165,7 @@ class WishlistService(TestCase):
     # TEST READ
     # ----------------------------------------------------------
     def test_get_wishlist(self):
-        """It should Get an existing Wishlist""" 
+        """It should Get an existing Wishlist"""
         # Create a Wishlist to read
         test_wishlist = WishlistFactory()
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
@@ -212,10 +214,10 @@ class WishlistService(TestCase):
         # resp = self.client.get(location, content_type="application/json")
         # self.assertEqual(resp.status_code, status.HTTP_200_OK)
         # new_item = resp.get_json()
-        # self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")    
+        # self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")
 
     def test_add_item_wishlist_not_exist(self):
-        """It cannot find the wishlist that does not exist, and return 404 """
+        """It cannot find the wishlist that does not exist, and return 404"""
         wishlist_id = "wishlist_not_exist"
         item = WishlistItemFactory()
         resp = self.client.post(
@@ -241,14 +243,52 @@ class WishlistService(TestCase):
 
         # send delete request
         resp = self.client.delete(
-            f"{BASE_URL}/{wishlist.id}/addresses/{item_id}",
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
         # retrieve it back and make sure address is not there
         resp = self.client.get(
-            f"{BASE_URL}/{wishlist.id}/addresses/{item_id}",
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
         )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_item_list(self):
+        """It should Get a list of wishlist items"""
+        # add two items to wishlist
+        wishlist = self._create_wishlists(1)[0]
+        item_list = WishlistItemFactory.create_batch(2)
+
+        # get the list back and make sure it is empty, since we haven't add item into wishlist yet
+        resp = self.client.get(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
+       
+        # Create item 1
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item_list[0].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create item 2
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item_list[1].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # get the list back and make sure there are 2
+        resp = self.client.get(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+    def test_get_item_list_not_exist(self):
+        """It cannot find the wishlist that does not exist, and return 404"""
+        wishlist_id = "wishlist_not_exist"
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
