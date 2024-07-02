@@ -3,11 +3,10 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
 
 ## Overview
+This project is the back-end for an eCommerce website, designed as a RESTful microservice for managing wishlists and wishlist items. The microservice supports the Create, Read, Update, and Delete (CRUD) lifecycle for both wishlists and wishlist items.
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
 
 ## Automatic Setup
 
@@ -28,7 +27,7 @@ These should be copied using a bash shell as follows:
 ```
 
 ## Contents
-
+### File description
 The project contains the following:
 
 ```text
@@ -57,6 +56,59 @@ tests/                     - test cases package
 ├── test_models.py         - test suite for business models
 └── test_routes.py         - test suite for service routes
 ```
+### API description
+### Wishlists
+
+- **GET /wishlists**
+  - **Description:** List all wishlists
+
+- **POST /wishlists**
+  - **Description:** Create a wishlist
+
+- **GET /wishlists/{wishlist_id}**
+  - **Description:** Read a wishlist
+
+- **PUT /wishlists/{wishlist_id}**
+  - **Description:** Update a wishlist
+
+- **DELETE /wishlists/{wishlist_id}**
+  - **Description:** Delete a wishlist
+
+### Wishlist Items
+
+- **GET /wishlists/{wishlist_id}/items**
+  - **Description:** List all items in a wishlist
+
+- **POST /wishlists/{wishlist_id}/items**
+  - **Description:** Create an item in a wishlist
+
+- **GET /wishlists/{wishlist_id}/items/{item_id}**
+  - **Description:** Read an item in a wishlist
+
+- **PUT /wishlists/{wishlist_id}/items/{item_id}**
+  - **Description:** Update an item in a wishlist
+
+- **DELETE /wishlists/{wishlist_id}/items/{item_id}**
+  - **Description:** Delete an item in a wishlist
+
+## Running the tests
+
+Run the unit tests using `pytest`
+
+```shell
+make test
+```
+
+PyTest is configured via the included `setup.cfg` file to automatically include the `--pspec` flag so that red-green-refactor is meaningful. 
+
+To see what lines of code were not tested use:
+
+```shell
+coverage report -m
+```
+
+It reports the line numbers for the code that have not been covered.
+
 
 ## License
 
