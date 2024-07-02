@@ -127,6 +127,7 @@ class TestWishlistItem(TestCase):
         self.assertEqual(new_wishlist_item.description, wishlist_item.description)
         self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
 
+
     def test_update_wishlist_item(self):
         """It should Update a wishlist item"""
         wishlists = Wishlist.all()

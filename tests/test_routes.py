@@ -7,7 +7,7 @@ import logging
 from unittest import TestCase
 from wsgi import app
 from service.common import status
-from service.models import db, Wishlist
+from service.models import db, Wishlist, WishlistItem
 from .factories import WishlistFactory, WishlistItemFactory
 
 DATABASE_URI = os.getenv(
@@ -43,6 +43,7 @@ class WishlistService(TestCase):
         """Runs before each test"""
         self.client = app.test_client()
         db.session.query(Wishlist).delete()  # clean up the last tests
+        db.session.query(WishlistItem).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -189,6 +190,7 @@ class WishlistService(TestCase):
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
 
+
     def test_update_wishlist_item(self):
         """It should Update a wishlist item in a wishlist"""
         # create a known wishlist and wishlist item
@@ -227,6 +229,50 @@ class WishlistService(TestCase):
         self.assertEqual(data["wishlist_id"], wishlist.id)
         self.assertEqual(data["description"], "Updated description") 
           
+
+    def test_get_wishlist_item(self):
+        """It should Get an existing Wishlist Item"""
+        # Create a Wishlist
+        wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_wishlist = resp.get_json()
+        wishlist_id = new_wishlist["id"]
+
+        # Add an item to the wishlist
+        item = WishlistItemFactory(wishlist_id=wishlist_id)
+        resp = self.client.post(f"{BASE_URL}/{wishlist_id}/items", json=item.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+        item_id = new_item["id"]
+
+        # Get the item
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items/{item_id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["wishlist_id"], wishlist_id)
+        self.assertEqual(data["product_id"], item.product_id)
+        self.assertEqual(data["description"], item.description)
+        self.assertAlmostEqual(data["price"], float(item.price))
+
+    def test_get_wishlist_item_not_found(self):
+        """It should not Get a Wishlist Item that does not exist"""
+        # Create a Wishlist
+        wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_wishlist = resp.get_json()
+        wishlist_id = new_wishlist["id"]
+
+        # Try to get a non-existent item
+        resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
+
+
     def test_add_item(self):
         """It should Add an item to an wishlist"""
         wishlist = self._create_wishlists(1)[0]
