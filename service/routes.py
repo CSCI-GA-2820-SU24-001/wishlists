@@ -267,6 +267,9 @@ def read_wishlist_item(wishlist_id, item_id):
     app.logger.info("Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id)
     
 # LIST ADDRESSES
+
+
+
 ######################################################################
 @app.route("/wishlists/<wishlist_id>/items", methods=["GET"])
 def list_items(wishlist_id):
