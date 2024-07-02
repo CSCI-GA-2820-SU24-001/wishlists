@@ -256,6 +256,7 @@ def delete_wishlist(wishlist_id):
 
 
 ######################################################################
+<<<<<<< view_wishlist_item
 # READ AN ITEM IN A WISHLIST
 ######################################################################
 @app.route("/wishlists/<string:wishlist_id>/items/<string:item_id>", methods=["GET"])
@@ -267,9 +268,6 @@ def read_wishlist_item(wishlist_id, item_id):
     app.logger.info("Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id)
     
 # LIST ADDRESSES
-
-
-
 ######################################################################
 @app.route("/wishlists/<wishlist_id>/items", methods=["GET"])
 def list_items(wishlist_id):
@@ -280,6 +278,7 @@ def list_items(wishlist_id):
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
         abort(
+<<<<<<< view_wishlist_item
             status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found."
         )
     
@@ -292,6 +291,7 @@ def list_items(wishlist_id):
     
     result = item.serialize()
     return jsonify(result), status.HTTP_200_OK
+
             status.HTTP_404_NOT_FOUND,
             f"Wishlist with id '{wishlist_id}' could not be found.",
         )
