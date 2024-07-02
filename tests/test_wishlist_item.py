@@ -126,3 +126,8 @@ class TestWishlistItem(TestCase):
         self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
         self.assertEqual(new_wishlist_item.description, wishlist_item.description)
         self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
+
+
+
+
+  

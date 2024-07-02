@@ -80,17 +80,17 @@ def index():
                 },
                 {
                     "method": "GET",
-                    "url": "/wishlists/{id}/items/{id}",
+                    "url": "/wishlists/{id}/items/{item_id}",
                     "description": "Read an item in a wishlist",
                 },
                 {
                     "method": "PUT",
-                    "url": "/wishlists/{id}/items/{id}",
+                    "url": "/wishlists/{id}/items/{item_id}",
                     "description": "Update an item in a wishlist",
                 },
                 {
                     "method": "DELETE",
-                    "url": "/wishlists/{id}/items/{id}",
+                    "url": "/wishlists/{id}/items/{item_id}",
                     "description": "Delete an item in a wishlist",
                 },
             ],
@@ -256,7 +256,38 @@ def delete_wishlist(wishlist_id):
 
 
 ######################################################################
-# LIST ADDRESSES
+# READ AN ITEM IN A WISHLIST
+######################################################################
+@app.route("/wishlists/<string:wishlist_id>/items/<string:item_id>", methods=["GET"])
+def read_wishlist_item(wishlist_id, item_id):
+    """
+    Read an item in a Wishlist
+    This endpoint will return a Wishlist item based on its id within the specified wishlist
+    """
+    app.logger.info("Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id)
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+
+    # Find the item within the wishlist and abort if it doesn't exist
+    item = WishlistItem.find(item_id)
+    if not item or item.wishlist_id != wishlist_id:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' was not found in wishlist '{wishlist_id}'.",
+        )
+
+    result = item.serialize()
+    return jsonify(result), status.HTTP_200_OK
+
+
+######################################################################
+# LIST ITEMS IN A WISHLIST
 ######################################################################
 @app.route("/wishlists/<wishlist_id>/items", methods=["GET"])
 def list_items(wishlist_id):
