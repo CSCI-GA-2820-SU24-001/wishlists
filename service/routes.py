@@ -130,12 +130,13 @@ def create_wishlists():
 def read_wishlists(wishlist_id):
     """Read a Wishlist"""
     app.logger.info("Request to read a wishlist with id: %s", wishlist_id)
-    
+
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
         abort(
-            status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found."
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
         )
     result = wishlist.serialize()
 
@@ -174,7 +175,8 @@ def update_wishlist(wishlist_id):
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
         abort(
-            status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found."
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
         )
 
     # Update from the json in the body of the request
@@ -183,6 +185,7 @@ def update_wishlist(wishlist_id):
     wishlist.update()
 
     return jsonify(wishlist.serialize()), status.HTTP_200_OK
+
 
 ######################################################################
 # ADD AN ITEM TO A WISHLIST
@@ -232,6 +235,7 @@ def create_items(wishlist_id):
 ######################################################################
 # DELETE A  WISHLIST
 ######################################################################
+
 @app.route("/wishlists/<wishlist_id>", methods=["DELETE"])
 def delete_wishlist(wishlist_id):
     """
@@ -261,6 +265,13 @@ def read_wishlist_item(wishlist_id, item_id):
     """
     app.logger.info("Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id)
     
+# LIST ADDRESSES
+######################################################################
+@app.route("/wishlists/<wishlist_id>/items", methods=["GET"])
+def list_items(wishlist_id):
+    """Returns all of the items for an Wishlist"""
+    app.logger.info("Request for all items for Wishlist with id: %s", wishlist_id)
+
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
@@ -277,6 +288,14 @@ def read_wishlist_item(wishlist_id, item_id):
     
     result = item.serialize()
     return jsonify(result), status.HTTP_200_OK
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+
+    # Get the items for the wishlist
+    results = [item.serialize() for item in wishlist.items]
+
+    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
