@@ -182,9 +182,6 @@ class WishlistService(TestCase):
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
 
-    # ----------------------------------------------------------
-    # TEST READ
-    # ----------------------------------------------------------
     def test_get_wishlist(self):
         """It should Get an existing Wishlist"""
         # Create a Wishlist to read
