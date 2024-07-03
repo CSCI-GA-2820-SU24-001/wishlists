@@ -80,7 +80,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_create_wishlist(self):
-        """It should Accept a POST request and Create a new Wishlist"""
+        """It should Accept a POST request and Create a new Wishlist, but not for duplicate ones"""
         wishlist = WishlistFactory()
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
@@ -110,6 +110,11 @@ class WishlistService(TestCase):
             new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
+
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_delete_wishlist(self):
         """It should delete a wishlist"""

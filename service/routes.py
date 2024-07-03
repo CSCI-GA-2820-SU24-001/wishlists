@@ -111,9 +111,13 @@ def create_wishlists():
     app.logger.info("Request to create an Wishlist")
     check_content_type("application/json")
 
-    # Create the wishlist
+    # Check if the wishlist already exists
     wishlist = Wishlist()
     wishlist.deserialize(request.get_json())
+
+    if wishlist.find_by_name(wishlist.name):
+        return jsonify({"name": wishlist.name, "status": "Wishlist already exists."}), status.HTTP_409_CONFLICT
+
     wishlist.create()
 
     # Create a message to return
@@ -140,7 +144,6 @@ def read_wishlists(wishlist_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
-
             f"Wishlist with id '{wishlist_id}' was not found.",
         )
     result = wishlist.serialize()
@@ -251,10 +254,7 @@ def create_items(wishlist_id):
 
     # Send the location to GET the new item
     location_url = url_for(
-        "read_wishlist_item",
-        wishlist_id=wishlist.id,
-        item_id=item.id,
-        _external=True
+        "read_wishlist_item", wishlist_id=wishlist.id, item_id=item.id, _external=True
     )
 
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -270,7 +270,9 @@ def read_wishlist_item(wishlist_id, item_id):
 
     This endpoint will return a Wishlist item based on its id within the specified wishlist
     """
-    app.logger.info("Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id)
+    app.logger.info(
+        "Request to read item with id: %s in wishlist with id: %s", item_id, wishlist_id
+    )
 
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
@@ -373,7 +375,9 @@ def update_wishlist_item(wishlist_id, item_id):
 ######################################################################
 def check_content_type(content_type):
     """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:  # TODO: cannot cover with tests, since flask sets default Content-type parameter
+    if (
+        "Content-Type" not in request.headers
+    ):  # TODO: cannot cover with tests, since flask sets default Content-type parameter
         app.logger.error("No Content-Type specified.")
         abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
