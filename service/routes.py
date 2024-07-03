@@ -111,9 +111,13 @@ def create_wishlists():
     app.logger.info("Request to create an Wishlist")
     check_content_type("application/json")
 
-    # Create the wishlist
+    # Check if the wishlist already exists
     wishlist = Wishlist()
     wishlist.deserialize(request.get_json())
+
+    if wishlist.find_by_name(wishlist.name):
+        return jsonify({"name": wishlist.name, "status": "Wishlist already exists."}), status.HTTP_409_CONFLICT
+
     wishlist.create()
 
     # Create a message to return
@@ -272,10 +276,10 @@ def delete_wishlist(wishlist_id):
     # Retrieve the wishlist to delete and delete it if it exists
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
-        return "", status.HTTP_404_NOT_FOUND
+        return {}, status.HTTP_404_NOT_FOUND
 
     wishlist.delete()
-    return "", status.HTTP_204_NO_CONTENT
+    return {}, status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # UPDATE A WISHLIST ITEM
