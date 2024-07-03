@@ -327,12 +327,11 @@ class WishlistService(TestCase):
         self.assertEqual(data["description"], item.description)
         self.assertEqual(data["product_id"], item.product_id)
 
-        # TODO: uncomment after get_item_from_wishlist is implemented
-        # # Check that the location header was correct by getting it
-        # resp = self.client.get(location, content_type="application/json")
-        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # new_item = resp.get_json()
-        # self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_item = resp.get_json()
+        self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")
 
     def test_add_item_wishlist_not_exist(self):
         """It cannot find the wishlist that does not exist, and return 404"""

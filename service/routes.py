@@ -222,15 +222,13 @@ def create_items(wishlist_id):
     # Prepare a message to return
     message = item.serialize()
 
-    # TODO uncomment or modify this after implemented get_item feature
-    # # Send the location to GET the new item
-    # location_url = url_for(
-    #     "get_addresses",
-    #     wishlist_id=wishlist.id,
-    #     address_id=item.id,
-    #     _external=True
-    # )
-    location_url = "Unknown"
+    # Send the location to GET the new item
+    location_url = url_for(
+        "read_wishlist_item",
+        wishlist_id=wishlist.id,
+        item_id=item.id,
+        _external=True
+    )
 
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
@@ -249,7 +247,7 @@ def delete_items(wishlist_id, item_id):
         "Request to delete Item %s for Wishlist id: %s", (wishlist_id, item_id)
     )
 
-    # See if the address exists and delete it if it does
+    # See if the item exists and delete it if it does
     item = WishlistItem.find(item_id)
     if not item:
         return {}, status.HTTP_404_NOT_FOUND
