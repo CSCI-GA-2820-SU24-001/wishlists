@@ -254,10 +254,10 @@ def delete_items(wishlist_id, item_id):
     # See if the item exists and delete it if it does
     item = WishlistItem.find(item_id)
     if not item:
-        return {}, status.HTTP_404_NOT_FOUND
+        return "", status.HTTP_404_NOT_FOUND
 
     item.delete()
-    return {}, status.HTTP_204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # DELETE A WISHLIST
@@ -276,10 +276,10 @@ def delete_wishlist(wishlist_id):
     # Retrieve the wishlist to delete and delete it if it exists
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
-        return {}, status.HTTP_404_NOT_FOUND
+        return "", status.HTTP_404_NOT_FOUND
 
     wishlist.delete()
-    return {}, status.HTTP_204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # UPDATE A WISHLIST ITEM
