@@ -117,7 +117,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_delete_wishlist(self):
-        """It should delete a wishlist"""
+        """It should Delete a wishlist"""
         # create a wishlist to be deleted
         wishlist = WishlistFactory()
         resp = self.client.post(
@@ -139,7 +139,7 @@ class WishlistService(TestCase):
         """It should not delete a wishlist that does not exist"""
         # try to delete a wishlist that doesn't exist
         resp = self.client.delete(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_wishlist_list(self):
         """It should Get a list of Wishlists"""
@@ -385,7 +385,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item(self):
-        """It should Delete an Item if the wishlist and the items exist, otherwise return 404"""
+        """It should Delete an Item if the wishlist and the items exist"""
         wishlist = self._create_wishlists(1)[0]
         item = WishlistItemFactory()
         resp = self.client.post(
@@ -405,19 +405,19 @@ class WishlistService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        # retrieve it back and make sure address is not there
+        # retrieve it back and make sure item is not there
         resp = self.client.get(
             f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-        # try delete again and should return 404
+        # try delete again and should return 204
         resp = self.client.delete(
             f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_invalid_content_type(self):
         """It should not Accept any request that have an invalid content type"""

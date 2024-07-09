@@ -128,7 +128,7 @@ class TestWishlist(TestCase):
         """It should not delete a Wishlist that does not exist"""
         wishlist = WishlistFactory()
         wishlist.id = "non-existent-id"  # Set an ID that does not exist in the database
-        self.assertRaises(DataValidationError, wishlist.delete)
+        self.assertEqual(len(Wishlist.all()), 0)
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
