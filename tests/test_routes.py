@@ -405,7 +405,7 @@ class WishlistService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        # retrieve it back and make sure address is not there
+        # retrieve it back and make sure item is not there
         resp = self.client.get(
             f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
