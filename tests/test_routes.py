@@ -385,7 +385,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item(self):
-        """It should Delete an Item if the wishlist and the items exist, otherwise return 404"""
+        """It should Delete an Item if the wishlist and the items exist"""
         wishlist = self._create_wishlists(1)[0]
         item = WishlistItemFactory()
         resp = self.client.post(
@@ -412,12 +412,12 @@ class WishlistService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-        # try delete again and should return 404
+        # try delete again and should return 204
         resp = self.client.delete(
             f"{BASE_URL}/{wishlist.id}/items/{item_id}",
             content_type="application/json",
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_invalid_content_type(self):
         """It should not Accept any request that have an invalid content type"""
