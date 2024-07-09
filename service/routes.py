@@ -214,7 +214,7 @@ def delete_wishlist(wishlist_id):
     # Retrieve the wishlist to delete and delete it if it exists
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
-        return "", status.HTTP_404_NOT_FOUND
+        return "", status.HTTP_204_NO_CONTENT
 
     wishlist.delete()
     return "", status.HTTP_204_NO_CONTENT

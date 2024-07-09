@@ -117,7 +117,7 @@ class WishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_delete_wishlist(self):
-        """It should delete a wishlist"""
+        """It should Delete a wishlist"""
         # create a wishlist to be deleted
         wishlist = WishlistFactory()
         resp = self.client.post(
@@ -139,7 +139,7 @@ class WishlistService(TestCase):
         """It should not delete a wishlist that does not exist"""
         # try to delete a wishlist that doesn't exist
         resp = self.client.delete(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_wishlist_list(self):
         """It should Get a list of Wishlists"""
