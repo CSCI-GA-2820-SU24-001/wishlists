@@ -65,7 +65,7 @@ class WishlistItem(db.Model, PersistentBase):
                     "Invalid type for int/float [price]: "
                     + str(type(data["price"]))
                 )
-        except AttributeError as error:  # TODO: actually not possible to test it
+        except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
@@ -83,7 +83,6 @@ class WishlistItem(db.Model, PersistentBase):
     # Class Methods
     ##################################################
 
-    # TODO: Future features, some of them are duplicate with sqlalchemy features
     # @classmethod
     # def find_by_wishlist_id(cls, wishlist_id):
     #     """Returns all WishlistItems with the given wishlist_id

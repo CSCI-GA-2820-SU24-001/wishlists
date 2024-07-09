@@ -377,7 +377,7 @@ def check_content_type(content_type):
     """Checks that the media type is correct"""
     if (
         "Content-Type" not in request.headers
-    ):  # TODO: cannot cover with tests, since flask sets default Content-type parameter
+    ):
         app.logger.error("No Content-Type specified.")
         abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,

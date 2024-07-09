@@ -2,17 +2,10 @@
 WishlistModel API Service Test Suite
 """
 
-import os
 import logging
-from unittest import TestCase
-from wsgi import app
 from service.common import status
-from service.models import db, Wishlist, WishlistItem
 from .factories import WishlistFactory, WishlistItemFactory
-
-DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
-)
+from .test_base import TestBase
 
 BASE_URL = "/wishlists"
 
@@ -21,34 +14,8 @@ BASE_URL = "/wishlists"
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class WishlistService(TestCase):
+class WishlistService(TestBase):
     """REST API Server Tests"""
-
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests"""
-        app.config["TESTING"] = True
-        app.config["DEBUG"] = False
-        # Set up the test database
-        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
-        app.app_context().push()
-
-    @classmethod
-    def tearDownClass(cls):
-        """Run once after all tests"""
-        db.session.close()
-
-    def setUp(self):
-        """Runs before each test"""
-        self.client = app.test_client()
-        db.session.query(Wishlist).delete()  # clean up the last tests
-        db.session.query(WishlistItem).delete()  # clean up the last tests
-        db.session.commit()
-
-    def tearDown(self):
-        """This runs after each test"""
-        db.session.remove()
 
     ######################################################################
     #  HELPER FUNCTIONS HERE

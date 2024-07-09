@@ -31,7 +31,7 @@ class WishlistFactory(Factory):
 
         model = Wishlist
 
-    id = Sequence(lambda n: str(n))
+    id = Sequence(lambda n: f"{n:04d}")
     customer_id = Sequence(lambda n: f"Customer{n:04d}")
     name = Faker("word")
 
@@ -56,9 +56,9 @@ class WishlistItemFactory(Factory):
 
         model = WishlistItem
 
-    id = Sequence(lambda n: str(n))
+    id = Sequence(lambda n: f"{n:04d}")
     wishlist_id = None
-    product_id = Sequence(lambda n: str(n))
+    product_id = Sequence(lambda n: f"{n:04d}")
     description = Faker("sentence")
     price = FuzzyFloat(1.0, 100.0)
     wishlist = SubFactory(WishlistFactory)
