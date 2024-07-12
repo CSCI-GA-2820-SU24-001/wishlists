@@ -3,8 +3,10 @@ Models for Wishlists
 
 The models for Wishlists are stored in this module
 """
-import logging
+
 import uuid
+import logging
+from datetime import date
 from .persistent_base import db, PersistentBase, DataValidationError
 from .wishlist_item import WishlistItem
 
@@ -23,9 +25,13 @@ class Wishlist(db.Model, PersistentBase):
     ##################################################
     # Table Schema
     ##################################################
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))  # pylint: disable=invalid-name
+    id = db.Column(
+        db.String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )  # pylint: disable=invalid-name
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
+    created_date = db.Column(db.Date(), nullable=False, default=date.today())
+    modified_date = db.Column(db.Date(), nullable=False, default=date.today(), onupdate=date.today())
     items = db.relationship("WishlistItem", backref="wishlist", passive_deletes=True)
 
     def __repr__(self):
@@ -37,6 +43,8 @@ class Wishlist(db.Model, PersistentBase):
             "id": self.id,
             "customer_id": self.customer_id,
             "name": self.name,
+            "created_date": self.created_date,
+            "modified_date": self.modified_date,
             "items": [item.serialize() for item in self.items],
         }
         return wishlist
@@ -51,6 +59,8 @@ class Wishlist(db.Model, PersistentBase):
         try:
             self.customer_id = data["customer_id"]
             self.name = data["name"]
+            self.created_date = data["created_date"]
+            self.modified_date = data["modified_date"]
 
             item_list = data.get("items")
             if item_list:
