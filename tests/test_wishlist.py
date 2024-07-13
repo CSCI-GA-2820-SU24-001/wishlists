@@ -18,6 +18,7 @@
 Test cases for Wishlist Model
 """
 
+from datetime import date
 from unittest.mock import patch
 from service.models import Wishlist, DataValidationError
 from .factories import WishlistFactory, WishlistItemFactory
@@ -39,6 +40,8 @@ class TestWishlist(TestBase):
         fake_wishlist = WishlistFactory()
         wishlist = Wishlist()
         wishlist.name = fake_wishlist.name
+        wishlist.created_date = fake_wishlist.created_date
+        wishlist.modified_date = fake_wishlist.modified_date
         wishlist.customer_id = fake_wishlist.customer_id
         wishlist.items = []
 
@@ -47,6 +50,8 @@ class TestWishlist(TestBase):
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.items, [])
         self.assertEqual(wishlist.name, fake_wishlist.name)
+        self.assertEqual(wishlist.created_date, fake_wishlist.created_date)
+        self.assertEqual(wishlist.modified_date, fake_wishlist.modified_date)
         self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
 
     def test_add_a_wishlist(self):
@@ -73,12 +78,16 @@ class TestWishlist(TestBase):
         # pylint: disable=unexpected-keyword-arg
         wishlist = Wishlist(
             name=fake_wishlist.name,
+            created_date=fake_wishlist.created_date,
+            modified_date=fake_wishlist.modified_date,
             customer_id=fake_wishlist.customer_id,
             items=[]
         )
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.items, [])
         self.assertEqual(wishlist.name, fake_wishlist.name)
+        self.assertEqual(wishlist.created_date, fake_wishlist.created_date)
+        self.assertEqual(wishlist.modified_date, fake_wishlist.modified_date)
         self.assertEqual(wishlist.customer_id, fake_wishlist.customer_id)
 
     def test_delete_a_wishlist(self):
@@ -87,6 +96,8 @@ class TestWishlist(TestBase):
         wishlist = Wishlist(
             name=fake_wishlist.name,
             customer_id=fake_wishlist.customer_id,
+            created_date=fake_wishlist.created_date,
+            modified_date=fake_wishlist.modified_date,
         )
         wishlist.create()
         self.assertEqual(len(Wishlist.all()), 1)
@@ -102,7 +113,12 @@ class TestWishlist(TestBase):
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
-        wishlist = WishlistFactory(name="Holiday Wishlist")
+        fake_wishlist = WishlistFactory()
+        wishlist = WishlistFactory(
+            name="Holiday Wishlist",
+            created_date=fake_wishlist.created_date,
+            modified_date=fake_wishlist.modified_date,
+        )
         wishlist.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(wishlist.id)
@@ -116,6 +132,7 @@ class TestWishlist(TestBase):
         # Fetch it back again
         wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(wishlist.name, "Birthday Wishlist")
+        self.assertEqual(wishlist.modified_date, date.today())
 
     @patch("service.models.db.session.commit")
     def test_update_wishlist_failed(self, exception_mock):
@@ -153,6 +170,8 @@ class TestWishlist(TestBase):
         self.assertEqual(serial_wishlist["id"], wishlist.id)
         self.assertEqual(serial_wishlist["customer_id"], wishlist.customer_id)
         self.assertEqual(serial_wishlist["name"], wishlist.name)
+        self.assertEqual(serial_wishlist["created_date"], wishlist.created_date)
+        self.assertEqual(serial_wishlist["modified_date"], wishlist.modified_date)
         self.assertEqual(len(serial_wishlist["items"]), 1)
         items = serial_wishlist["items"]
         self.assertEqual(items[0]["id"], wishlist_item.id)
@@ -170,6 +189,8 @@ class TestWishlist(TestBase):
         new_wishlist.deserialize(serial_wishlist)
         self.assertEqual(new_wishlist.customer_id, wishlist.customer_id)
         self.assertEqual(new_wishlist.name, wishlist.name)
+        self.assertEqual(new_wishlist.created_date, wishlist.created_date)
+        self.assertEqual(new_wishlist.modified_date, wishlist.modified_date)
         self.assertEqual(len(new_wishlist.items), len(wishlist.items))
 
     def test_deserialize_with_key_error(self):

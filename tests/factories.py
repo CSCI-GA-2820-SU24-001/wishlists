@@ -17,8 +17,9 @@
 """
 Test Factory to make fake objects for testing
 """
+from datetime import date
 from factory import Factory, SubFactory, Sequence, Faker, post_generation
-from factory.fuzzy import FuzzyFloat
+from factory.fuzzy import FuzzyFloat, FuzzyDate
 from service.models import Wishlist, WishlistItem
 
 
@@ -34,6 +35,8 @@ class WishlistFactory(Factory):
     id = Sequence(lambda n: f"{n:04d}")
     customer_id = Sequence(lambda n: f"Customer{n:04d}")
     name = Faker("word")
+    created_date = FuzzyDate(start_date=date(2000, 1, 1))
+    modified_date = FuzzyDate(start_date=date(2000, 1, 1))
 
     @post_generation
     def items(
