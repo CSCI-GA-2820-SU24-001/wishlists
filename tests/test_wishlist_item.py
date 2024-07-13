@@ -69,8 +69,8 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist.items[1].description, item2.description)
         self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
         self.assertAlmostEqual(float(new_wishlist.items[1].price), float(item2.price))
-        self.assertEqual(new_wishlist.items[0].added_date, item2.added_date)
-        self.assertEqual(new_wishlist.items[0].modified_date, item2.modified_date)
+        self.assertEqual(new_wishlist.items[1].added_date, item2.added_date)
+        self.assertEqual(new_wishlist.items[1].modified_date, item2.modified_date)
 
     @patch("service.models.db.session.commit")
     def test_add_wishlist_item_failed(self, exception_mock):
@@ -165,13 +165,10 @@ class TestWishlistItem(TestBase):
         self.assertRaises(DataValidationError, item.deserialize, [])
 
     def test_deserialize_item_bad_price_type(self):
-        """It should not Deserialize a wishlist item with a TypeError because bad price type"""
-        item = WishlistItem()
+        """It should not deserialize a bad price attribute"""
+        data = WishlistItemFactory().serialize()
+        data['price'] = "twenty"
 
-        data = {}
-        data['wishlist_id'] = "0"
-        data["product_id"] = "0"
-        data["description"] = "desc"
-        data["price"] = "123456"  # should be int / float, but set to string here
+        item = WishlistItem()
 
         self.assertRaises(DataValidationError, item.deserialize, data)
