@@ -5,8 +5,8 @@ The models for WishlistItems are stored in this module
 """
 
 import uuid
-from .persistent_base import db, PersistentBase, DataValidationError
 from datetime import date
+from .persistent_base import db, PersistentBase, DataValidationError
 
 ######################################################################
 #  W I S H L I S T   I T E M   M O D E L
