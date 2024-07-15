@@ -461,6 +461,70 @@ class WishlistService(TestBase):
         resp = self.client.post("/", json={}, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_sort_wishlist_items_by_price_ascending(self):
+        """Test sorting wishlist items by price in ascending order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(price=10),
+            WishlistItemFactory(price=30),
+            WishlistItemFactory(price=20)
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort?order=asc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["price"], 10)
+        self.assertEqual(data[1]["price"], 20)
+        self.assertEqual(data[2]["price"], 30)
+
+    def test_sort_wishlist_items_by_price_descending(self):
+        """Test sorting wishlist items by price in descending order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(price=10),
+            WishlistItemFactory(price=30),
+            WishlistItemFactory(price=20)
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort?order=desc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["price"], 30)
+        self.assertEqual(data[1]["price"], 20)
+        self.assertEqual(data[2]["price"], 10)
+
+    def test_sort_wishlist_items_by_price_default_order(self):
+        """Test sorting wishlist items by price with default (ascending) order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(price=20),
+            WishlistItemFactory(price=10),
+            WishlistItemFactory(price=30)
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["price"], 10)
+        self.assertEqual(data[1]["price"], 20)
+        self.assertEqual(data[2]["price"], 30)
+
+    def test_sort_items_in_nonexistent_wishlist(self):
+        """Test sorting items in a non-existent wishlist"""
+        response = self.client.get("/wishlists/nonexistent-id/items/sort")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("could not be found", data["message"])
+
     def test_query_wishlist_item_by_price(self):
         """It should Query wishlist item by price"""
 
