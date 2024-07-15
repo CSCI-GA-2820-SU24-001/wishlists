@@ -413,6 +413,31 @@ def sort_wishlist_items(wishlist_id):
 
 
 ######################################################################
+# QUERY WISHLISTS BY CUSTOMER ID
+######################################################################
+@app.route("/wishlists/customers/<string:customer_id>", methods=["GET"])
+def get_wishlists_by_customer_id(customer_id):
+    """
+    Query Wishlists by Customer ID
+
+    This endpoint will return all wishlists for a given customer ID
+    """
+    app.logger.info("Request to get wishlists for customer id: %s", customer_id)
+
+    wishlists = Wishlist.query.filter_by(customer_id=customer_id).all()
+
+    if not wishlists:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"No wishlists found for customer id '{customer_id}'.",
+        )
+
+    results = [wishlist.serialize() for wishlist in wishlists]
+
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def check_content_type(content_type):

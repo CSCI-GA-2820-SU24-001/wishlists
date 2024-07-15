@@ -525,6 +525,26 @@ class WishlistService(TestBase):
         data = response.get_json()
         self.assertIn("could not be found", data["message"])
 
+    def test_get_wishlists_by_customer_id(self):
+        """Test retrieving wishlists by customer ID"""
+        customer_id = str(uuid.uuid4())
+        wishlist1 = WishlistFactory(customer_id=customer_id)
+        wishlist2 = WishlistFactory(customer_id=customer_id)
+        wishlist1.create()
+        wishlist2.create()
+
+        response = self.client.get(f"/wishlists/customers/{customer_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 2)
+
+    def test_get_wishlists_by_nonexistent_customer_id(self):
+        """Test retrieving wishlists by non-existent customer ID"""
+        response = self.client.get("/wishlists/customers/nonexistent-customer-id")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("No wishlists found for customer id", data["message"])
+
     def test_query_wishlist_item_by_price(self):
         """It should Query wishlist item by price"""
 
