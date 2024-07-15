@@ -377,6 +377,8 @@ def update_wishlist_item(wishlist_id, item_id):
     wishlist_item.update()
 
     return jsonify(wishlist_item.serialize()), status.HTTP_200_OK
+
+
 ######################################################################
 # SORT ITEMS IN A WISHLIST BY PRICE
 ######################################################################
@@ -408,6 +410,7 @@ def sort_wishlist_items(wishlist_id):
     results = [item.serialize() for item in sorted_items]
 
     return jsonify(results), status.HTTP_200_OK
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
