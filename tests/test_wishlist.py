@@ -104,12 +104,20 @@ class TestWishlist(TestBase):
         # delete the wishlist
         wishlist.delete()
         self.assertEqual(len(Wishlist.all()), 0)
+        wishlist.delete()
 
     def test_delete_wishlist_not_found(self):
         """It should not delete a Wishlist that does not exist"""
         wishlist = WishlistFactory()
         wishlist.id = "non-existent-id"  # Set an ID that does not exist in the database
         self.assertEqual(len(Wishlist.all()), 0)
+
+    @patch("service.models.db.session.commit")
+    def test_delete_wishlist_failed(self, exception_mock):
+        """It should not delete a Wishlist on database error"""
+        exception_mock.side_effect = Exception()
+        wishlist = WishlistFactory()
+        self.assertRaises(DataValidationError, wishlist.delete)
 
     def test_update_wishlist(self):
         """It should Update a wishlist"""
@@ -189,9 +197,11 @@ class TestWishlist(TestBase):
         new_wishlist.deserialize(serial_wishlist)
         self.assertEqual(new_wishlist.customer_id, wishlist.customer_id)
         self.assertEqual(new_wishlist.name, wishlist.name)
-        self.assertEqual(new_wishlist.created_date, wishlist.created_date)
-        self.assertEqual(new_wishlist.modified_date, wishlist.modified_date)
         self.assertEqual(len(new_wishlist.items), len(wishlist.items))
+
+        # Do not need to test, only set by default or on update
+        # self.assertEqual(new_wishlist.created_date, wishlist.created_date)
+        # self.assertEqual(new_wishlist.modified_date, wishlist.modified_date)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize a wishlist with a KeyError"""

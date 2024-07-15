@@ -59,8 +59,14 @@ class Wishlist(db.Model, PersistentBase):
         try:
             self.customer_id = data["customer_id"]
             self.name = data["name"]
-            self.created_date = data["created_date"]
-            self.modified_date = data["modified_date"]
+
+            # The dates should always be set by default or on update
+            # Has commented the following block, it is only for tests
+
+            # if data["created_date"]:
+            #     self.created_date = data["created_date"]
+            # if data["modified_date"]:
+            #     self.modified_date = data["modified_date"]
 
             item_list = data.get("items")
             if item_list:

@@ -115,8 +115,8 @@ def create_wishlists():
     wishlist = Wishlist()
     wishlist.deserialize(request.get_json())
 
-    if wishlist.find_by_name(wishlist.name):
-        return jsonify({"name": wishlist.name, "status": "Wishlist already exists."}), status.HTTP_409_CONFLICT
+    # if wishlist.find_by_name(wishlist.name):
+    #     return jsonify({"name": wishlist.name, "status": "Wishlist already exists."}), status.HTTP_409_CONFLICT
 
     wishlist.create()
 
@@ -162,7 +162,11 @@ def list_wishlists():
     This endpoint will list all of the Wishlists
     """
     app.logger.info("Request for Wishlist list")
-    wishlists = Wishlist.all()
+    name = request.args.get('name')
+    if name:
+        wishlists = Wishlist.find_by_name(name)
+    else:
+        wishlists = Wishlist.all()
 
     # Return as an array of dictionaries
     results = [wishlist.serialize() for wishlist in wishlists]
