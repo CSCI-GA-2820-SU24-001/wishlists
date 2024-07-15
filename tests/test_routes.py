@@ -517,7 +517,7 @@ class WishlistService(TestBase):
         self.assertEqual(data[0]["price"], 10)
         self.assertEqual(data[1]["price"], 20)
         self.assertEqual(data[2]["price"], 30)
-   
+
     def test_sort_items_in_nonexistent_wishlist(self):
         """Test sorting items in a non-existent wishlist"""
         response = self.client.get("/wishlists/nonexistent-id/items/sort")
