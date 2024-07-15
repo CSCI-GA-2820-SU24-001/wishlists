@@ -54,6 +54,8 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist.items[0].description, item.description)
         self.assertEqual(new_wishlist.items[0].product_id, item.product_id)
         self.assertAlmostEqual(float(new_wishlist.items[0].price), float(item.price))
+        self.assertEqual(new_wishlist.items[0].added_date, item.added_date)
+        self.assertEqual(new_wishlist.items[0].modified_date, item.modified_date)
 
         item2 = WishlistItemFactory(wishlist=wishlist)
         wishlist.items.append(item2)
@@ -67,6 +69,8 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist.items[1].description, item2.description)
         self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
         self.assertAlmostEqual(float(new_wishlist.items[1].price), float(item2.price))
+        self.assertEqual(new_wishlist.items[1].added_date, item2.added_date)
+        self.assertEqual(new_wishlist.items[1].modified_date, item2.modified_date)
 
     @patch("service.models.db.session.commit")
     def test_add_wishlist_item_failed(self, exception_mock):
@@ -134,6 +138,8 @@ class TestWishlistItem(TestBase):
         self.assertEqual(serial_wishlist_item["product_id"], wishlist_item.product_id)
         self.assertEqual(serial_wishlist_item["description"], wishlist_item.description)
         self.assertAlmostEqual(serial_wishlist_item["price"], float(wishlist_item.price))
+        self.assertEqual(serial_wishlist_item["added_date"], wishlist_item.added_date)
+        self.assertEqual(serial_wishlist_item["modified_date"], wishlist_item.modified_date)
 
     def test_deserialize_a_wishlist_item(self):
         """It should deserialize a WishlistItem"""
@@ -145,6 +151,8 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist_item.product_id, wishlist_item.product_id)
         self.assertEqual(new_wishlist_item.description, wishlist_item.description)
         self.assertAlmostEqual(new_wishlist_item.price, float(wishlist_item.price))
+        self.assertEqual(new_wishlist_item.added_date, wishlist_item.added_date)
+        self.assertEqual(new_wishlist_item.modified_date, wishlist_item.modified_date)
 
     def test_deserialize_item_key_error(self):
         """It should not Deserialize a wishlist item with a KeyError"""
@@ -157,13 +165,10 @@ class TestWishlistItem(TestBase):
         self.assertRaises(DataValidationError, item.deserialize, [])
 
     def test_deserialize_item_bad_price_type(self):
-        """It should not Deserialize a wishlist item with a TypeError because bad price type"""
-        item = WishlistItem()
+        """It should not deserialize a bad price attribute"""
+        data = WishlistItemFactory().serialize()
+        data['price'] = "twenty"
 
-        data = {}
-        data['wishlist_id'] = "0"
-        data["product_id"] = "0"
-        data["description"] = "desc"
-        data["price"] = "123456"  # should be int / float, but set to string here
+        item = WishlistItem()
 
         self.assertRaises(DataValidationError, item.deserialize, data)

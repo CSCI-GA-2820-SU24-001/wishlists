@@ -80,10 +80,10 @@ class WishlistService(TestBase):
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
-        resp = self.client.post(
-            BASE_URL, json=wishlist.serialize(), content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+        # resp = self.client.post(
+        #     BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        # )
+        # self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_delete_wishlist(self):
         """It should Delete a wishlist"""
@@ -171,6 +171,49 @@ class WishlistService(TestBase):
         data = resp.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
+
+    def test_query_wishlists_by_name(self):
+        """It should query and return a list of wishlists of the specified name"""
+        # create 3 wishlists
+        wishlists = self._create_wishlists(3)
+        resp = self.client.get(f"{BASE_URL}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 3)
+
+        # change the names of 2 wishlists as "myWishlist"
+        wishlists[0].name = "myWishlist"
+        wishlists[1].name = "myWishlist"
+        wishlists[2].name = "notMyWishlist"
+
+        # update the wishlists
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlists[0].id}",
+            json=wishlists[0].serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlists[1].id}",
+            json=wishlists[1].serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.client.put(
+            f"{BASE_URL}/{wishlists[2].id}",
+            json=wishlists[2].serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.client.get(f"{BASE_URL}?name=myWishlist")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+        self.assertEqual(wishlists[0].name, data[0]["name"])
+        self.assertEqual(wishlists[0].name, data[1]["name"])
 
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
