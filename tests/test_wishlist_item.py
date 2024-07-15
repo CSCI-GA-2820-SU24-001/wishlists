@@ -40,6 +40,10 @@ class TestWishlistItem(TestBase):
         self.assertEqual(wishlists, [])
         wishlist = WishlistFactory()
         item = WishlistItemFactory(wishlist=wishlist)
+
+        # To cover test of __repr__()
+        self.assertEqual(repr(item), f"<WishlistItem product_id=[{item.product_id}] wishlist_id=[{item.wishlist_id}]>")
+
         wishlist.items.append(item)
         wishlist.create()
         # Assert that it was assigned an id and shows up in the database

@@ -386,8 +386,6 @@ class WishlistService(TestBase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-
-
     def test_move_item_to_another_wishlist(self):
         """It should Move an item from one wishlist to another"""
         # Create two wishlists
@@ -438,8 +436,65 @@ class WishlistService(TestBase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_move_item_to_another_wishlist_bad_path(self):
+        """It should not Move an item from one wishlist to another"""
+        # Create two wishlists
+        source_wishlist = WishlistFactory()
+        target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
+        other_wishlist = WishlistFactory(customer_id="other_customer")
 
-        
+        # Add source wishlist to the database
+        resp = self.client.post(BASE_URL, json=source_wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        source_wishlist_id = resp.get_json()["id"]
+
+        # Add target wishlist to the database
+        resp = self.client.post(BASE_URL, json=target_wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        target_wishlist_id = resp.get_json()["id"]
+
+        # Add other wishlist to the database
+        resp = self.client.post(BASE_URL, json=other_wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        other_wishlist_id = resp.get_json()["id"]
+
+        # Add an item to the source wishlist
+        item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{source_wishlist_id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        item_id = resp.get_json()["id"]
+
+        # Deny when the source wishlist does not exist
+        resp = self.client.put(
+            f"{BASE_URL}/null/items/{item_id}/move-to/{target_wishlist_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Deny when the target wishlist does not exist
+        resp = self.client.put(
+            f"{BASE_URL}/{source_wishlist_id}/items/{item_id}/move-to/null",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Deny when the item does not exist
+        resp = self.client.put(
+            f"{BASE_URL}/{source_wishlist_id}/items/null/move-to/{target_wishlist_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Deny when the customer id does not match
+        resp = self.client.put(
+            f"{BASE_URL}/{source_wishlist_id}/items/{item_id}/move-to/{other_wishlist_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_invalid_content_type(self):
         """It should not Accept any request that have an invalid content type"""

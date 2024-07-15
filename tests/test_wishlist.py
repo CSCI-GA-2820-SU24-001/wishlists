@@ -203,7 +203,6 @@ class TestWishlist(TestBase):
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, [])
 
-
     def test_move_item_to_another_wishlist_model(self):
         """It should Move an Item from one Wishlist to another in the model"""
         # Create source and target wishlists
@@ -221,7 +220,7 @@ class TestWishlist(TestBase):
         # Move the item from source wishlist to target wishlist
         item.wishlist_id = target_wishlist.id
         item.update()
-        
+
         # Refresh wishlists to get the latest data
         source_wishlist = Wishlist.find(source_wishlist.id)
         target_wishlist = Wishlist.find(target_wishlist.id)
@@ -229,6 +228,3 @@ class TestWishlist(TestBase):
         # Check if the item is moved
         self.assertNotIn(item, source_wishlist.items)
         self.assertIn(item, target_wishlist.items)
-
-
-

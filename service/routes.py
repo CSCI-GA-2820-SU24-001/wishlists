@@ -370,7 +370,8 @@ def update_wishlist_item(wishlist_id, item_id):
     return jsonify(wishlist_item.serialize()), status.HTTP_200_OK
 
 
-@app.route("/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>", methods=["PUT"])
+@app.route("/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>",
+           methods=["PUT"])
 def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_id):
     """
     Move an Item from One Wishlist to Another
@@ -411,18 +412,16 @@ def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_i
     if target_wishlist.customer_id != source_wishlist.customer_id:
         abort(
             status.HTTP_403_FORBIDDEN,
-            f"Wishlists belong to different customers.",
+            "Wishlists belong to different customers.",
         )
 
-     # Update the item's wishlist_id and save it to the database
-     
+    # Update the item's wishlist_id and save it to the database
     item.wishlist_id = target_wishlist_id
     item.update()
 
     # Remove the item from the source wishlist
     source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
     source_wishlist.update()
-
 
     # Add the item to the target wishlist
     target_wishlist.items.append(item)
