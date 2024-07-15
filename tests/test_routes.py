@@ -517,7 +517,7 @@ class WishlistService(TestBase):
         self.assertEqual(data[0]["price"], 10)
         self.assertEqual(data[1]["price"], 20)
         self.assertEqual(data[2]["price"], 30)
- 
+
     def test_query_wishlist_item_by_price(self):
         """It should Query wishlist item by price"""
 
