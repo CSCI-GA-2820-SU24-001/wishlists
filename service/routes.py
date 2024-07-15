@@ -315,6 +315,11 @@ def list_items(wishlist_id):
         )
 
     # Get the items for the wishlist
+    price = request.args.get("price")
+    if price:
+        app.logger.info("Find by price: %s", price)
+        wishlist.items = WishlistItem.find_by_price(wishlist_id, price)
+
     results = [item.serialize() for item in wishlist.items]
 
     return jsonify(results), status.HTTP_200_OK
@@ -379,9 +384,7 @@ def update_wishlist_item(wishlist_id, item_id):
 ######################################################################
 def check_content_type(content_type):
     """Checks that the media type is correct"""
-    if (
-        "Content-Type" not in request.headers
-    ):
+    if "Content-Type" not in request.headers:
         app.logger.error("No Content-Type specified.")
         abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,

@@ -35,9 +35,7 @@ class WishlistItem(db.Model, PersistentBase):
         return f"<WishlistItem product_id=[{self.product_id}] wishlist_id=[{self.wishlist_id}]>"
 
     def __str__(self):
-        return (
-            f"Product ID: {self.product_id}, Description: {self.description}, Price: {self.price}"
-        )
+        return f"Product ID: {self.product_id}, Description: {self.description}, Price: {self.price}"
 
     def serialize(self) -> dict:
         """Converts a WishlistItem into a dictionary"""
@@ -69,8 +67,7 @@ class WishlistItem(db.Model, PersistentBase):
                 self.price = data["price"]
             else:
                 raise TypeError(
-                    "Invalid type for int/float [price]: "
-                    + str(type(data["price"]))
+                    "Invalid type for int/float [price]: " + str(type(data["price"]))
                 )
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
@@ -85,6 +82,19 @@ class WishlistItem(db.Model, PersistentBase):
             ) from error
 
         return self
+
+    @classmethod
+    def find_by_price(cls, wishlist_id, price):
+        """Returns all WishlistItems with the given wishlist_id and price
+
+        Args:
+            wishlist_id (string): the wishlist_id of the WishlistItem you want to match
+            price(string): the price of the WishlistItem you want to match
+        """
+
+        return cls.query.filter(
+            cls.wishlist_id == wishlist_id, cls.price <= float(price)
+        ).all()
 
     ##################################################
     # Class Methods
