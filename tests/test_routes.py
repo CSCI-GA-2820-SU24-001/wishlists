@@ -386,6 +386,61 @@ class WishlistService(TestBase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
+
+
+    def test_move_item_to_another_wishlist(self):
+        """It should Move an item from one wishlist to another"""
+        # Create two wishlists
+        source_wishlist = WishlistFactory()
+        target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
+
+        # Add source wishlist to the database
+        resp = self.client.post(BASE_URL, json=source_wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        source_wishlist_id = resp.get_json()["id"]
+
+        # Add target wishlist to the database
+        resp = self.client.post(BASE_URL, json=target_wishlist.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        target_wishlist_id = resp.get_json()["id"]
+
+        # Add an item to the source wishlist
+        item = WishlistItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{source_wishlist_id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        item_id = resp.get_json()["id"]
+
+        # Move the item to the target wishlist
+        resp = self.client.put(
+            f"{BASE_URL}/{source_wishlist_id}/items/{item_id}/move-to/{target_wishlist_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Verify the item is now in the target wishlist
+        resp = self.client.get(
+            f"{BASE_URL}/{target_wishlist_id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["wishlist_id"], target_wishlist_id)
+
+        # Verify the item is no longer in the source wishlist
+        resp = self.client.get(
+            f"{BASE_URL}/{source_wishlist_id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        
+
     def test_invalid_content_type(self):
         """It should not Accept any request that have an invalid content type"""
         wishlist = WishlistFactory()

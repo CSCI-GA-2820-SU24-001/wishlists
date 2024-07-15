@@ -202,3 +202,33 @@ class TestWishlist(TestBase):
         """It should not Deserialize a wishlist with a TypeError"""
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, [])
+
+
+    def test_move_item_to_another_wishlist_model(self):
+        """It should Move an Item from one Wishlist to another in the model"""
+        # Create source and target wishlists
+        source_wishlist = WishlistFactory()
+        target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
+        source_wishlist.create()
+        target_wishlist.create()
+
+        # Create an item and add it to the source wishlist
+        item = WishlistItemFactory(wishlist_id=source_wishlist.id)
+        item.create()
+        source_wishlist.items.append(item)
+        source_wishlist.update()
+
+        # Move the item from source wishlist to target wishlist
+        item.wishlist_id = target_wishlist.id
+        item.update()
+        
+        # Refresh wishlists to get the latest data
+        source_wishlist = Wishlist.find(source_wishlist.id)
+        target_wishlist = Wishlist.find(target_wishlist.id)
+
+        # Check if the item is moved
+        self.assertNotIn(item, source_wishlist.items)
+        self.assertIn(item, target_wishlist.items)
+
+
+
