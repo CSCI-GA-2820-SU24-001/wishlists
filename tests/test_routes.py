@@ -1,7 +1,7 @@
 """
 WishlistModel API Service Test Suite
 """
-
+import uuid
 import logging
 from service.common import status
 from .factories import WishlistFactory, WishlistItemFactory
