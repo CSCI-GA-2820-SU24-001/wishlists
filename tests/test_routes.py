@@ -74,7 +74,9 @@ class WishlistService(TestBase):
         new_wishlist = resp.get_json()
         self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
         self.assertEqual(
-            new_wishlist["customer_id"], wishlist.customer_id, "customer id does not match"
+            new_wishlist["customer_id"],
+            wishlist.customer_id,
+            "customer id does not match",
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
@@ -233,14 +235,20 @@ class WishlistService(TestBase):
         """It should Get an existing Wishlist Item"""
         # Create a Wishlist
         wishlist = WishlistFactory()
-        resp = self.client.post(BASE_URL, json=wishlist.serialize(), content_type="application/json")
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         new_wishlist = resp.get_json()
         wishlist_id = new_wishlist["id"]
 
         # Add an item to the wishlist
         item = WishlistItemFactory(wishlist_id=wishlist_id)
-        resp = self.client.post(f"{BASE_URL}/{wishlist_id}/items", json=item.serialize(), content_type="application/json")
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist_id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         new_item = resp.get_json()
         item_id = new_item["id"]
@@ -265,7 +273,9 @@ class WishlistService(TestBase):
         resp = self.client.get(f"{BASE_URL}/{wishlist_id}/items/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-        resp = self.client.post(BASE_URL, json=wishlist.serialize(), content_type="application/json")
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # Try to get a non-existent item
@@ -300,7 +310,9 @@ class WishlistService(TestBase):
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_item = resp.get_json()
-        self.assertEqual(new_item["product_id"], item.product_id, "Item's product_id does not match")
+        self.assertEqual(
+            new_item["product_id"], item.product_id, "Item's product_id does not match"
+        )
 
     def test_add_item_wishlist_not_exist(self):
         """It cannot find the wishlist that does not exist, and return 404"""
@@ -398,14 +410,43 @@ class WishlistService(TestBase):
         """It should not Accept any bad requests"""
         data = {}
         data["attr"] = "nonsense"  # malformed data that the server cannot parse
-        resp = self.client.post(
-            BASE_URL, json=data, content_type="application/json"
-        )
+        resp = self.client.post(BASE_URL, json=data, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_request_method_not_supported(self):
         """It should not Accept any requests with unsupported methods"""
-        resp = self.client.post(
-            "/", json={}, content_type="application/json"
-        )
+        resp = self.client.post("/", json={}, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_query_wishlist_item_by_price(self):
+        """It should Query wishlist item by price"""
+
+        wishlist = self._create_wishlists(1)[0]
+        item_list = WishlistItemFactory.create_batch(5)
+        for i in range(5):
+            resp = self.client.post(
+                f"{BASE_URL}/{wishlist.id}/items",
+                json=item_list[i].serialize(),
+                content_type="application/json",
+            )
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.get(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
+        test_price = 50
+        filtered_count = len([item for item in item_list if item.price <= test_price])
+        response = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/items", query_string=f"price={test_price}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), filtered_count)
+        # check the data just to be sure
+        for item in data:
+            self.assertTrue(
+                item["price"] < test_price,
+                f"Item {item['id']} has a price of {item['price']} which is not less than {test_price}",
+            )
