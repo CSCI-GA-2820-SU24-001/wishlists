@@ -379,6 +379,66 @@ def update_wishlist_item(wishlist_id, item_id):
     return jsonify(wishlist_item.serialize()), status.HTTP_200_OK
 
 
+@app.route("/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>",
+           methods=["PUT"])
+def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_id):
+    """
+    Move an Item from One Wishlist to Another
+
+    This endpoint will move an item from a source wishlist to a target wishlist
+    """
+    app.logger.info(
+        "Request to move item with id: %s from wishlist with id: %s to wishlist with id: %s",
+        item_id, source_wishlist_id, target_wishlist_id
+    )
+    check_content_type("application/json")
+
+    # Find the source wishlist
+    source_wishlist = Wishlist.find(source_wishlist_id)
+    if not source_wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Source wishlist with id '{source_wishlist_id}' could not be found.",
+        )
+
+    # Find the target wishlist
+    target_wishlist = Wishlist.find(target_wishlist_id)
+    if not target_wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Target wishlist with id '{target_wishlist_id}' could not be found.",
+        )
+
+    # Find the item
+    item = WishlistItem.find(item_id)
+    if not item or item.wishlist_id != source_wishlist_id:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' could not be found in wishlist '{source_wishlist_id}'.",
+        )
+
+    # Check if both wishlists belong to the same customer
+    if target_wishlist.customer_id != source_wishlist.customer_id:
+        abort(
+            status.HTTP_403_FORBIDDEN,
+            "Wishlists belong to different customers.",
+        )
+
+    # Update the item's wishlist_id and save it to the database
+    item.wishlist_id = target_wishlist_id
+    item.update()
+
+    # Remove the item from the source wishlist
+    source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
+    source_wishlist.update()
+
+    # Add the item to the target wishlist
+    target_wishlist.items.append(item)
+    target_wishlist.update()
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
 ######################################################################
 # SORT ITEMS IN A WISHLIST BY PRICE
 ######################################################################
