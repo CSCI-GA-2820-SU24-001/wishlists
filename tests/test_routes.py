@@ -681,3 +681,30 @@ class WishlistService(TestBase):
                 item["price"] < test_price,
                 f"Item {item['id']} has a price of {item['price']} which is not less than {test_price}",
             )
+    
+    def test_delete_all_wishlists_by_customer_id(self):
+        customer_id = "fake_customer_id"
+        for _ in range(5):
+            fake_wishlist = WishlistFactory()
+            resp = self.client.post(
+                BASE_URL,
+                json=fake_wishlist.serialize(),
+                content_type="application/json",
+            )
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+            # update the wishlist
+            updated_wishlist = resp.get_json()
+            updated_wishlist["customer_id"] = customer_id
+            updated_wishlist_id = updated_wishlist["id"]
+            resp = self.client.put(
+                f"{BASE_URL}/{updated_wishlist_id}", json=updated_wishlist
+            )
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"{BASE_URL}?customer_id={customer_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+        response = self.client.delete(f"{BASE_URL}/customer/{customer_id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
