@@ -446,7 +446,7 @@ def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_i
 ######################################################################
 # SORT ITEMS IN A WISHLIST BY PRICE
 ######################################################################
-@app.route("/wishlists/<string:wishlist_id>/items/sort", methods=["GET"])
+@app.route("/wishlists/<string:wishlist_id>/items?sort_by=price", methods=["GET"])
 def sort_wishlist_items_bt_price(wishlist_id):
     """
     Sort Items in a Wishlist by Price
@@ -455,6 +455,7 @@ def sort_wishlist_items_bt_price(wishlist_id):
     """
     app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
 
+    sort_by = request.args.get("sort_by", "price").lower
     sort_order = request.args.get("order", "asc").lower()
 
     # See if the wishlist exists and abort if it doesn't
@@ -466,7 +467,7 @@ def sort_wishlist_items_bt_price(wishlist_id):
         )
 
     # Sort the items by price
-    if sort_order == "desc":
+    if sort_by == "price" and sort_order == "desc":
         sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
     else:
         sorted_items = sorted(wishlist.items, key=lambda item: item.price)
@@ -477,9 +478,9 @@ def sort_wishlist_items_bt_price(wishlist_id):
 
 
 ######################################################################
-# SORT ITEMS IN A WISHLIST BY PRICE
+# SORT ITEMS IN A WISHLIST BY ADDED DATE
 ######################################################################
-@app.route("/wishlists/<string:wishlist_id>/items/sort", methods=["GET"])
+@app.route("/wishlists/<string:wishlist_id>/items?sort_by=added_date", methods=["GET"])
 def sort_wishlist_items_by_added_date(wishlist_id):
     """
     Sort Items in a Wishlist by Added Date
@@ -500,9 +501,9 @@ def sort_wishlist_items_by_added_date(wishlist_id):
 
     # Sort the items by price
     if sort_order == "desc":
-        sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
+        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
     else:
-        sorted_items = sorted(wishlist.items, key=lambda item: item.price)
+        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date)
 
     results = [item.serialize() for item in sorted_items]
 
