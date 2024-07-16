@@ -162,8 +162,12 @@ def list_wishlists():
     This endpoint will list all of the Wishlists
     """
     app.logger.info("Request for Wishlist list")
+    customer_id = request.args.get('customer_id')
     name = request.args.get('name')
-    if name:
+
+    if customer_id:
+        wishlists = Wishlist.find_by_customer_id(customer_id)
+    elif name:
         wishlists = Wishlist.find_by_name(name)
     else:
         wishlists = Wishlist.all()
