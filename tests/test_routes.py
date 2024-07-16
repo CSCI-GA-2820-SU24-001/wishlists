@@ -528,12 +528,12 @@ class WishlistService(TestBase):
     def test_query_wishlists_by_customer_id(self):
         """It should Query Wishlists by Customer ID"""
         customer_id = "12345"
-        wishlist1 = Wishlist(customer_id=customer_id, name="Wishlist1")
-        wishlist2 = Wishlist(customer_id=customer_id, name="Wishlist2")
-        wishlist1.create()
-        wishlist2.create()
+        wishlist1 = WishlistFactory(customer_id=customer_id)
+        wishlist2 = WishlistFactory(customer_id=customer_id)
+        self.client.post(BASE_URL, json=wishlist1.serialize(), content_type="application/json")
+        self.client.post(BASE_URL, json=wishlist2.serialize(), content_type="application/json")
 
-        resp = self.client.get(f"/wishlists?customer_id={customer_id}")
+        resp = self.client.get(f"{BASE_URL}?customer_id={customer_id}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 2)
