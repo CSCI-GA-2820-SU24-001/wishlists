@@ -162,8 +162,12 @@ def list_wishlists():
     This endpoint will list all of the Wishlists
     """
     app.logger.info("Request for Wishlist list")
+    customer_id = request.args.get('customer_id')
     name = request.args.get('name')
-    if name:
+
+    if customer_id:
+        wishlists = Wishlist.find_by_customer_id(customer_id)
+    elif name:
         wishlists = Wishlist.find_by_name(name)
     else:
         wishlists = Wishlist.all()
@@ -408,31 +412,6 @@ def sort_wishlist_items(wishlist_id):
         sorted_items = sorted(wishlist.items, key=lambda item: item.price)
 
     results = [item.serialize() for item in sorted_items]
-
-    return jsonify(results), status.HTTP_200_OK
-
-
-######################################################################
-# QUERY WISHLISTS BY CUSTOMER ID
-######################################################################
-@app.route("/wishlists/customers/<string:customer_id>", methods=["GET"])
-def get_wishlists_by_customer_id(customer_id):
-    """
-    Query Wishlists by Customer ID
-
-    This endpoint will return all wishlists for a given customer ID
-    """
-    app.logger.info("Request to get wishlists for customer id: %s", customer_id)
-
-    wishlists = Wishlist.query.filter_by(customer_id=customer_id).all()
-
-    if not wishlists:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"No wishlists found for customer id '{customer_id}'.",
-        )
-
-    results = [wishlist.serialize() for wishlist in wishlists]
 
     return jsonify(results), status.HTTP_200_OK
 
