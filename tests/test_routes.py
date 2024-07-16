@@ -5,6 +5,7 @@ import logging
 from service.common import status
 from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
+from datetime import date
 
 BASE_URL = "/wishlists"
 
@@ -581,7 +582,7 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort?order=asc")
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=price&order=asc")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
@@ -600,7 +601,7 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort?order=desc")
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=price&order=desc")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
@@ -619,7 +620,7 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items/sort")
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=price")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
@@ -629,10 +630,67 @@ class WishlistService(TestBase):
 
     def test_sort_items_in_nonexistent_wishlist(self):
         """Test sorting items in a non-existent wishlist"""
-        response = self.client.get("/wishlists/nonexistent-id/items/sort")
+        response = self.client.get("/wishlists/nonexistent-id/items?sort_by=price|added_date")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("could not be found", data["message"])
+
+    def test_sort_wishlist_items_by_added_date_ascending(self):
+        """Test sorting wishlist items by added date in ascending order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(added_date=date(2022, 3, 12)),
+            WishlistItemFactory(added_date=date(2022, 3, 13)),
+            WishlistItemFactory(added_date=date(2022, 3, 14))
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=asc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["added_date"], date(2022, 3, 12))
+        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
+        self.assertEqual(data[2]["added_date"], date(2022, 3, 14))
+
+    def test_sort_wishlist_items_by_added_date_descending(self):
+        """Test sorting wishlist items by added date in descending order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(added_date=date(2022, 3, 12)),
+            WishlistItemFactory(added_date=date(2022, 3, 14)),
+            WishlistItemFactory(added_date=date(2022, 3, 13))
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=asc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["added_date"], date(2022, 3, 14))
+        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
+        self.assertEqual(data[2]["added_date"], date(2022, 3, 12))
+
+    def test_sort_wishlist_items_by_added_date_default_order(self):
+        """Test sorting wishlist items by added date in default (descending) order"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(added_date=date(2022, 3, 13)),
+            WishlistItemFactory(added_date=date(2022, 3, 12)),
+            WishlistItemFactory(added_date=date(2022, 3, 14))
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=desc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["added_date"], date(2022, 3, 14))
+        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
+        self.assertEqual(data[2]["added_date"], date(2022, 3, 12))
 
     def test_query_wishlists_by_customer_id(self):
         """It should Query Wishlists by Customer ID"""
