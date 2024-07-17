@@ -709,3 +709,6 @@ class WishlistService(TestBase):
         self.assertEqual(len(data), 5)
         response = self.client.delete(f"{BASE_URL}/customer/{customer_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        not_exist_customer_id = "fake_customer_id_2"
+        response = self.client.delete(f"{BASE_URL}/customer/{not_exist_customer_id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
