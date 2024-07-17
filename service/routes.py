@@ -330,14 +330,6 @@ def list_items(wishlist_id):
 
     sort_by = request.args.get("sort_by", "price").lower()
 
-    # See if the wishlist exists and abort if it doesn't
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist with id '{wishlist_id}' could not be found.",
-        )
-
     if sort_by == "price":
         # Sort the items by price
         sort_order = request.args.get("order", "asc").lower()
