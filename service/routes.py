@@ -217,7 +217,7 @@ def delete_wishlist(wishlist_id):
 
     This endpoint will delete a Wishlist based on the id specified in the path
     """
-    app.logger.info("Request to delete wishlist with id: %s", wishlist_id)    
+    app.logger.info("Request to delete wishlist with id: %s", wishlist_id)   
 
     # Retrieve the wishlist to delete and delete it if it exists
     wishlist = Wishlist.find(wishlist_id)
@@ -496,6 +496,7 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
 
+
 ######################################################################
 # DELETE ALL WISHLISTS FOR SPECIFIC CUSTOMER
 ######################################################################
@@ -516,3 +517,4 @@ def delete_all_wishlists(customer_id):
     for wishlist in all_wishlist:
         wishlist.delete()
     return "", status.HTTP_204_NO_CONTENT
+    
