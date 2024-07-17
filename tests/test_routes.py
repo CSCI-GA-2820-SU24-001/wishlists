@@ -681,7 +681,7 @@ class WishlistService(TestBase):
                 item["price"] < test_price,
                 f"Item {item['id']} has a price of {item['price']} which is not less than {test_price}",
             )
-    
+
     def test_delete_all_wishlists_by_customer_id(self):
         customer_id = "fake_customer_id"
         for _ in range(5):
