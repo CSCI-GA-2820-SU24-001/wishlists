@@ -492,7 +492,7 @@ def check_content_type(content_type):
 ######################################################################
 # DELETE ALL WISHLISTS FOR SPECIFIC CUSTOMER
 ######################################################################
-@app.route("/wishlists/customer/<customer_id>", methods=["DELETE"])
+@app.route("/wishlists/customers/<customer_id>", methods=["DELETE"])
 def delete_all_wishlists(customer_id):
     """
     Delete all wishlists for specific customer
