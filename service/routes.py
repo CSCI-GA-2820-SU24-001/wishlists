@@ -319,7 +319,7 @@ def list_items(wishlist_id):
             status.HTTP_404_NOT_FOUND,
             f"Wishlist with id '{wishlist_id}' could not be found.",
         )
-    
+
     # Get the items for the wishlist
     price = request.args.get("price")
     if price:

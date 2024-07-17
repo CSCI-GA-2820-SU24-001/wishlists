@@ -2,10 +2,10 @@
 WishlistModel API Service Test Suite
 """
 import logging
+from datetime import date
 from service.common import status
 from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
-from datetime import datetime, date
 
 BASE_URL = "/wishlists"
 
