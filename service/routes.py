@@ -495,3 +495,25 @@ def check_content_type(content_type):
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
+
+
+######################################################################
+# DELETE ALL WISHLISTS FOR SPECIFIC CUSTOMER
+######################################################################
+@app.route("/wishlists/customer/<customer_id>", methods=["DELETE"])
+def delete_all_wishlists(customer_id):
+    """
+    Delete all wishlists for specific customer
+
+    This endpoint will delete all wishlists for specific customer based on the customer id specified in the path
+    """
+    app.logger.info("Request to delete all wishlist with customer id: %s", customer_id)
+
+    # Retrieve the wishlist to delete and delete it if it exists
+    all_wishlist = Wishlist.find_by_customer_id(customer_id)
+    if not all_wishlist:
+        return "", status.HTTP_204_NO_CONTENT
+
+    for wishlist in all_wishlist:
+        wishlist.delete()
+    return "", status.HTTP_204_NO_CONTENT
