@@ -161,13 +161,15 @@ def list_wishlists():
 
     This endpoint will list all of the Wishlists
     """
-    app.logger.info("Request for Wishlist list")
+    app.logger.info("Request to list wishlists ")
     customer_id = request.args.get('customer_id')
     name = request.args.get('name')
 
     if customer_id:
+        app.logger.info("Filter by customer_id")
         wishlists = Wishlist.find_by_customer_id(customer_id)
     elif name:
+        app.logger.info("Filter by name")
         wishlists = Wishlist.find_by_name(name)
     else:
         wishlists = Wishlist.all()
@@ -307,8 +309,26 @@ def read_wishlist_item(wishlist_id, item_id):
 ######################################################################
 @app.route("/wishlists/<wishlist_id>/items", methods=["GET"])
 def list_items(wishlist_id):
-    """Returns all of the items for an Wishlist"""
-    app.logger.info("Request for all items for Wishlist with id: %s", wishlist_id)
+    """Returns all of the .filtered items for an Wishlist in given sorting order"""
+    app.logger.info("Request for list items for Wishlist with id: %s", wishlist_id)
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+    
+    # Get the items for the wishlist
+    price = request.args.get("price")
+    if price:
+        app.logger.info("Find by price: %s", price)
+        wishlist.items = WishlistItem.find_by_price(wishlist_id, price)
+
+    app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
+
+    sort_by = request.args.get("sort_by", "price").lower()
 
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
@@ -318,13 +338,26 @@ def list_items(wishlist_id):
             f"Wishlist with id '{wishlist_id}' could not be found.",
         )
 
-    # Get the items for the wishlist
-    price = request.args.get("price")
-    if price:
-        app.logger.info("Find by price: %s", price)
-        wishlist.items = WishlistItem.find_by_price(wishlist_id, price)
+    if sort_by == "price":
+        # Sort the items by price
+        sort_order = request.args.get("order", "asc").lower()
+        app.logger.info("Sort by price in %s order", sort_order)
 
-    results = [item.serialize() for item in wishlist.items]
+        if sort_order == "desc":
+            sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
+        else:
+            sorted_items = sorted(wishlist.items, key=lambda item: item.price)
+    elif sort_by == "added_date":
+        # Sort the items by price
+        sort_order = request.args.get("order", "desc").lower()
+        app.logger.info("Sort by added_date in %s order", sort_order)
+
+        if sort_order == "asc":
+            sorted_items = sorted(wishlist.items, key=lambda item: item.added_date)
+        else:
+            sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
+
+    results = [item.serialize() for item in sorted_items]
 
     return jsonify(results), status.HTTP_200_OK
 
@@ -441,72 +474,6 @@ def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_i
     target_wishlist.update()
 
     return jsonify(item.serialize()), status.HTTP_200_OK
-
-
-######################################################################
-# SORT ITEMS IN A WISHLIST BY PRICE
-######################################################################
-@app.route("/wishlists/<string:wishlist_id>/items?sort_by=price", methods=["GET"])
-def sort_wishlist_items_bt_price(wishlist_id):
-    """
-    Sort Items in a Wishlist by Price
-
-    This endpoint will return the items in a wishlist sorted by price
-    """
-    app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
-
-    sort_order = request.args.get("order", "asc").lower()
-
-    # See if the wishlist exists and abort if it doesn't
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist with id '{wishlist_id}' could not be found.",
-        )
-
-    # Sort the items by price
-    if sort_order == "desc":
-        sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
-    else:
-        sorted_items = sorted(wishlist.items, key=lambda item: item.price)
-
-    results = [item.serialize() for item in sorted_items]
-
-    return jsonify(results), status.HTTP_200_OK
-
-
-######################################################################
-# SORT ITEMS IN A WISHLIST BY ADDED DATE
-######################################################################
-@app.route("/wishlists/<string:wishlist_id>/items?sort_by=added_date", methods=["GET"])
-def sort_wishlist_items_by_added_date(wishlist_id):
-    """
-    Sort Items in a Wishlist by Added Date
-
-    This endpoint will return the items in a wishlist sorted by added date
-    """
-    app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
-
-    sort_order = request.args.get("order", "desc").lower()
-
-    # See if the wishlist exists and abort if it doesn't
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist with id '{wishlist_id}' could not be found.",
-        )
-
-    # Sort the items by price
-    if sort_order == "asc":
-        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date)
-    else:
-        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
-
-    results = [item.serialize() for item in sorted_items]
-
-    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
