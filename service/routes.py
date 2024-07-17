@@ -517,4 +517,3 @@ def delete_all_wishlists(customer_id):
     for wishlist in all_wishlist:
         wishlist.delete()
     return "", status.HTTP_204_NO_CONTENT
-
