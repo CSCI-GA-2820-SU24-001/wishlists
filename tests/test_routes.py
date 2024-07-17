@@ -683,6 +683,7 @@ class WishlistService(TestBase):
             )
 
     def test_delete_all_wishlists_by_customer_id(self):
+        """It should delete all wishlist for specific customer"""
         customer_id = "fake_customer_id"
         for _ in range(5):
             fake_wishlist = WishlistFactory()
