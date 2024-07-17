@@ -5,7 +5,7 @@ import logging
 from service.common import status
 from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
-from datetime import date
+from datetime import datetime, date
 
 BASE_URL = "/wishlists"
 
@@ -650,9 +650,9 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0]["added_date"], date(2022, 3, 12))
-        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
-        self.assertEqual(data[2]["added_date"], date(2022, 3, 14))
+        self.assertEqual(data[0]['added_date'], date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[1]['added_date'], date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[2]['added_date'], date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"))
 
     def test_sort_wishlist_items_by_added_date_descending(self):
         """Test sorting wishlist items by added date in descending order"""
@@ -665,13 +665,13 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=asc")
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=desc")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0]["added_date"], date(2022, 3, 14))
-        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
-        self.assertEqual(data[2]["added_date"], date(2022, 3, 12))
+        self.assertEqual(data[0]['added_date'], date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[1]['added_date'], date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[2]['added_date'], date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"))
 
     def test_sort_wishlist_items_by_added_date_default_order(self):
         """Test sorting wishlist items by added date in default (descending) order"""
@@ -684,13 +684,13 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date&order=desc")
+        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=added_date")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0]["added_date"], date(2022, 3, 14))
-        self.assertEqual(data[1]["added_date"], date(2022, 3, 13))
-        self.assertEqual(data[2]["added_date"], date(2022, 3, 12))
+        self.assertEqual(data[0]['added_date'], date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[1]['added_date'], date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"))
+        self.assertEqual(data[2]['added_date'], date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"))
 
     def test_query_wishlists_by_customer_id(self):
         """It should Query Wishlists by Customer ID"""

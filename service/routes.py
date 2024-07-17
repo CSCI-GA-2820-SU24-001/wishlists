@@ -455,7 +455,6 @@ def sort_wishlist_items_bt_price(wishlist_id):
     """
     app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
 
-    sort_by = request.args.get("sort_by", "price").lower
     sort_order = request.args.get("order", "asc").lower()
 
     # See if the wishlist exists and abort if it doesn't
@@ -467,7 +466,7 @@ def sort_wishlist_items_bt_price(wishlist_id):
         )
 
     # Sort the items by price
-    if sort_by == "price" and sort_order == "desc":
+    if sort_order == "desc":
         sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
     else:
         sorted_items = sorted(wishlist.items, key=lambda item: item.price)
@@ -489,7 +488,7 @@ def sort_wishlist_items_by_added_date(wishlist_id):
     """
     app.logger.info("Request to sort items for Wishlist with id: %s", wishlist_id)
 
-    sort_order = request.args.get("order", "asc").lower()
+    sort_order = request.args.get("order", "desc").lower()
 
     # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
@@ -500,10 +499,10 @@ def sort_wishlist_items_by_added_date(wishlist_id):
         )
 
     # Sort the items by price
-    if sort_order == "desc":
-        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
-    else:
+    if sort_order == "asc":
         sorted_items = sorted(wishlist.items, key=lambda item: item.added_date)
+    else:
+        sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
 
     results = [item.serialize() for item in sorted_items]
 
