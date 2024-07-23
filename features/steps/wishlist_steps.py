@@ -5,7 +5,7 @@ from behave import given, when, then
 @given('the server is started')
 def step_impl(context):
     context.base_url = os.getenv(
-        'BASE_URL', 
+        'BASE_URL',
         'http://localhost:8080'
     )
 
