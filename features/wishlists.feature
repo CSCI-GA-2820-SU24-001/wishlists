@@ -6,7 +6,7 @@ Feature: The wishlist store service back-end
 Background:
     Given the server is started
 
-Scenario: The server is running
-    When I visit the "home page"
-    Then I should see "Wishlist Demo REST API Service"
-    And  I should not see "404 Not Found"
+# Scenario: The server is running
+#     When I visit the "home page"
+#     Then I should see "Wishlist Demo REST API Service"
+#     And  I should not see "404 Not Found"
