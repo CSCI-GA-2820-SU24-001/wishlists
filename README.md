@@ -45,19 +45,23 @@ tests/                     - test cases package
 ## API Endpoints
 The wishlists service provides the following API endpoints:
 
-| Operation                         | Method | URL                                          |
-|-----------------------------------|--------|----------------------------------------------|
-| **List all wishlists**            | GET    | `/wishlists`                                 |
-| **Create a wishlist**             | POST   | `/wishlists`                                 |
-| **Read a wishlist**               | GET    | `/wishlists/{id}`                            |
-| **Update a wishlist**             | PUT    | `/wishlists/{id}`                            |
-| **Delete a wishlist**             | DELETE | `/wishlists/{id}`                            |
-| **List all items in a wishlist**  | GET    | `/wishlists/{id}/items`                      |
-| **Create an item in a wishlist**  | POST   | `/wishlists/{id}/items`                      |
-| **Read an item in a wishlist**    | GET    | `/wishlists/{id}/items/{id}`                 |
-| **Update an item in a wishlist**  | PUT    | `/wishlists/{id}/items/{id}`                 |
-| **Delete an item in a wishlist**  | DELETE | `/wishlists/{id}/items/{id}`                 |
-
+| Operation                         | Method | URL                                                    |
+|-----------------------------------|--------|----------------------------------------------------    |
+| **List all wishlists**            | GET    | `/wishlists`                                           |
+| **Create a wishlist**             | POST   | `/wishlists`                                           |
+| **Read a wishlist**               | GET    | `/wishlists/{id}`                                      |
+| **Update a wishlist**             | PUT    | `/wishlists/{id}`                                      |
+| **Delete a wishlist**             | DELETE | `/wishlists/{id}`                                      |
+| **List all items in a wishlist**  | GET    | `/wishlists/{id}/items`                                |
+| **Create an item in a wishlist**  | POST   | `/wishlists/{id}/items`                                |
+| **Read an item in a wishlist**    | GET    | `/wishlists/{id}/items/{id}`                           |
+| **Update an item in a wishlist**  | PUT    | `/wishlists/{id}/items/{id}`                           |
+| **Delete an item in a wishlist**  | DELETE | `/wishlists/{id}/items/{id}`                           |
+| **Search for wishlists**          | GET    | `/wishlists?attribute=value`                           |
+| **Sort wishlists**                | GET    | `/wishlists?sort_by=attribute&order=value`             |
+| **Search items in a wishlist**    | GET    | `/wishlists/{id}/items?attribute=value`                |
+| **Delete all wishlists**          | DELETE | `/customers/{id}/wishlists`                            |
+| **Move a item between wishlists** | PUT    | `/wishlists/{source_id}/items/{id}/move-to/{target_id}`|
 
 ## Running the Tests
 
