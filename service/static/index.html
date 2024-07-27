@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wishlist Demo RESTful Service</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="static/images/newapp-icon.png">
+    <link rel="stylesheet" href="static/css/cerulean_bootstrap.min.css">
+    <style>
+      .container {
+        width: 96%;
+      }
+      .form-wrapper {
+        display: flex;
+        justify-content: space-between;
+      }
+      .form-container {
+        width: 48%;
+      }
+      .result-wrapper {
+        display: flex;
+        justify-content: space-between;
+      }
+      .result-container {
+        width: 48%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <h1>Wishlist Demo REST API Service</h1>
+      </div>
+
+      <!-- Flash Message -->
+      <div class="table-responsive">
+        <table class="table">
+          <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
+        </table>
+      </div>
+
+      <!-- FORM -->
+      <div class="form-wrapper">
+        <div class="form-container">
+          <h3>Create, Retrieve, Update, and Delete a Wishlist:</h3>
+          <div class="well">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="wishlist_id">Wishlist ID:</label>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" id="wishlist_id" placeholder="Enter ID of Wishlist">
+                </div>
+                <div class="col-sm-4">
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+                </div>
+              </div>
+            </div> <!-- form horizontal -->
+
+            <div class="form-horizontal">
+              <!-- NAME -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="wishlist_name">Name:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="wishlist_name" placeholder="Enter name for Wishlist">
+                </div>
+              </div>
+
+              <!-- CUSTOMER_ID -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="wishlist_customer_id">Customer ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="wishlist_customer_id" placeholder="Enter the customer id of the owner">
+                </div>
+              </div>
+
+              <!-- CREATED_DATE -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="wishlist_created_date">Created date:</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" id="wishlist_created_date" placeholder="2020-04-01">
+                </div>
+              </div>
+
+              <!-- MODIFIED_DATE -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="wishlist_modified_date">Modified Date:</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" id="wishlist_modified_date" placeholder="2020-04-01">
+                </div>
+              </div>
+
+              <!-- SUBMIT BUTTONS -->
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary" id="wishlist-search-btn">Search</button>
+                  <button type="submit" class="btn btn-primary" id="wishlist-clear-btn">Clear</button>
+                  <button type="submit" class="btn btn-success" id="wishlist-create-btn">Create</button>
+                  <button type="submit" class="btn btn-warning" id="wishlist-update-btn">Update</button>
+                </div>
+              </div>
+            </div> <!-- form horizontal -->
+          </div> <!-- end well -->
+        </div> <!-- end form-container -->
+
+        <div class="form-container">
+          <h3>Create, Retrieve, Update, and Delete an Item:</h3>
+          <div class="well">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="item_id">Item ID:</label>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" id="item_id" placeholder="Enter ID of the item">
+                </div>
+                <div class="col-sm-4">
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn2">Retrieve</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn2">Delete</button>
+                </div>
+              </div>
+            </div> <!-- form horizontal -->
+
+            <div class="form-horizontal">
+              <!-- PRODUCT_ID -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="product_id">Product ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="product_id" placeholder="Enter the product ID of the item">
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="description">Description:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="description" placeholder="Enter the description of the item">
+                </div>
+              </div>
+
+              <!-- ADDED_DATE -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="item_added_date">Added date:</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" id="item_added_date" placeholder="2020-04-01">
+                </div>
+              </div>
+
+              <!-- ITEM_MODIFIED_DATE -->
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="item_modified_date">Modified Date:</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" id="item_modified_date" placeholder="2020-04-01">
+                </div>
+              </div>
+
+              <!-- SUBMIT BUTTONS -->
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary" id="item-search-btn">Search</button>
+                  <button type="submit" class="btn btn-primary" id="item-clear-btn">Clear</button>
+                  <button type="submit" class="btn btn-success" id="item-create-bt">Create</button>
+                  <button type="submit" class="btn btn-warning" id="item-update-btn">Update</button>
+                </div>
+              </div>
+            </div> <!-- form horizontal -->
+          </div> <!-- end well -->
+        </div> <!-- end form-container -->
+      </div> <!-- end form-wrapper -->
+
+      <!-- Search Results -->
+      <div class="result-wrapper">
+        <div class="result-container">
+          <div class="table-responsive" id="wishlist_search_result">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="col-md-1">ID</th>
+                  <th class="col-md-4">Name</th>
+                  <th class="col-md-4">Customer ID</th>
+                  <th class="col-md-3">Created Date</th>
+                  <th class="col-md-3">Modified Date</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+
+        <div class="result-container">
+          <div class="table-responsive" id="item_search_result">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="col-md-1">ID</th>
+                  <th class="col-md-4">Product ID</th>
+                  <th class="col-md-4">Description</th>
+                  <th class="col-md-3">Added Date</th>
+                  <th class="col-md-3">Modified Date</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div> <!-- end form-wrapper -->
+
+      <footer>
+        <br><br>
+        <p>&copy; NYU DevOps Company 2022</p>
+      </footer>
+
+    </div> <!-- container -->
+
+    <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+
+    <!-- YOUR REST API -->
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+  </body>
+</html>
