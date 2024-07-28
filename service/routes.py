@@ -38,65 +38,7 @@ from service.common import status  # HTTP Status Codes
 @app.route("/", methods=["GET"])
 def index():
     """Root URL response"""
-    return (
-        {
-            "service name": "Wishlists Service",
-            "version": "1.0.0",
-            "endpoints": [
-                {
-                    "method": "GET",
-                    "url": "/wishlists",
-                    "description": "List all wishlists",
-                },
-                {
-                    "method": "POST",
-                    "url": "/wishlists",
-                    "description": "Create a wishlist",
-                },
-                {
-                    "method": "GET",
-                    "url": "/wishlists/{id}",
-                    "description": "Read a wishlist",
-                },
-                {
-                    "method": "PUT",
-                    "url": "/wishlists/{id}",
-                    "description": "Update a wishlist",
-                },
-                {
-                    "method": "DELETE",
-                    "url": "/wishlists/{id}",
-                    "description": "Delete a wishlist",
-                },
-                {
-                    "method": "GET",
-                    "url": "/wishlists/{id}/items",
-                    "description": "List all items in a wishlist",
-                },
-                {
-                    "method": "POST",
-                    "url": "/wishlists/{id}/items",
-                    "description": "Create an item in a wishlist",
-                },
-                {
-                    "method": "GET",
-                    "url": "/wishlists/{id}/items/{item_id}",
-                    "description": "Read an item in a wishlist",
-                },
-                {
-                    "method": "PUT",
-                    "url": "/wishlists/{id}/items/{item_id}",
-                    "description": "Update an item in a wishlist",
-                },
-                {
-                    "method": "DELETE",
-                    "url": "/wishlists/{id}/items/{item_id}",
-                    "description": "Delete an item in a wishlist",
-                },
-            ],
-        },
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 ######################################################################
