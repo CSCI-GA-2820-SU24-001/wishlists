@@ -60,8 +60,8 @@ class WishlistItem(db.Model, PersistentBase):
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
-            # self.added_date = data["added_date"]
-            # self.modified_date = data["modified_date"]
+            self.added_date = data["added_date"]
+            self.modified_date = data["modified_date"]
 
             if isinstance(data["price"], (int, float)):
                 self.price = data["price"]
