@@ -159,15 +159,15 @@ $(function () {
             url: `/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: '',
-        })
+        });
     
         ajax.done(function (res) {
-            clear_wishlist_form_data()
-            flash_message("Wishlist has been Deleted!")
+            clear_wishlist_form_data();
+            flash_message("Wishlist has been Deleted!");
         });
     
         ajax.fail(function (res) {
-            flash_message("Server error!")
+            flash_message("Server error!");
         });
     });
     
