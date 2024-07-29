@@ -19,14 +19,15 @@ $(function () {
     }
 
     /// Clears all form fields
-    function clear_form_data() {
-        $("#pet_name").val("");
-        $("#pet_category").val("");
-        $("#pet_available").val("");
-        $("#pet_gender").val("");
-        $("#pet_birthday").val("");
+    function clear_wishlist_form_data() {
+        $("#wishlist_id").val("");
+        $("#wishlist_name").val("");
+        $("#wishlist_customer_id").val("");
+        $("#wishlist_created_date").val("");
+        $("#wishlist_modified_date").val("");
+        $("#wishlist_items").empty(); 
     }
-
+    
     // Updates the flash message area
     function flash_message(message) {
         $("#flash_message").empty();
@@ -159,18 +160,19 @@ $(function () {
             url: `/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: '',
-        });
+        })
     
         ajax.done(function (res) {
-            clear_wishlist_form_data();
-            flash_message("Wishlist has been Deleted!");
+            clear_wishlist_form_data()
+            flash_message("Wishlist has been Deleted!")
         });
     
         ajax.fail(function (res) {
-            flash_message("Server error!");
+            flash_message("Server error!")
         });
     });
     
+
 
     // ****************************************
     // Clear the form

@@ -1,19 +1,30 @@
-Feature: The wishlist store service back-end
-  As a Wishlist Store Owner
-  I need a RESTful catalog service
-  So that I can keep track of all my wishlists
+Feature: The wishlist service back-end
+    As a wishlist manager
+    I need a RESTful catalog service
+    So that I can keep track of all the wishlists and wishlist items
 
-  Background:
-    Given the server is running
+Background:
+    Given the following wishlists
+        | name          | customer_id                         |
+        | Birthday      | 123e4567-e89b-12d3-a456-426614174000 |
+        | Anniversary   | 123e4567-e89b-12d3-a456-426614174001 |
+        | Christmas     | 123e4567-e89b-12d3-a456-426614174002 |
+        | New Year      | 123e4567-e89b-12d3-a456-426614174003 |
+    And the following wishlist items
+        | wishlist_id                              | product_id  | price   | description   |
+        | 123e4567-e89b-12d3-a456-426614174000     | 1           | 50.0    | Phone         |
+        | 123e4567-e89b-12d3-a456-426614174001     | 2           | 100.0   | Laptop        |
+        | 123e4567-e89b-12d3-a456-426614174002     | 3           | 20.0    | Book          |
+        | 123e4567-e89b-12d3-a456-426614174003     | 4           | 15.0    | Pen           |
 
-  Scenario: The server is running
-    When I visit the "home page"
-    Then I should see "Wishlist Demo RESTful Service" in the title
+Scenario: The server is running
+    When I visit the "Home Page"
+    Then I should see "Wishlists RESTful Service" in the title
     And I should not see "404 Not Found"
 
-  Scenario: Delete a Wishlist Item
+Scenario: Delete a Wishlist
     When I visit the "Home Page"
-    And I set the "Wishlist Item Name" to "Marco"
+    And I set the "Wishlist Name" to "Birthday"
     And I press the "Wishlist Search" button
     Then I should see the message "Success"
     When I copy the "Wishlist ID" field
