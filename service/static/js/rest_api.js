@@ -145,31 +145,32 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Wishlist
     // ****************************************
 
-    $("#delete-btn").click(function () {
-
-        let pet_id = $("#pet_id").val();
-
+    $("#wishlist-delete-btn").click(function () {
+        let wishlist_id = $("#wishlist_id").val();
+    
+        $("#wishlist_search_results").empty();
         $("#flash_message").empty();
-
+    
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/pets/${pet_id}`,
+            url: `/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: '',
         })
-
-        ajax.done(function(res){
-            clear_form_data()
-            flash_message("Pet has been Deleted!")
+    
+        ajax.done(function (res) {
+            clear_wishlist_form_data()
+            flash_message("Wishlist has been Deleted!")
         });
-
-        ajax.fail(function(res){
+    
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
+    
 
     // ****************************************
     // Clear the form
