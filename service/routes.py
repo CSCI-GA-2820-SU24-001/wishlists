@@ -451,3 +451,13 @@ def delete_all_wishlists(customer_id):
     for wishlist in all_wishlist:
         wishlist.delete()
     return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# HEALTH CHECK ENDPOINT
+######################################################################
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK

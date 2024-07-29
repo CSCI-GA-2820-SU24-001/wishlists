@@ -48,6 +48,7 @@ The wishlists service provides the following API endpoints:
 | Operation                         | Method | URL                                                    |
 |-----------------------------------|--------|----------------------------------------------------    |
 | **List all wishlists**            | GET    | `/wishlists`                                           |
+| **Return Health Status**          | GET    | `/health`                                              |
 | **Create a wishlist**             | POST   | `/wishlists`                                           |
 | **Read a wishlist**               | GET    | `/wishlists/{id}`                                      |
 | **Update a wishlist**             | PUT    | `/wishlists/{id}`                                      |
