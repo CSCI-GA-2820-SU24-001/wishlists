@@ -1,6 +1,9 @@
 import os
 import requests
 from behave import given
+import logging
+
+logger = logging.getLogger('behave.steps')
 
 @given('the server is started')
 def step_impl(context):
@@ -16,7 +19,10 @@ def step_impl(context):
             "customer_id": row["customer_id"]
         }
         response = requests.post(f"{context.base_url}/wishlists", json=wishlist)
-        assert response.status_code == 201
+        logger.info(f"Creating wishlist: {wishlist}")
+        logger.info(f"Response status code: {response.status_code}")
+        logger.info(f"Response content: {response.content}")
+        assert response.status_code == 201, f"Error creating wishlist: {response.content}"
 
 @given('the following wishlist items')
 def step_impl(context):
@@ -28,5 +34,7 @@ def step_impl(context):
             "description": row["description"]
         }
         response = requests.post(f"{context.base_url}/wishlists/{row['wishlist_id']}/items", json=wishlist_item)
-        assert response.status_code == 201
-
+        logger.info(f"Creating wishlist item: {wishlist_item}")
+        logger.info(f"Response status code: {response.status_code}")
+        logger.info(f"Response content: {response.content}")
+        assert response.status_code == 201, f"Error creating wishlist item: {response.content}"
