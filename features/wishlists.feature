@@ -7,7 +7,7 @@ Background:
 
 Scenario: The server is running
     When I visit the "home page"
-    Then I should see "Wishlist Demo RESTful Service" in the title
+    Then I should see "Wishlist RESTful Service" in the title
     And  I should not see "404 Not Found"
 
 Scenario: Create a Wishlist
