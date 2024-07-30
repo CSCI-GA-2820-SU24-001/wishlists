@@ -778,3 +778,27 @@ class WishlistService(TestBase):
         not_exist_customer_id = "fake_customer_id_2"
         response = self.client.delete(f"{BASE_URL}/customers/{not_exist_customer_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_all_items_by_wishlist_id(self):
+        """It should delete all items for a specific wishlist"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(),
+            WishlistItemFactory(),
+            WishlistItemFactory()
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        # Delete all items
+        response = self.client.delete(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Fetch the wishlist and ensure items are deleted
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/items",
+            content_type="application/json",
+        )
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(len(data), 0)

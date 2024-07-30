@@ -25,7 +25,7 @@ def step_impl(context):
     """ Delete all Wishlists and load new ones """
 
     # Get a list all of the wishlists
-    rest_endpoint = f"{context.base_url}/shopcarts"
+    rest_endpoint = f"{context.base_url}/wishlists"
     context.resp = requests.get(rest_endpoint, timeout=WAIT_TIMEOUT)
     expect(context.resp.status_code).equal_to(HTTP_200_OK)
     # and delete them one by one
@@ -36,8 +36,8 @@ def step_impl(context):
     # load the database with new wishlists
     for row in context.table:
         payload = {
-            "customer_id": float(row['customer_id']),
-            "name": float(row['name'])
+            "customer_id": row['customer_id'],
+            "name": row['name']
         }
         context.resp = requests.post(rest_endpoint, json=payload, timeout=WAIT_TIMEOUT)
         expect(context.resp.status_code).equal_to(HTTP_201_CREATED)
@@ -51,7 +51,7 @@ def step_impl(context):
     rest_endpoint = f"{context.base_url}/wishlists"
     context.resp = requests.get(rest_endpoint, timeout=WAIT_TIMEOUT)
     assert context.resp.status_code == HTTP_200_OK
-    # and delete all wishlist items in the wishlists one by one
+    # Delete all wishlist items in the wishlists one by one
     wishlist_ids = []
     for wishlist in context.resp.json():
         context.resp = requests.delete(f"{rest_endpoint}/{wishlist['id']}/items", timeout=WAIT_TIMEOUT)
