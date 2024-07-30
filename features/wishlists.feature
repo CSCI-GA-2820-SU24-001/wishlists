@@ -1,5 +1,5 @@
-Feature: The wishlist store service back-end
-    As a Wishlist Store Owner
+Feature: The wishlist service back-end
+    As a Wishlist Owner
     I need a RESTful catalog service
     So that I can keep track of all the wishlists and wishlist items
 
