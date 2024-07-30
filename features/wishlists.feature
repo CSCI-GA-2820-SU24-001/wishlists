@@ -17,7 +17,7 @@ Scenario: Create a Wishlist
     And I press the "Wishlist Create" button
     Then I should see the message "Wishlist has been created!"
     When I copy the "Wishlist ID" field
-    And I press the "Clear" button
+    And I press the "Wishlist Form Clear" button
     Then the "Wishlist ID" field should be empty
     And the "Wishlist Name" field should be empty
     And the "Wishlist Customer ID" field should be empty
