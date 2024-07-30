@@ -12,16 +12,19 @@ Scenario: The server is running
 
 Scenario: Create a Wishlist
     When I visit the "Home Page"
-    And I set the "Shopcart total price" to "10"
-    And I press the "Shopcart Create" button
-    Then I should see the message "Shopcart has been Created!"
-    When I copy the "Shopcart ID" field
-    And I press the "Shopcart Form Clear" button
-    Then the "Shopcart ID" field should be empty
-    And the "Shopcart Item product ID" field should be empty
-    And the "Shopcart Item name" field should be empty
-    And the "Shopcart total price" field should be empty
-    When I paste the "Shopcart Id" field
-    And I press the "Shopcart Retrieve" button
+    And I set the "Wishlist Name" to "My First Wishlist"
+    And I set the "Wishlist Customer ID" to "Explore0001"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Wishlist has been created!"
+    When I copy the "Wishlist ID" field
+    And I press the "Clear" button
+    Then the "Wishlist ID" field should be empty
+    And the "Wishlist Name" field should be empty
+    And the "Wishlist Customer ID" field should be empty
+    And the "Wishlist Item Product ID" field should be empty
+    And the "Wishlist Item Name" field should be empty
+    When I paste the "Wishlist Id" field
+    And I press the "Wishlist Retrieve" button
     Then I should see the message "Success"
-    And I should see "10" in the "Shopcart total price" field
+    And I should see "My First Wishlist" in the "Wishlist Name" field
+    And I should see "Explore0001" in the "Wishlist Customer ID" field

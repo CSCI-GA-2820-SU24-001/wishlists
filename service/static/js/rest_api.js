@@ -8,6 +8,7 @@ $(function () {
     function update_wishlist_form_data(res) {
         $("#wishlist_id").val(res.id);
         $("#wishlist_name").val(res.name);
+        $("#wishlist_customer_id").val(res.customer_id);
         $("#wishlist_item_product_id").val(res.item_product_id);
         $("#wishlist_item_name").val(res.item_name);
     }
@@ -55,34 +56,29 @@ $(function () {
     // Create a Wishlist
     // ****************************************
 
-    $("#create-btn").click(function () {
+    $("#wishlist-create-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let name = $("#wishlist_name").val();
+        let customer_id = $("#wishlist_customer_id").val();
 
         let data = {
             "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "customer_id": customer_id
         };
 
+        $("#wishlist_search_results").empty();
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: "/wishlists",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
 
         ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
+            update_wishlist_form_data(res)
+            flash_message("Wishlist has been created!")
         });
 
         ajax.fail(function(res){
