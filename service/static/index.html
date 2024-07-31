@@ -52,8 +52,8 @@
                   <input type="text" class="form-control" id="wishlist_id" placeholder="Enter ID of Wishlist">
                 </div>
                 <div class="col-sm-4">
-                  <button type="submit" class="btn btn-primary" id="wishlist-retrieve-btn">Retrieve</button>
-                  <button type="submit" class="btn btn-danger" id="wishlist-delete-btn">Delete</button>
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
                 </div>
               </div>
             </div> <!-- form horizontal -->
@@ -114,8 +114,8 @@
                   <input type="text" class="form-control" id="item_id" placeholder="Enter ID of the item">
                 </div>
                 <div class="col-sm-4">
-                  <button type="submit" class="btn btn-primary" id="item-retrieve-btn">Retrieve</button>
-                  <button type="submit" class="btn btn-danger" id="item-delete-btn">Delete</button>
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn2">Retrieve</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn2">Delete</button>
                 </div>
               </div>
             </div> <!-- form horizontal -->
@@ -129,14 +129,6 @@
                 </div>
               </div>
 
-              <!-- Price -->
-              <div class="form-group">
-                <label class="control-label col-sm-2" for="price">Price:</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" id="price" placeholder="Enter the price of the item">
-                </div>
-              </div>
-
               <!-- Description -->
               <div class="form-group">
                 <label class="control-label col-sm-2" for="description">Description:</label>
@@ -147,9 +139,9 @@
 
               <!-- WISHLIST_ID -->
               <div class="form-group">
-                <label class="control-label col-sm-2" for="item_wishlist_id">Wishlist ID:</label>
+                <label class="control-label col-sm-2" for="wishlist_id">Wishlist ID:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="item_wishlist_id" placeholder="Enter the Wishlist ID">
+                  <input type="text" class="form-control" id="wishlist_id" placeholder="Enter the Wishlist ID">
                 </div>
               </div>
 
@@ -174,7 +166,7 @@
                 <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-primary" id="item-search-btn">Search</button>
                   <button type="submit" class="btn btn-primary" id="item-clear-btn">Clear</button>
-                  <button type="submit" class="btn btn-success" id="item-create-btn">Create</button>
+                  <button type="submit" class="btn btn-success" id="item-create-bt">Create</button>
                   <button type="submit" class="btn btn-warning" id="item-update-btn">Update</button>
                 </div>
               </div>
@@ -208,7 +200,6 @@
                 <tr>
                   <th class="col-md-1">ID</th>
                   <th class="col-md-4">Product ID</th>
-                  <th class="col-md-4">Price</th>
                   <th class="col-md-4">Description</th>
                   <th class="col-md-4">Wishlist ID</th>
                   <th class="col-md-3">Added Date</th>

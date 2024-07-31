@@ -11,12 +11,12 @@ Background:
         | BBBBB      | B0002         | testB  |
         | CCCCC      | C0003         | testC  |
         | DDDDD      | D0004         | testD  |
-    And the following wishlist items
-        | wishlist_id  | product_id  | price   | description            |
-        | AAAAA        | 1           | 12.0    | not bad                |
-        | AAAAA        | 2           | 1.0     | good product           |
-        | CCCCC        | 3           | 3.0     | coooooooool            |
-        | DDDDD        | 4           | 2.5     | the best product       |
+    # And the following wishlist items
+    #     | wishlist_id  | product_id  | price   | description            |
+    #     | AAAAA        | 1           | 1.0     | not bad                |
+    #     | AAAAA        | 2           | 1.0     | good product           |
+    #     | CCCCC        | 3           | 3.0     | coooooooool            |
+    #     | DDDDD        | 4           | 2.5     | the best product       |
 
 Scenario: The server is running
   When I visit the "Home Page"
