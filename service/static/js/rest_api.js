@@ -147,28 +147,28 @@ $(function () {
     // Delete a Wishlist
     // ****************************************
 
-    // $("#wishlist-delete-btn").click(function () {
+    $("#wishlist-delete-btn").click(function () {
 
-    //     let wishlist_id = $("#wishlist_id").val();
+        let wishlist_id = $("#wishlist_id").val();
     
-    //     $("#flash_message").empty();
+        $("#flash_message").empty();
     
-    //     let ajax = $.ajax({
-    //         type: "DELETE",
-    //         url: `/wishlists/${wishlist_id}`,
-    //         contentType: "application/json",
-    //         data: '',
-    //     })
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}`,
+            contentType: "application/json",
+            data: '',
+        })
     
-    //     ajax.done(function(res){
-    //         clear_wishlist_form_data();
-    //         flash_message("Wishlist has been deleted!");
-    //     });
+        ajax.done(function(res){
+            clear_wishlist_form_data();
+            flash_message("Wishlist has been deleted!");
+        });
     
-    //     ajax.fail(function(res){
-    //         flash_message("Server error!");
-    //     });
-    // });
+        ajax.fail(function(res){
+            flash_message("Server error!");
+        });
+    });
 
     // ****************************************
     // Search Wishlists

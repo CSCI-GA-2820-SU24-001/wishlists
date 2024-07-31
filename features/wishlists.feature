@@ -54,21 +54,21 @@ Scenario: Update a Wishlist
     Then I should see the message "Success"
     And I should see "102" in the "Wishlist Customer ID" field
 
-# Scenario: Delete a Wishlist
-#     When I visit the "Home Page"
-#     And I set the "Wishlist Name" to "My First Wishlist"
-#     And I set the "Wishlist Customer ID" to "Explore0001"
-#     And I press the "Wishlist Create" button
-#     Then I should see the message "Wishlist has been created!"
-#     When I copy the "Wishlist ID" field
-#     And I press the "Wishlist Form Clear" button
-#     And I paste the "Wishlist ID" field
-#     And I press the "Wishlist Delete" button
-#     Then I should see the message "Wishlist has been deleted!"
-#     When I press the "Wishlist Form Clear" button
-#     And I paste the "Wishlist ID" field
-#     And I press the "Wishlist Retrieve" button
-#     Then I should not see "Success"
+Scenario: Delete a Wishlist
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "My First Wishlist"
+    And I set the "Wishlist Customer ID" to "Explore0001"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Wishlist has been created!"
+    When I copy the "Wishlist ID" field
+    And I press the "Wishlist Form Clear" button
+    And I paste the "Wishlist ID" field
+    And I press the "Wishlist Delete" button
+    Then I should see the message "Wishlist has been deleted!"
+    When I press the "Wishlist Form Clear" button
+    And I paste the "Wishlist ID" field
+    And I press the "Wishlist Retrieve" button
+    Then I should not see "Success"
 
 Scenario: Create a Wishlist Item
     When I visit the "Home Page"
