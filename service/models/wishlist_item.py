@@ -5,8 +5,11 @@ The models for WishlistItems are stored in this module
 """
 
 import uuid
+import logging
 from datetime import date
 from .persistent_base import db, PersistentBase, DataValidationError
+
+logger = logging.getLogger("flask.app")
 
 ######################################################################
 #  W I S H L I S T   I T E M   M O D E L
@@ -95,6 +98,16 @@ class WishlistItem(db.Model, PersistentBase):
         return cls.query.filter(
             cls.wishlist_id == wishlist_id, cls.price <= float(price)
         ).all()
+
+    @classmethod
+    def find_by_wishlist_id(cls, wishlist_id):
+        """Returns all items with the given wishlist_id
+
+        Args:
+            wishlist_id (string): the wishlist_id of the WishlistItems you want to match
+        """
+        logger.info("Processing wishlist_id query for %s ...", wishlist_id)
+        return cls.query.filter(cls.wishlist_id == wishlist_id).all()
 
     ##################################################
     # Class Methods
