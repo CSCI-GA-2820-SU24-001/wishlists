@@ -212,7 +212,7 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            $("#search_results").empty();
+            $("#wishlist_search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
             table += '<th class="col-md-2">ID</th>'
@@ -228,7 +228,7 @@ $(function () {
                 }
             }
             table += '</tbody></table>';
-            $("#search_results").append(table);
+            $("#wishlist_search_results").append(table);
 
             // copy the first result to the form
             if (firstWishlist != "") {

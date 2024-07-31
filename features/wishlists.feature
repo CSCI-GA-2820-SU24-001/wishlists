@@ -105,15 +105,15 @@ Scenario: Create a Wishlist Item
 #     And I should see "testA" in the "Wishlist Name" field
 #     And I should see "A0001" in the "Customer ID" field
 
-# Scenario: Search for Wishlist by Customer ID
-#     When I visit the "Home Page"
-#     And I set the "Wishlist Customer ID" to "A0001"
-#     And I press the "Wishlist Search" button
-#     Then I should see the message "Success"
-#     And I should see "testA" in the "Wishlist" results
-#     And I should not see "testB" in the "Wishlist" results
-#     And I should not see "testC" in the "Wishlist" results
-#     And I should not see "testD" in the "Wishlist" results
+Scenario: Search for Wishlist by Customer ID
+    When I visit the "Home Page"
+    And I set the "Wishlist Customer ID" to "A0001"
+    And I press the "Wishlist Search" button
+    Then I should see the message "Success"
+    And I should see "testA" in the "Wishlist" results
+    And I should not see "testB" in the "Wishlist" results
+    And I should not see "testC" in the "Wishlist" results
+    And I should not see "testD" in the "Wishlist" results
 
 # Scenario: Search for Wishlist by Name
 #     When I visit the "Home Page"
