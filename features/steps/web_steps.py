@@ -25,27 +25,12 @@ For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
 """
 import logging
-import requests
-from behave import when, then, given  # pylint: disable=no-name-in-module
+from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 
-
-@given('the following wishlists exist')
-def step_impl(context):
-    base_url = context.base_url
-    for row in context.table:
-        wishlist_data = {
-            "id": row['id'],
-            "name": row['name'],
-            "customer_id": row['customer_id'],
-            "created_date": row['created_date'],
-            "modified_date": row['modified_date']
-        }
-        response = requests.post(f"{base_url}/wishlists", json=wishlist_data)
-        assert response.status_code in [200, 201]
 
 @when('I visit the "Home Page"')
 def step_impl(context):
