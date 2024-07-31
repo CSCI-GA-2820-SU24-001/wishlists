@@ -9,14 +9,23 @@ $(function () {
         $("#wishlist_id").val(res.id);
         $("#wishlist_name").val(res.name);
         $("#wishlist_customer_id").val(res.customer_id);
-        // let createdDate = new Date(res.created_date);
-        // let formattedCreatedDate = createdDate.toISOString().split('T')[0];
-        // $("#wishlist_created_date").val(formattedCreatedDate);
+        let createdDate = new Date(res.created_date);
+        let formattedCreatedDate = createdDate.toISOString().split('T')[0];
+        $("#wishlist_created_date").val(formattedCreatedDate);
     
         // Convert modified_date to YYYY-MM-DD format
-        // let modifiedDate = new Date(res.modified_date);
-        // let formattedModifiedDate = modifiedDate.toISOString().split('T')[0];
-        // $("#wishlist_modified_date").val(formattedModifiedDate);
+        let modifiedDate = new Date(res.modified_date);
+        let formattedModifiedDate = modifiedDate.toISOString().split('T')[0];
+        $("#wishlist_modified_date").val(formattedModifiedDate);
+    }
+
+    // Updates the wishlist item form with data from the response
+    function update_wishlist_item_form_data(res) {
+        $("#item_id").val(res.id);
+        $("#item_product_id").val(res.product_id);
+        $("#item_price").val(res.price);
+        $("#item_description").val(res.description);
+        $("#item_wishlist_id").val(res.wishlist_id);
     }
 
     // Clears all wishlist form fields
