@@ -6,16 +6,18 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#pet_id").val(res.id);
-        $("#pet_name").val(res.name);
-        $("#pet_category").val(res.category);
-        if (res.available == true) {
-            $("#pet_available").val("true");
-        } else {
-            $("#pet_available").val("false");
-        }
-        $("#pet_gender").val(res.gender);
-        $("#pet_birthday").val(res.birthday);
+
+        $("#wishlist_id").val(res.id);
+        $("#wishlist_name").val(res.name);
+        $("#wishlist_customer_id").val(res.customer_id);
+        let createdDate = new Date(res.created_date);
+        let formattedCreatedDate = createdDate.toISOString().split('T')[0];
+        $("#wishlist_created_date").val(formattedCreatedDate);
+    
+        // Convert modified_date to YYYY-MM-DD format
+        let modifiedDate = new Date(res.modified_date);
+        let formattedModifiedDate = modifiedDate.toISOString().split('T')[0];
+        $("#wishlist_modified_date").val(formattedModifiedDate);
     }
 
     /// Clears all form fields
@@ -74,31 +76,30 @@ $(function () {
 
 
     // ****************************************
-    // Update a Pet
+    // Update a WISHLIST
     // ****************************************
 
-    $("#update-btn").click(function () {
+    $("#wishlist-update-btn").click(function () {
 
-        let pet_id = $("#pet_id").val();
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let wishlist_id = $("#wishlist_id").val();
+        let wishlist_name = $("#wishlist_name").val();
+        let wishlist_customer_id = $("#wishlist_customer_id").val();
+        let wishlist_created_date = $("#wishlist_created_date").val() == "true";
+        let wishlist_modified_date = $("#wishlist_modified_date").val();
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "name": wishlist_name,
+            "id":wishlist_id,
+            "customer_id": wishlist_customer_id,
+            "created_date": wishlist_created_date,
+            "modified_date": wishlist_modified_date,
         };
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/pets/${pet_id}`,
+                url: `/wishlists/${wishlist_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
