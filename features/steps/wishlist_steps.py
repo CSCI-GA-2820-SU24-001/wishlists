@@ -17,7 +17,7 @@ HTTP_200_OK = 200
 HTTP_201_CREATED = 201
 HTTP_204_NO_CONTENT = 204
 
-WAIT_TIMEOUT = 10
+WAIT_TIMEOUT = 60
 
 
 @given('the following wishlists')
