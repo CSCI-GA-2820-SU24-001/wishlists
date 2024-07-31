@@ -23,7 +23,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: wishlists
-        image: cluster-registry:32000/wishlists
+        image: cluster-registry:32000/wishlists:1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -40,7 +40,14 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgres-creds
-                key: SECRET_KEY
+                key: SECRET_KEY  
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          timeoutSeconds: 1
+          httpGet:
+            path: /health
+            port: 8080                          
         resources:
           limits:
             cpu: "0.50"

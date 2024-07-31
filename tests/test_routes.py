@@ -215,6 +215,14 @@ class WishlistService(TestBase):
         self.assertEqual(wishlists[0].name, data[0]["name"])
         self.assertEqual(wishlists[0].name, data[1]["name"])
 
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], 200)
+        self.assertEqual(data["message"], "Healthy")
+
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
     ######################################################################
@@ -770,3 +778,29 @@ class WishlistService(TestBase):
         not_exist_customer_id = "fake_customer_id_2"
         response = self.client.delete(f"{BASE_URL}/customers/{not_exist_customer_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_all_items_by_wishlist_id(self):
+        """It should delete all items for a specific wishlist"""
+        wishlist = WishlistFactory()
+        items = [
+            WishlistItemFactory(),
+            WishlistItemFactory(),
+            WishlistItemFactory()
+        ]
+        wishlist.items = items
+        wishlist.create()
+
+        # Delete all items
+        response = self.client.delete(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Fetch the wishlist and ensure items are deleted
+        response = self.client.delete(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/items",
+            content_type="application/json",
+        )
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(len(data), 0)

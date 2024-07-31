@@ -437,17 +437,49 @@ def check_content_type(content_type):
 @app.route("/wishlists/customers/<customer_id>", methods=["DELETE"])
 def delete_all_wishlists(customer_id):
     """
-    Delete all wishlists for specific customer
+    Delete all wishlists for a specific customer
 
     This endpoint will delete all wishlists for specific customer based on the customer id specified in the path
     """
     app.logger.info("Request to delete all wishlist with customer id: %s", customer_id)
 
     # Retrieve the wishlist to delete and delete it if it exists
-    all_wishlist = Wishlist.find_by_customer_id(customer_id)
-    if not all_wishlist:
+    all_wishlists = Wishlist.find_by_customer_id(customer_id)
+    if not all_wishlists:
         return "", status.HTTP_204_NO_CONTENT
 
-    for wishlist in all_wishlist:
+    for wishlist in all_wishlists:
         wishlist.delete()
     return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# DELETE ALL ITEMS FOR A SPECIFIC WISHLIST
+######################################################################
+@app.route("/wishlists/<string:wishlist_id>/items", methods=["DELETE"])
+def delete_all_items(wishlist_id):
+    """
+    Delete all items in a specific wishlist
+
+    This endpoint will delete all items in a specific wishlist based on the wishlist id specified in the path
+    """
+    app.logger.info("Request to delete all items with wishlist id: %s", wishlist_id)
+
+    # Retrieve the item to delete and delete it if it exists
+    all_items = WishlistItem.find_by_wishlist_id(wishlist_id)
+    if not all_items:
+        return "", status.HTTP_204_NO_CONTENT
+
+    for item in all_items:
+        item.delete()
+    return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# HEALTH CHECK ENDPOINT
+######################################################################
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
