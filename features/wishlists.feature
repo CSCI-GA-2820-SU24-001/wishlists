@@ -18,9 +18,25 @@ Background:
         | DDDDD        | 4           | 2.5     | the best product       |
 
 Scenario: The server is running
-    When I visit the "home page"
-    Then I should see "Wishlist RESTful Service" in the title
-    And  I should not see "404 Not Found"
+  When I visit the "Home Page"
+  Then I should see "Wishlist RESTful Service" in the title
+  And I should not see "404 Not Found"
+
+Scenario: Update a wishlist
+  When I visit the "Home Page"
+  And I set the "Wishlist name" to "Birthday List"
+  And I press the "wishlist search" button
+#  Then I should see the message "Success"
+#   And I should see "101" in the "wishlist Customer Id" field
+#   When I change "wishlist Customer Id" to "102"
+#   And I press the "wishlist update" button
+#   Then I should see the message "Success"
+#   When I copy the "wishlist ID" field
+#   And I press the "wishlist clear" button
+#   And I paste the "wishlist ID" field
+#   And I press the "wishlist retrieve" button
+#   Then I should see the message "Success"
+#   And I should see "102" in the "wishlist Customer Id" field
 
 Scenario: Create a Wishlist
     When I visit the "Home Page"

@@ -9,8 +9,14 @@ $(function () {
         $("#wishlist_id").val(res.id);
         $("#wishlist_name").val(res.name);
         $("#wishlist_customer_id").val(res.customer_id);
-        $("#wishlist_item_product_id").val(res.item_product_id);
-        $("#wishlist_item_name").val(res.item_name);
+        let createdDate = new Date(res.created_date);
+        let formattedCreatedDate = createdDate.toISOString().split('T')[0];
+        $("#wishlist_created_date").val(formattedCreatedDate);
+    
+        // Convert modified_date to YYYY-MM-DD format
+        let modifiedDate = new Date(res.modified_date);
+        let formattedModifiedDate = modifiedDate.toISOString().split('T')[0];
+        $("#wishlist_modified_date").val(formattedModifiedDate);
     }
 
     // Updates the wishlist item form with data from the response
@@ -95,34 +101,34 @@ $(function () {
     // Update a Wishlist
     // ****************************************
 
-    $("#update-btn").click(function () {
+    
+    $("#wishlist-update-btn").click(function () {
 
-        let pet_id = $("#pet_id").val();
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let wishlist_id = $("#wishlist_id").val();
+        let wishlist_name = $("#wishlist_name").val();
+        let wishlist_customer_id = $("#wishlist_customer_id").val();
+        let wishlist_created_date = $("#wishlist_created_date").val();
+        let wishlist_modified_date = $("#wishlist_modified_date").val();
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "name": wishlist_name,
+            "id":wishlist_id,
+            "customer_id": wishlist_customer_id,
+            "created_date": wishlist_created_date,
+            "modified_date": wishlist_modified_date,
         };
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/pets/${pet_id}`,
+                url: `/wishlists/${wishlist_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
 
         ajax.done(function(res){
-            update_form_data(res)
+            update_wishlist_form_data(res)
             flash_message("Success")
         });
 
@@ -131,7 +137,6 @@ $(function () {
         });
 
     });
-
     // ****************************************
     // Retrieve a Wishlist
     // ****************************************
@@ -509,9 +514,3 @@ $(function () {
 
 
 })
-
-
-
-
-
-
