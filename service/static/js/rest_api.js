@@ -328,10 +328,6 @@ $(function () {
         });
     });
 
-
-    // ****************************************
-       ***********************************
-
     $("#wishlist-update-btn").click(function () {
 
         let wishlist_id = $("#wishlist_id").val();
@@ -509,10 +505,7 @@ $(function () {
         $("#flash_message").empty();
         clear_wishlist_item_form_data()
     });
-
-
-})
-
+}})
 
 
 
