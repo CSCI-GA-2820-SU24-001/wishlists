@@ -795,6 +795,9 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # Fetch the wishlist and ensure items are deleted
+        response = self.client.delete(f"{BASE_URL}/{wishlist.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
         resp = self.client.get(
             f"{BASE_URL}/{wishlist.id}/items",
             content_type="application/json",
