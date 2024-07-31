@@ -22,22 +22,6 @@ Scenario: The server is running
   Then I should see "Wishlist RESTful Service" in the title
   And I should not see "404 Not Found"
 
-Scenario: Update a wishlist
-  When I visit the "Home Page"
-  And I set the "Wishlist name" to "Birthday List"
-  And I press the "wishlist search" button
-#  Then I should see the message "Success"
-#   And I should see "101" in the "wishlist Customer Id" field
-#   When I change "wishlist Customer Id" to "102"
-#   And I press the "wishlist update" button
-#   Then I should see the message "Success"
-#   When I copy the "wishlist ID" field
-#   And I press the "wishlist clear" button
-#   And I paste the "wishlist ID" field
-#   And I press the "wishlist retrieve" button
-#   Then I should see the message "Success"
-#   And I should see "102" in the "wishlist Customer Id" field
-
 Scenario: Create a Wishlist
     When I visit the "Home Page"
     And I set the "Wishlist Name" to "My First Wishlist"
@@ -54,6 +38,37 @@ Scenario: Create a Wishlist
     # And I should see "My First Wishlist" in the "Wishlist Name" field
     # And I should see "Explore0001" in the "Customer ID" field
 
+Scenario: Update a wishlist
+  When I visit the "Home Page"
+  And I set the "Wishlist name" to "Birthday List"
+  And I press the "wishlist search" button
+#  Then I should see the message "Success"
+#   And I should see "101" in the "wishlist Customer Id" field
+#   When I change "wishlist Customer Id" to "102"
+#   And I press the "wishlist update" button
+#   Then I should see the message "Success"
+#   When I copy the "wishlist ID" field
+#   And I press the "wishlist clear" button
+#   And I paste the "wishlist ID" field
+#   And I press the "wishlist retrieve" button
+#   Then I should see the message "Success"
+#   And I should see "102" in the "wishlist Customer Id" field
+
+Scenario: Delete a Wishlist
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "Birthday List"
+    And I press the "Wishlist Search" button
+    # Then I should see the message "Success"
+    # When I copy the "Wishlist ID" field
+    # And I press the "Wishlist Form Clear" button
+    # And I paste the "Wishlist ID" field
+    # And I press the "Wishlist Delete" button
+    # Then I should see the message "Wishlist has been Deleted!"
+    # When I press the "Wishlist Form Clear" button
+    # And I paste the "Wishlist ID" field
+    # And I press the "Wishlist Retrieve" button
+    # Then I should not see "Success"
+    
 # BDD for both Create and Retrieve, since those tow actions are coupled
 # TODO: uncomment the second half after implemented Retrieve
 Scenario: Create a Wishlist Item
@@ -78,3 +93,4 @@ Scenario: Create a Wishlist Item
     # Then I should see the message "Success"
     # And I should see "My First Wishlist" in the "Wishlist Name" field
     # And I should see "Explore0001" in the "Customer ID" field
+
