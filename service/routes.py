@@ -50,7 +50,6 @@ def create_wishlists():
     Create a Wishlist
     This endpoint will create an Wishlist based the data in the body that is posted
     """
-    app.logger.info("Request to create an Wishlist")
     check_content_type("application/json")
 
     # Check if the wishlist already exists
@@ -65,6 +64,7 @@ def create_wishlists():
     # Create a message to return
     message = wishlist.serialize()
     location_url = url_for("read_wishlists", wishlist_id=wishlist.id, _external=True)
+    app.logger.info(f"Request to create an Wishlist: {message['id']}")
 
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
