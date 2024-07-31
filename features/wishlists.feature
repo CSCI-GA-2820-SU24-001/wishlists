@@ -15,11 +15,11 @@ Scenario: The server is running
   Then I should see "Wishlist RESTful Service" in the title
   And I should not see "404 Not Found"
 
-Scenario: Successfully update a wishlist
+Scenario: Update a wishlist
   When I visit the "Home Page"
   And I set the "Wishlist name" to "Birthday List"
   And I press the "wishlist search" button
-#   Then I should see the message "Success"
+#  Then I should see the message "Success"
 #   And I should see "101" in the "wishlist Customer Id" field
 #   When I change "wishlist Customer Id" to "102"
 #   And I press the "wishlist update" button
@@ -52,7 +52,7 @@ Scenario: Create a Wishlist
     And I set the "Wishlist Name" to "My First Wishlist"
     And I set the "Wishlist Customer ID" to "Explore0001"
     And I press the "Wishlist Create" button
-    # Then I should see the message "Wishlist has been created!"
+    Then I should see the message "Wishlist has been created!"
     # When I copy the "Wishlist ID" field
     # And I press the "Wishlist Form Clear" button
     # Then the "Wishlist ID" field should be empty
