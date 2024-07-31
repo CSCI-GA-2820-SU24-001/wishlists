@@ -17,7 +17,7 @@ HTTP_200_OK = 200
 HTTP_201_CREATED = 201
 HTTP_204_NO_CONTENT = 204
 
-WAIT_TIMEOUT = 60
+WAIT_TIMEOUT = 10
 
 
 @given('the following wishlists')
@@ -69,6 +69,6 @@ def step_impl(context):
             "price": float(row["price"])
         }
         context.resp = requests.post(f"{rest_endpoint}/{wishlist_id}/items", json=payload, timeout=WAIT_TIMEOUT)
-        assert context.resp.status_code == HTTP_201_CREATED
+        assert context.resp.status_code == HTTP_201_CREATED, context.resp.status_code
         # Move to the next wishlist after assigning an items to the current wishlist
         wishlist_index = wishlist_index + 1

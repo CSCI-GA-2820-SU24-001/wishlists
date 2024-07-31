@@ -14,13 +14,12 @@ $(function () {
     }
 
     // Updates the wishlist item form with data from the response
-    function update_wishlist_form_data(res) {
+    function update_item_form_data(res) {
         $("#item_id").val(res.id);
+        $("#product_id").val(res.product_id);
+        $("#price").val(res.price);
+        $("#description").val(res.description);
         $("#item_wishlist_id").val(res.wishlist_id);
-        $("#item_product_id").val(res.product_id);
-        $("#item_name").val(res.name);
-        $("#item_description").val(res.description);
-        $("#item_price").val(res.price);
     }
 
     /// Clears all wishlist form fields
@@ -32,13 +31,12 @@ $(function () {
     }
 
     /// Clears all wishlist item form fields
-    function clear_wishlist_item_form_data() {
+    function clear_item_form_data() {
         $("#item_id").val("");
         $("#item_wishlist_id").val("");
-        $("#item_product_id").val("");
-        $("#item_name").val("");
-        $("#item_description").val("");
-        $("#item_price").val("");
+        $("#product_id").val("");
+        $("#description").val("");
+        $("#price").val("");
     }
 
     // Updates the flash message area
@@ -286,34 +284,33 @@ $(function () {
     // Create a Wishlist Item
     // ****************************************
 
-    $("#create-btn").click(function () {
+    $("#item-create-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let product_id = $("#product_id").val();
+        let price = parseFloat($("#price").val());
+        let description = $("#description").val();
+        let wishlist_id = $("#item_wishlist_id").val();
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "product_id": product_id,
+            "price": price,
+            "description": description,
+            "wishlist_id": wishlist_id,
         };
-
+        
+        $("#item_search_results").empty();
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: `/wishlists/${wishlist_id}/items`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
 
         ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
+            update_item_form_data(res)
+            flash_message("An item has been created!")
         });
 
         ajax.fail(function(res){
