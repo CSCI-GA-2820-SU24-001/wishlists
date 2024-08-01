@@ -78,20 +78,58 @@ Scenario: Create a Wishlist Item
     Then I should see the message "Wishlist has been created!"
     When I copy the "Wishlist ID" field
     And I set the "Item Product ID" to "1357"
-    And I set the "Item Price" to "99.80"
+    And I set the "Item Price" to "99.8"
     And I set the "Item Description" to "The newest version!"
     And I paste the "Item Wishlist ID" field
     And I press the "Item Create" button
     Then I should see the message "An item has been created!"
-    # When I copy the "Wishlist ID" field
-    # And I press the "Wishlist Form Clear" button
-    # Then the "Wishlist ID" field should be empty
-    # And the "Wishlist Name" field should be empty
-    # When I paste the "Wishlist ID" field
-    # And I press the "Item Retrieve" button
-    # Then I should see the message "Success"
-    # And I should see "My First Wishlist" in the "Wishlist Name" field
-    # And I should see "Explore0001" in the "Customer ID" field
+    When I copy the "Item ID" and "Item Wishlist ID" fields
+    And I press the "Item Clear" button
+    Then the "Item ID" field should be empty
+    And the "Item Product ID" field should be empty
+    And the "Item Price" field should be empty
+    And the "Item Description" field should be empty
+    And the "Item Wishlist ID" field should be empty
+    And the "Item Added Date" field should be empty
+    And the "Item Modified Date" field should be empty
+    When I paste the "Item ID" and "Item Wishlist ID" fields
+    And I press the "Item Retrieve" button
+    Then I should see the message "Success"
+    And I should see "1357" in the "Item Product ID" field
+    And I should see "99.8" in the "Item Price" field
+    And I should see "The newest version!" in the "Item Description" field
+
+Scenario: Update a Wishlist Item
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "My First Wishlist"
+    And I set the "Wishlist Customer ID" to "Explore0001"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Wishlist has been created!"
+    When I copy the "Wishlist ID" field
+    And I set the "Item Product ID" to "1357"
+    And I set the "Item Price" to "99.8"
+    And I set the "Item Description" to "The newest version!"
+    And I paste the "Item Wishlist ID" field
+    And I press the "Item Create" button
+    Then I should see the message "An item has been created!"
+    When I copy the "Item ID" and "Item Wishlist ID" fields
+    And I press the "Item Clear" button
+    Then the "Item ID" field should be empty
+    And the "Item Product ID" field should be empty
+    And the "Item Price" field should be empty
+    And the "Item Description" field should be empty
+    And the "Item Wishlist ID" field should be empty
+    And the "Item Added Date" field should be empty
+    And the "Item Modified Date" field should be empty
+    When I paste the "Item ID" and "Item Wishlist ID" fields
+    And I set the "Item Product ID" to "1357"
+    And I set the "Item Price" to "109.8"
+    And I set the "Item Description" to "The updated version!"
+    And I press the "Item Update" button
+    Then I should see the message "Success"
+    And I should see "1357" in the "Item Product ID" field
+    And I should see "109.8" in the "Item Price" field
+    And I should see "The updated version!" in the "Item Description" field
 
 # Scenario: Retrieve a Wishlist
 #     When I visit the "Home Page"
