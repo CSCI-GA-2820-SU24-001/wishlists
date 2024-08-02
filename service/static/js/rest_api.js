@@ -1,5 +1,3 @@
-
-
 $(function () {
 
     // ****************************************
@@ -170,7 +168,6 @@ $(function () {
     // ****************************************
 
     $("#wishlist-delete-btn").click(function () {
-
         let wishlist_id = $("#wishlist_id").val();
         let customer_id = $("#wishlist_customer_id").val();
         $("#flash_message").empty();
