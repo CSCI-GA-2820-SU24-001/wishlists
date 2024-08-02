@@ -320,7 +320,6 @@ $(function () {
     // ****************************************
 
     $("#item-update-btn").click(function () {
-
         let item_id = $("#item_id").val();
         let product_id = $("#item_product_id").val();
         let price = parseFloat($("#item_price").val());
