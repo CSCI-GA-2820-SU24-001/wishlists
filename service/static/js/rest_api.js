@@ -1,3 +1,4 @@
+
 $(function () {
 
     // ****************************************
@@ -303,6 +304,45 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
 
+    });
+
+    // ****************************************
+    // Update a WishlistItem
+    // ****************************************
+
+    $("#item-update-btn").click(function () {
+
+        let item_id = $("#item_id").val();        
+        let product_id = $("#item_product_id").val();
+        let price = parseFloat($("#item_price").val());
+        let description = $("#item_description").val();
+        let wishlist_id = $("#item_wishlist_id").val();
+
+        let data = {
+            "product_id": product_id,
+            "price": price,
+            "description": description,
+            "wishlist_id": wishlist_id
+        };
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/wishlists/${wishlist_id}/items/${item_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_wishlist_item_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+        
     });
 
     // ****************************************
