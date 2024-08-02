@@ -311,8 +311,7 @@ $(function () {
     // ****************************************
 
     $("#item-update-btn").click(function () {
-
-        let item_id = $("#item_id").val();        
+        let item_id = $("#item_id").val();
         let product_id = $("#item_product_id").val();
         let price = parseFloat($("#item_price").val());
         let description = $("#item_description").val();
@@ -343,6 +342,34 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
         
+    });
+
+    // ****************************************
+    // Delete a WishlistItem
+    // ****************************************
+
+    $("#item-delete-btn").click(function () {
+
+        let item_id = $("#item_id").val();
+        let wishlist_id = $("#item_wishlist_id").val();
+    
+        $("#flash_message").empty();
+    
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}/items/${item_id}`,
+            contentType: "application/json",
+            data: '',
+        })
+    
+        ajax.done(function(res){
+            clear_wishlist_item_data()
+            flash_message("Success");
+        });
+    
+        ajax.fail(function(res){
+            flash_message("Server error!");
+        });
     });
 
     // ****************************************
