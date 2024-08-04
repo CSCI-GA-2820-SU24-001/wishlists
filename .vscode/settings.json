@@ -5,6 +5,10 @@
         "onupdate",
         "psycopg",
         "sqlalchemy",
-        "testdb"
+        "testdb",
+        "api",
+        "restx",
+        "apidocs",
+        "gunicorn"
     ]
 }
