@@ -190,14 +190,6 @@ def create_items(wishlist_id):
     app.logger.info("Request to create an Item for Wishlist with id: %s", wishlist_id)
     check_content_type("application/json")
 
-    # See if the wishlist exists and abort if it doesn't
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist with id '{wishlist_id}' could not be found.",
-        )
-
     # Create an item from the json data
     item = WishlistItem()
     try:
@@ -206,6 +198,14 @@ def create_items(wishlist_id):
         abort(
             status.HTTP_400_BAD_REQUEST,
             f"{e}",
+        )
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
         )
 
     # Append the item to the wishlist
