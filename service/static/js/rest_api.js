@@ -170,26 +170,14 @@ $(function () {
 
     $("#wishlist-delete-btn").click(function () {
         let wishlist_id = $("#wishlist_id").val();
-        let customer_id = $("#wishlist_customer_id").val();
         $("#flash_message").empty();
         
-        let ajax = null
-        if (customer_id){
-            ajax = $.ajax({
-                type: "DELETE",
-                url: `/wishlists/customers/${customer_id}`,
-                contentType: "application/json",
-                data: '',
-            })
-        }
-        else{
-            ajax = $.ajax({
-                type: "DELETE",
-                url: `/wishlists/${wishlist_id}`,
-                contentType: "application/json",
-                data: '',
-            })
-        }
+        ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}`,
+            contentType: "application/json",
+            data: '',
+        })
 
         ajax.done(function(res){
             clear_wishlist_form_data();
@@ -198,6 +186,31 @@ $(function () {
     
         ajax.fail(function(res){
             flash_message("Server error!");
+        });
+    });
+
+    // ****************************************
+    // Delete all Wishlist by customer ID
+    // ****************************************
+
+    $("#wishlist-delete-all-btn").click(function () {
+        let customer_id = $("#wishlist_customer_id").val();
+        $("#flash_message").empty();
+        
+        ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/customers/${customer_id}`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_wishlist_form_data();
+            flash_message("Wishlist has been deleted!");
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
         });
     });
 
