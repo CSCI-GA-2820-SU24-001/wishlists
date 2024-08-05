@@ -432,5 +432,67 @@ $(function () {
         });
     });
 
+    // ****************************************
+    // Search filtered WishlistItem
+    // ****************************************
+
+    $("#item-search-btn").click(function () {
+
+        let item_wishlist_id = $("#item_wishlist_id").val();
+        let item_price = $("#item_price").val();
+
+        let queryString = ""
+
+        if (item_price) {
+            queryString += 'price=' + item_price
+        }
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/wishlists/${item_wishlist_id}/items?${queryString}`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#item_search_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-2">ID</th>'
+            table += '<th class="col-md-2">Product ID</th>'
+            table += '<th class="col-md-2">Description</th>'
+            table += '<th class="col-md-2">Wishlist ID</th>'
+            table += '<th class="col-md-2">Price</th>'
+            table += '<th class="col-md-2">Added Date</th>'
+            table += '<th class="col-md-2">Modified Date</th>'
+            table += '</tr></thead><tbody>'
+            let firstWishlistItem = "";
+            for(let i = 0; i < res.length; i++) {
+                let item = res[i];
+                table +=  `<tr id="row_${i}"><td>${item.id}</td><td>${item.product_id}</td><td>${item.description}</td><td>${item.wishlist_id}</td><td>${item.price}</td><td>${item.added_date}</td><td>${item.modified_date}</td></tr>`;
+                if (i == 0) {
+                    firstWishlistItem = item;
+                }
+            }
+            table += '</tbody></table>';
+            $("#item_search_results").append(table);
+
+            // copy the first result to the form
+            if (firstWishlistItem != "") {
+                update_wishlist_item_form_data(firstWishlistItem)
+            }
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
 
 })
