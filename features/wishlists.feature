@@ -198,6 +198,7 @@ Scenario: Delete All Wishlist by Customer ID
     And I press the "Wishlist Delete All" button
     Then I should see the message "Wishlist has been deleted!"
     When I press the "Wishlist Form Clear" button
+    And I paste the "Wishlist Customer ID" field
     And I press the "Wishlist Search" button
     Then I should not see "Explore0001" in the "Wishlist" results
 
