@@ -62,10 +62,10 @@ class WishlistItem(db.Model, PersistentBase):
         try:
             if data["wishlist_id"] == "":
                 raise DataValidationError("Invalid Wishlist: missing wishlist_id")
-            
+
             if data["product_id"] == "":
                 raise DataValidationError("Invalid Wishlist: missing product_id")
-            
+
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
