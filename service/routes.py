@@ -23,7 +23,7 @@ and Delete for managing wishlists and wishlist items on the eCommerce website
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Wishlist, WishlistItem
+from service.models import Wishlist, WishlistItem, DataValidationError
 from service.common import status  # HTTP Status Codes
 
 
@@ -54,8 +54,13 @@ def create_wishlists():
 
     # Check if the wishlist already exists
     wishlist = Wishlist()
-    wishlist.deserialize(request.get_json())
-
+    try:
+        wishlist.deserialize(request.get_json())
+    except DataValidationError as e:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"{e}",
+        )
     # if wishlist.find_by_name(wishlist.name):
     #     return jsonify({"name": wishlist.name, "status": "Wishlist already exists."}), status.HTTP_409_CONFLICT
 
@@ -104,8 +109,8 @@ def list_wishlists():
     This endpoint will list all of the Wishlists
     """
     app.logger.info("Request to list wishlists ")
-    customer_id = request.args.get('customer_id')
-    name = request.args.get('name')
+    customer_id = request.args.get("customer_id")
+    name = request.args.get("name")
 
     if customer_id:
         app.logger.info("Filter by customer_id")
@@ -195,7 +200,13 @@ def create_items(wishlist_id):
 
     # Create an item from the json data
     item = WishlistItem()
-    item.deserialize(request.get_json())
+    try:
+        item.deserialize(request.get_json())
+    except DataValidationError as e:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"{e}",
+        )
 
     # Append the item to the wishlist
     wishlist.items.append(item)
@@ -278,7 +289,9 @@ def list_items(wishlist_id):
         app.logger.info("Sort by price in %s order", sort_order)
 
         if sort_order == "desc":
-            sorted_items = sorted(wishlist.items, key=lambda item: item.price, reverse=True)
+            sorted_items = sorted(
+                wishlist.items, key=lambda item: item.price, reverse=True
+            )
         else:
             sorted_items = sorted(wishlist.items, key=lambda item: item.price)
     elif sort_by == "added_date":
@@ -289,7 +302,9 @@ def list_items(wishlist_id):
         if sort_order == "asc":
             sorted_items = sorted(wishlist.items, key=lambda item: item.added_date)
         else:
-            sorted_items = sorted(wishlist.items, key=lambda item: item.added_date, reverse=True)
+            sorted_items = sorted(
+                wishlist.items, key=lambda item: item.added_date, reverse=True
+            )
 
     results = [item.serialize() for item in sorted_items]
 
@@ -350,8 +365,10 @@ def update_wishlist_item(wishlist_id, item_id):
     return jsonify(wishlist_item.serialize()), status.HTTP_200_OK
 
 
-@app.route("/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>",
-           methods=["PUT"])
+@app.route(
+    "/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>",
+    methods=["PUT"],
+)
 def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_id):
     """
     Move an Item from One Wishlist to Another
@@ -360,7 +377,9 @@ def move_item_to_another_wishlist(source_wishlist_id, item_id, target_wishlist_i
     """
     app.logger.info(
         "Request to move item with id: %s from wishlist with id: %s to wishlist with id: %s",
-        item_id, source_wishlist_id, target_wishlist_id
+        item_id,
+        source_wishlist_id,
+        target_wishlist_id,
     )
     check_content_type("application/json")
 
@@ -478,6 +497,7 @@ def delete_all_items(wishlist_id):
 ######################################################################
 # HEALTH CHECK ENDPOINT
 ######################################################################
+
 
 @app.route("/health", methods=["GET"])
 def health_check():
