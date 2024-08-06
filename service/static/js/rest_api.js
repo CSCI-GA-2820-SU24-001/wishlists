@@ -414,22 +414,27 @@ $(function () {
         };
 
         $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "POST",
-            url: `/wishlists/${wishlist_id}/items`,
-            contentType: "application/json",
-            data: JSON.stringify(data),
-        });
 
-        ajax.done(function(res){
-            update_wishlist_item_form_data(res)
-            flash_message("An item has been created!")
-        });
+        if (wishlist_id.trim() === "") {
+            flash_message("Wishlist ID cannot be empty");
+        }
+        else {
+            let ajax = $.ajax({
+                type: "POST",
+                url: `/wishlists/${wishlist_id}/items`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+            });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
+            ajax.done(function(res){
+                update_wishlist_item_form_data(res)
+                flash_message("An item has been created!")
+            });
+
+            ajax.fail(function(res){
+                flash_message(res.responseJSON.message)
+            });
+        }
     });
 
     // ****************************************
