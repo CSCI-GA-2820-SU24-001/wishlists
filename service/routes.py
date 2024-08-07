@@ -316,7 +316,7 @@ class WishlistCollection(Resource):
 
 
 ######################################################################
-#  PATH: /wishlists/{wishlist_id}/items
+#  PATH: /wishlists/<wishlist_id>/items
 ######################################################################
 @api.route("/wishlists/<wishlist_id>/items")
 @api.param("wishlist_id", "The Wishlist identifier")
@@ -326,8 +326,8 @@ class WishlistItemCollection(Resource):
 
     Allows the manipulation of a single Wishlist Item
     POST /wishlists/{wishlist_id}/items - Add an item to a wishlist
-    GET /wishlists/{wishlist_id}/items - List items in a wishlist
-    DELETE /wishlists/{wishlist_id}/items - Delete all items from a wishlist
+    GET /wishlists/<wishlist_id>/items - List items in a wishlist
+    DELETE /wishlists/<wishlist_id>/items - Delete all items from a wishlist
     """
 
     # ------------------------------------------------------------------
