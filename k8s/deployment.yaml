@@ -36,11 +36,11 @@ spec:
               secretKeyRef:
                 name: postgres-creds
                 key: DATABASE_URI
-          - name: SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: postgres-creds
-                key: SECRET_KEY  
+          # - name: SECRET_KEY
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: postgres-creds
+          #       key: SECRET_KEY  
         readinessProbe:
           initialDelaySeconds: 10
           periodSeconds: 60
