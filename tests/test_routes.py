@@ -80,6 +80,20 @@ class WishlistService(TestBase):
         )
         self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
 
+        tmp = wishlist.customer_id
+        wishlist.customer_id = ""
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        wishlist.customer_id = tmp
+        wishlist.name = ""
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
         # resp = self.client.post(
         #     BASE_URL, json=wishlist.serialize(), content_type="application/json"
         # )
@@ -364,6 +378,20 @@ class WishlistService(TestBase):
         self.assertEqual(
             new_item["product_id"], item.product_id, "Item's product_id does not match"
         )
+
+        tmp = item.wishlist_id
+        item.wishlist_id = ""
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        item.wishlist_id = tmp
+        item.product_id = ""
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_add_item_wishlist_not_exist(self):
         """It cannot find the wishlist that does not exist, and return 404"""
