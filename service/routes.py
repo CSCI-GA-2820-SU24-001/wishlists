@@ -48,30 +48,44 @@ def health_check():
 
 
 # Swagger data models
-create_wishlist_model = api.model(
-    "CreateWishlist",
-    {
-        "customer_id": fields.String(
-            required=True, description="The customer ID associated with the wishlist"
-        ),
-        "name": fields.String(required=True, description="The name of the wishlist"),
-    },
-)
-
-wishlist_model = api.inherit(
+wishlist_model = api.model(
     "Wishlist",
-    create_wishlist_model,
     {
         "id": fields.String(
-            readOnly=True, description="The unique identifier of a wishlist"
+            readOnly=True, description="The unique id assigned internally by service"
         ),
-        "created_date": fields.Date(
-            readOnly=True, description="The date the wishlist was created"
+        "customer_id": fields.Integer(
+            required=True, description="The customer id of the wishlist owner"
         ),
-        "modified_date": fields.Date(
-            readOnly=True, description="The date the wishlist was last modified"
+        "name": fields.String(required=True, description="The name of the wishlist"),
+        "items": fields.List(
+            fields.Nested(
+                api.model(
+                    "WishlistItem",
+                    {
+                        "id": fields.String(
+                            readOnly=True,
+                            description="The unique id assigned internally by service",
+                        ),
+                        "product_id": fields.Integer(
+                            required=True, description="The product id of the item"
+                        ),
+                        "description": fields.String(
+                            required=True, description="The description of the item"
+                        ),
+                        "price": fields.Float(
+                            required=True, description="The price of the item"
+                        ),
+                        "quantity": fields.Integer(
+                            required=True, description="The quantity of the item"
+                        ),
+                        "wishlist_id": fields.String(
+                            required=True, description="The id of the wishlist"
+                        ),
+                    },
+                )
+            )
         ),
-        "items": fields.List(fields.Raw, description="List of items in the wishlist"),
     },
 )
 
@@ -181,7 +195,7 @@ class WishlistResource(Resource):
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist not found")
     @api.response(400, "The posted Wishlist data was not valid")
-    @api.expect(create_wishlist_model)
+    @api.expect(wishlist_model)
     @api.marshal_with(wishlist_model)
     def put(self, wishlist_id):
         """
@@ -268,7 +282,7 @@ class WishlistCollection(Resource):
     # CREATE A NEW WISHLIST
     # ------------------------------------------------------------------
     @api.response(400, "The posted Wishlist data was not valid")
-    @api.expect(create_wishlist_model)
+    @api.expect(wishlist_model)
     @api.marshal_with(wishlist_model, code=201)
     def post(self):
         """
@@ -350,7 +364,7 @@ class WishlistItemResource(Resource):
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist Item not found")
     @api.response(400, "The posted Wishlist Item data was not valid")
-    @api.expect(create_wishlistItem_model)
+    @api.expect(wishlistItem_model)
     @api.marshal_with(wishlistItem_model)
     def put(self, wishlist_id, item_id):
         """
@@ -427,20 +441,13 @@ class WishlistItemResource(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items
 ######################################################################
-@api.route("/wishlists/<string:wishlist_id}/items", strict_slashes=False)
+@api.route("/wishlists/<wishlist_id>/items", strict_slashes=False)
 @api.param("wishlist_id", "The Wishlist identifier")
 class WishlistItemCollection(Resource):
-    """
-    WishlistItemCollection class
-
-    Allows the manipulation of all Wishlist Items for a Wishlist
-    GET /wishlists/{id}/items - Returns all Items in Wishlist with id
-    POST /wishlists/{id}/items - Adds an Item to Wishlist with id
-    DELETE /wishlists/{id}/items - Deletes all Items in Wishlist with id
-    """
+    """Handles all interactions with collections of Wishlist Items"""
 
     # ------------------------------------------------------------------
-    # RETRIEVE ALL ITEMS FROM A WISHLIST
+    # LIST ALL ITEMS IN A WISHLIST
     # ------------------------------------------------------------------
     @api.expect(wishlistItem_args, validate=True)
     @api.marshal_list_with(wishlistItem_model)
@@ -462,18 +469,29 @@ class WishlistItemCollection(Resource):
         sort_by = args.get("sort_by", "price").lower()
         order = args.get("order", "asc").lower()
 
-        items = WishlistItem.find_by_wishlist_id(wishlist_id)
-
+        items = wishlist.items
         if price:
-            items = [item for item in items if item.price <= price]
+            app.logger.info("Filtering by price [%s]", price)
+            items = WishlistItem.find_by_price(wishlist_id, price)
 
-        if sort_by and sort_by in ["price", "added_date"]:
-            reverse = True if order == "desc" else False
-            items = sorted(items, key=lambda x: getattr(x, sort_by), reverse=reverse)
+        if sort_by == "price":
+            app.logger.info("Sorting by price in [%s] order", order)
+            items = sorted(
+                items, key=lambda item: item.price, reverse=(order == "desc")
+            )
+        elif sort_by == "added_date":
+            app.logger.info("Sorting by added date in [%s] order", order)
+            items = sorted(
+                items, key=lambda item: item.added_date, reverse=(order == "desc")
+            )
 
-        app.logger.info("Returning [%d] items", len(items))
+        items = [item.serialize() for item in items]
 
-        return [item.serialize() for item in items], status.HTTP_200_OK
+        app.logger.info(
+            "Returning [%s] Items in Wishlist with id [%s]", len(items), wishlist_id
+        )
+
+        return items, status.HTTP_200_OK
 
     # ------------------------------------------------------------------
     # ADD AN ITEM TO A WISHLIST
@@ -504,33 +522,37 @@ class WishlistItemCollection(Resource):
             data["product_id"], wishlist_id
         )
         if item:
-            error(
-                status.HTTP_400_BAD_REQUEST,
-                f"Item with product id [{data['product_id']}] already exists in wishlist [{wishlist_id}].",
-            )
-
-        item = WishlistItem()
-        item.deserialize(data)
-        item.wishlist_id = wishlist_id
-        item.create()
+            item.quantity += data["quantity"]
+            item.update()
+        else:
+            item = WishlistItem()
+            data["wishlist_id"] = wishlist_id
+            item.deserialize(data)
+            wishlist.items.append(item)
+            wishlist.update()
 
         app.logger.info(
-            "Item with product id [%s] added to Wishlist with id [%s]",
-            data["product_id"],
-            wishlist_id,
+            "Item with id [%s] saved in Wishlist with id [%s]!", item.id, wishlist_id
         )
 
-        return item.serialize(), status.HTTP_201_CREATED
+        location_url = api.url_for(
+            WishlistItemResource,
+            item_id=item.id,
+            wishlist_id=wishlist_id,
+            _external=True,
+        )
+
+        return item.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
     # ------------------------------------------------------------------
     # DELETE ALL ITEMS IN A WISHLIST
     # ------------------------------------------------------------------
-    @api.response(204, "Wishlist Items deleted")
+    @api.response(204, "All Wishlist Items deleted")
     def delete(self, wishlist_id):
         """
         Delete all Items in a Wishlist
 
-        This endpoint will delete all Items in a Wishlist based on its id
+        This endpoint will delete all Items from a Wishlist based on the id specified in the path
         """
         app.logger.info(
             "Request to delete all Items in Wishlist with id [%s]", wishlist_id
@@ -546,7 +568,7 @@ class WishlistItemCollection(Resource):
         for item in wishlist.items:
             item.delete()
 
-        app.logger.info("All Items in Wishlist with id [%s] deleted!", wishlist_id)
+        app.logger.info("Items in Wishlist with id [%s] deleted!", wishlist_id)
 
         return "", status.HTTP_204_NO_CONTENT
 
@@ -609,6 +631,12 @@ class MoveWishlistItemResource(Resource):
 
         item.wishlist_id = target_wishlist_id
         item.update()
+
+        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
+        source_wishlist.update()
+
+        target_wishlist.items.append(item)
+        target_wishlist.update()
 
         return item.serialize(), status.HTTP_200_OK
 
