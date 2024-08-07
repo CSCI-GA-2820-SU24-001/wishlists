@@ -31,7 +31,9 @@ class Wishlist(db.Model, PersistentBase):
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     created_date = db.Column(db.Date(), nullable=False, default=date.today())
-    modified_date = db.Column(db.Date(), nullable=False, default=date.today(), onupdate=date.today())
+    modified_date = db.Column(
+        db.Date(), nullable=False, default=date.today(), onupdate=date.today()
+    )
     items = db.relationship("WishlistItem", backref="wishlist", passive_deletes=True)
 
     def __repr__(self):
@@ -43,8 +45,8 @@ class Wishlist(db.Model, PersistentBase):
             "id": self.id,
             "customer_id": self.customer_id,
             "name": self.name,
-            "created_date": self.created_date,
-            "modified_date": self.modified_date,
+            "created_date": self.created_date.isoformat(),
+            "modified_date": self.modified_date.isoformat(),
             "items": [item.serialize() for item in self.items],
         }
         return wishlist
@@ -65,14 +67,6 @@ class Wishlist(db.Model, PersistentBase):
 
             self.customer_id = data["customer_id"]
             self.name = data["name"]
-
-            # The dates should always be set by default or on update
-            # Has commented the following block, it is only for tests
-
-            # if data["created_date"]:
-            #     self.created_date = data["created_date"]
-            # if data["modified_date"]:
-            #     self.modified_date = data["modified_date"]
 
             item_list = data.get("items")
             if item_list:

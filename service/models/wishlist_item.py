@@ -50,8 +50,8 @@ class WishlistItem(db.Model, PersistentBase):
             "product_id": self.product_id,
             "description": self.description,
             "price": float(f"{self.price:.2f}"),
-            "added_date": self.added_date,
-            "modified_date": self.modified_date,
+            "added_date": self.added_date.isoformat(),
+            "modified_date": self.modified_date.isoformat(),
         }
 
     def deserialize(self, data):
@@ -71,8 +71,6 @@ class WishlistItem(db.Model, PersistentBase):
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
-            # self.added_date = data["added_date"]
-            # self.modified_date = data["modified_date"]
 
             if isinstance(data["price"], (int, float)):
                 self.price = data["price"]
@@ -102,7 +100,6 @@ class WishlistItem(db.Model, PersistentBase):
             wishlist_id (string): the wishlist_id of the WishlistItem you want to match
             price(string): the price of the WishlistItem you want to match
         """
-
         return cls.query.filter(
             cls.wishlist_id == wishlist_id, cls.price <= float(price)
         ).all()
@@ -117,47 +114,15 @@ class WishlistItem(db.Model, PersistentBase):
         logger.info("Processing wishlist_id query for %s ...", wishlist_id)
         return cls.query.filter(cls.wishlist_id == wishlist_id).all()
 
-    ##################################################
-    # Class Methods
-    ##################################################
+    @classmethod
+    def find_by_product_id_wishlist_id(cls, product_id, wishlist_id):
+        """Returns all WishlistItems with the given product_id and wishlist_id
 
-    # @classmethod
-    # def find_by_wishlist_id(cls, wishlist_id):
-    #     """Returns all WishlistItems with the given wishlist_id
-
-    #     Args:
-    #         wishlist_id (string): the wishlist_id of the WishlistItem you want to match
-    #     """
-    #     logger.info("Processing wishlist_id query for %s ...", wishlist_id)
-    #     return cls.query.filter(cls.wishlist_id == wishlist_id).all()
-
-    # @classmethod
-    # def find_by_product_id(cls, product_id):
-    #     """Returns all WishlistItems with the given product_id
-
-    #     Args:
-    #         product_id (string): the product_id of the WishlistItem you want to match
-    #     """
-    #     logger.info("Processing product_id query for %s", product_id)
-    #     return cls.query.filter(cls.product_id == product_id).all()
-
-    # @classmethod
-    # def find_by_product_id_wishlist_id(cls, product_id, wishlist_id):
-    #     """Returns all WishlistItems with the given product_id and wishlist_id
-
-    #     Args:
-    #         product_id (string): the product_id of the WishlistItem you want to match
-    #         wishlist_id (string): the wishlist_id of the WishlistItem you want to match
-    #     """
-    #     logger.info("Processing product_id query for %s", product_id)
-    #     return cls.query.filter(cls.product_id == product_id, cls.wishlist_id == wishlist_id).all()
-
-    # @classmethod
-    # def find_by_description(cls, description):
-    #     """Returns all WishlistItems with the given description
-
-    #     Args:
-    #         description (string): the description of the WishlistItem you want to match
-    #     """
-    #     logger.info("Processing description query for %s ...", description)
-    #     return cls.query.filter(cls.description == description).all()
+        Args:
+            product_id (string): the product_id of the WishlistItem you want to match
+            wishlist_id (string): the wishlist_id of the WishlistItem you want to match
+        """
+        logger.info("Processing product_id query for %s", product_id)
+        return cls.query.filter(
+            cls.product_id == product_id, cls.wishlist_id == wishlist_id
+        ).all()
