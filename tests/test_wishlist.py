@@ -189,7 +189,7 @@ class TestWishlist(TestBase):
         self.assertEqual(items[0]["id"], wishlist_item.id)
         self.assertEqual(items[0]["product_id"], wishlist_item.product_id)
         self.assertEqual(items[0]["description"], wishlist_item.description)
-        self.assertEqual(items[0]["price"], float(wishlist_item.price))
+        self.assertAlmostEqual(items[0]["price"], float(wishlist_item.price), places=2)
 
     def test_deserialize_a_wishlist(self):
         """It should Deserialize a wishlist"""

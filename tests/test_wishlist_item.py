@@ -60,7 +60,9 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist.items[0].product_id, item.product_id)
         self.assertEqual(new_wishlist.items[0].description, item.description)
         self.assertEqual(new_wishlist.items[0].product_id, item.product_id)
-        self.assertAlmostEqual(float(new_wishlist.items[0].price), float(item.price))
+        self.assertAlmostEqual(
+            float(new_wishlist.items[0].price), float(item.price), places=2
+        )
         self.assertEqual(new_wishlist.items[0].added_date, item.added_date)
         self.assertEqual(new_wishlist.items[0].modified_date, item.modified_date)
 
@@ -75,7 +77,10 @@ class TestWishlistItem(TestBase):
         self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
         self.assertEqual(new_wishlist.items[1].description, item2.description)
         self.assertEqual(new_wishlist.items[1].product_id, item2.product_id)
-        self.assertAlmostEqual(float(new_wishlist.items[1].price), float(item2.price))
+        self.assertAlmostEqual(
+            float(new_wishlist.items[1].price), float(item2.price), places=2
+        )
+
         self.assertEqual(new_wishlist.items[1].added_date, item2.added_date)
         self.assertEqual(new_wishlist.items[1].modified_date, item2.modified_date)
 

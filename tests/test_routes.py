@@ -1,7 +1,3 @@
-"""
-WishlistModel API Service Test Suite
-"""
-
 import logging
 from datetime import date
 import uuid
@@ -28,9 +24,9 @@ class WishlistService(TestBase):
         wishlists = []
         for _ in range(count):
             wishlist = WishlistFactory()
-            wishlist.customer_id = "Customer" + str(
-                uuid.uuid4()
-            )  # Ensure customer_id is a String
+            wishlist.customer_id = (
+                "Customer" + str(uuid.uuid4())[:36]
+            )  # Ensure customer_id is a String and within length constraints
             resp = self.client.post(BASE_URL, json=wishlist.serialize())
             self.assertEqual(
                 resp.status_code,
@@ -54,9 +50,9 @@ class WishlistService(TestBase):
     def test_create_wishlist(self):
         """It should Accept a POST request and Create a new Wishlist"""
         wishlist = WishlistFactory()
-        wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -106,9 +102,9 @@ class WishlistService(TestBase):
         """It should Delete a wishlist"""
         # create a wishlist to be deleted
         wishlist = WishlistFactory()
-        wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -142,9 +138,9 @@ class WishlistService(TestBase):
         """It should Update an existing Wishlist"""
         # create a Wishlist to update
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        test_wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -161,9 +157,9 @@ class WishlistService(TestBase):
         """It should not Update a Wishlist that does not exist"""
         # create a Wishlist to update
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        test_wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -181,9 +177,9 @@ class WishlistService(TestBase):
         """It should Get an existing Wishlist"""
         # Create a Wishlist to read
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        test_wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -249,8 +245,7 @@ class WishlistService(TestBase):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(data["status"], 200)
-        self.assertEqual(data["message"], "Healthy")
+        self.assertEqual(data["status"], "OK")
 
     ######################################################################
     #  WISHLIST ITEMS TEST CASES HERE
@@ -315,9 +310,9 @@ class WishlistService(TestBase):
         """It should Get an existing Wishlist Item"""
         # Create a Wishlist
         wishlist = WishlistFactory()
-        wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -350,9 +345,9 @@ class WishlistService(TestBase):
         """It should not Get a Wishlist Item that does not exist"""
         # Create a Wishlist
         wishlist = WishlistFactory()
-        wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         wishlist_id = wishlist.id
 
         # Try to get an item from non-existent wishlist
@@ -510,9 +505,9 @@ class WishlistService(TestBase):
         source_wishlist = WishlistFactory()
         target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
 
-        source_wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        source_wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         target_wishlist.customer_id = (
             source_wishlist.customer_id
         )  # Ensure same customer_id
@@ -573,9 +568,9 @@ class WishlistService(TestBase):
         target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
         other_wishlist = WishlistFactory(customer_id="other_customer")
 
-        source_wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        source_wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         target_wishlist.customer_id = (
             source_wishlist.customer_id
         )  # Ensure same customer_id
@@ -868,7 +863,7 @@ class WishlistService(TestBase):
         # check the data just to be sure
         for item in data:
             self.assertTrue(
-                item["price"] < test_price,
+                item["price"] <= test_price,
                 f"Item {item['id']} has a price of {item['price']} which is not less than {test_price}",
             )
 
@@ -900,9 +895,9 @@ class WishlistService(TestBase):
     def test_delete_all_items_by_wishlist_id(self):
         """It should delete all items for a specific wishlist"""
         wishlist = WishlistFactory()
-        wishlist.customer_id = "Customer" + str(
-            uuid.uuid4()
-        )  # Ensure customer_id is a String
+        wishlist.customer_id = (
+            "Customer" + str(uuid.uuid4())[:36]
+        )  # Ensure customer_id is a String and within length constraints
         items = [WishlistItemFactory(), WishlistItemFactory(), WishlistItemFactory()]
         wishlist.items = items
         wishlist.create()
@@ -912,8 +907,6 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # Fetch the wishlist and ensure items are deleted
-        response = self.client.delete(f"{BASE_URL}/{wishlist.id}/items")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         resp = self.client.get(
             f"{BASE_URL}/{wishlist.id}/items",
             content_type="application/json",

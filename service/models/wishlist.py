@@ -26,7 +26,7 @@ class Wishlist(db.Model, PersistentBase):
     # Table Schema
     ##################################################
     id = db.Column(
-        db.String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+        db.String(36), primary_key=True, default=lambda: str(uuid.uuid4())[:36]
     )  # pylint: disable=invalid-name
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
@@ -65,8 +65,8 @@ class Wishlist(db.Model, PersistentBase):
             if data["name"] == "":
                 raise DataValidationError("Invalid Wishlist: missing name")
 
-            self.customer_id = data["customer_id"]
-            self.name = data["name"]
+            self.customer_id = data["customer_id"][:36]
+            self.name = data["name"][:64]
 
             item_list = data.get("items")
             if item_list:

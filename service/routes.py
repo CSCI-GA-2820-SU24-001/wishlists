@@ -26,7 +26,7 @@ from flask import request
 from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem
 from service.common import status  # HTTP Status Codes
-from . import api
+from service import api
 
 
 ######################################################################
@@ -516,7 +516,7 @@ class WishlistItemCollection(Resource):
             data["product_id"], wishlist_id
         )
         if item:
-            item.quantity += data["quantity"]
+            item.price = data["price"]
             item.update()
         else:
             item = WishlistItem()
@@ -626,7 +626,9 @@ class MoveWishlistItemResource(Resource):
         item.wishlist_id = target_wishlist_id
         item.update()
 
-        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
+        # Remove the item from source wishlist's items if it is there
+        if item in source_wishlist.items:
+            source_wishlist.items.remove(item)
         source_wishlist.update()
 
         target_wishlist.items.append(item)
