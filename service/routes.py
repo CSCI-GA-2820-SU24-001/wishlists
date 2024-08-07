@@ -1,32 +1,9 @@
-######################################################################
-# Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-######################################################################
-
-"""
-Wishlists Service
-
-This service implements a REST API that allows you to Create, Read, Update
-and Delete for managing wishlists and wishlist items on the eCommerce website
-"""
-
 from flask import current_app as app  # Import Flask application
 from flask import request
 from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem
 from service.common import status  # HTTP Status Codes
-from service import api
+from . import api
 
 
 ######################################################################
@@ -289,6 +266,8 @@ class WishlistCollection(Resource):
 
         wishlist = Wishlist()
         wishlist.deserialize(api.payload)
+        if len(wishlist.customer_id) > 36:
+            wishlist.customer_id = wishlist.customer_id[:36]
         wishlist.create()
 
         app.logger.info("Wishlist with id [%s] saved!", wishlist.id)
@@ -448,6 +427,8 @@ class WishlistItemCollection(Resource):
     def get(self, wishlist_id):
         """
         Retrieve all Items in a Wishlist
+
+        This endpoint will return all items in a Wishlist based on the wishlist id
         """
         app.logger.info("Request to list Items in Wishlist with id [%s]", wishlist_id)
 
@@ -460,7 +441,9 @@ class WishlistItemCollection(Resource):
 
         args = wishlistItem_args.parse_args()
         price = args.get("price")
-        sort_by = args.get("sort_by", "price").lower()
+        sort_by = args.get("sort_by", "price")
+        if sort_by:
+            sort_by = sort_by.lower()
         order = args.get("order", "asc").lower()
 
         items = wishlist.items
@@ -626,9 +609,7 @@ class MoveWishlistItemResource(Resource):
         item.wishlist_id = target_wishlist_id
         item.update()
 
-        # Remove the item from source wishlist's items if it is there
-        if item in source_wishlist.items:
-            source_wishlist.items.remove(item)
+        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
         source_wishlist.update()
 
         target_wishlist.items.append(item)
