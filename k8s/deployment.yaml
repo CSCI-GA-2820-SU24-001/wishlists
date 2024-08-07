@@ -35,7 +35,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgres-creds
-                key: DATABASE_URI
+                key: database_uri
           # - name: SECRET_KEY
           #   valueFrom:
           #     secretKeyRef:
