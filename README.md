@@ -74,15 +74,15 @@ make test
 
 This command will run the test suite using `pytest` and ensure that all the tests pass.
 
-## Running the Service
+## Running the Service Locally
 
 To run the wishlists service locally, you can use the following command:
 
 ```bash
-flask run
+honcho start
 ```
 
-The service will start and be accessible at `http://localhost:8000`. To change the port, update the environment variable in the `.flaskenv` file.
+The service will start and be accessible at `http://localhost:8000`.
 
 
 ## License
