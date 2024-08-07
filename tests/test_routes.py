@@ -1,3 +1,7 @@
+"""
+Test cases for WishlistModel API Service
+"""
+
 import logging
 from datetime import date
 import uuid
