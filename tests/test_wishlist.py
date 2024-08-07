@@ -25,6 +25,7 @@ from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
 
 
+# pylint: disable=too-many-public-methods
 ######################################################################
 #        W I S H L I S T   M O D E L   T E S T   C A S E S
 ######################################################################
