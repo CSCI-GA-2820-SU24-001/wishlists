@@ -44,11 +44,11 @@ class PersistentBase:
         except DataError as e:
             db.session.rollback()
             logger.error("DataError creating record: %s", self)
-            raise DataValidationError(e.orig) from e
+            raise DataValidationError(str(e.orig)) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error creating record: %s", self)
-            raise DataValidationError(e) from e
+            raise DataValidationError(str(e)) from e
 
     def update(self) -> None:
         """
@@ -62,11 +62,11 @@ class PersistentBase:
         except DataError as e:
             db.session.rollback()
             logger.error("DataError updating record: %s", self)
-            raise DataValidationError(e.orig) from e
+            raise DataValidationError(str(e.orig)) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error updating record: %s", self)
-            raise DataValidationError(e) from e
+            raise DataValidationError(str(e)) from e
 
     def delete(self) -> None:
         """Removes a Wishlist/Wishlist Item from the data store"""
@@ -77,11 +77,11 @@ class PersistentBase:
         except DataError as e:
             db.session.rollback()
             logger.error("DataError deleting record: %s", self)
-            raise DataValidationError(e.orig) from e
+            raise DataValidationError(str(e.orig)) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error deleting record: %s", self)
-            raise DataValidationError(e) from e
+            raise DataValidationError(str(e)) from e
 
     @classmethod
     def all(cls):

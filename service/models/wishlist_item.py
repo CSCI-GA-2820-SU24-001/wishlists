@@ -62,22 +62,19 @@ class WishlistItem(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            if data["wishlist_id"] == "":
-                raise DataValidationError("Invalid Wishlist: missing wishlist_id")
-
-            if data["product_id"] == "":
-                raise DataValidationError("Invalid Wishlist: missing product_id")
+            if not data["wishlist_id"]:
+                raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
+            if not data["product_id"]:
+                raise DataValidationError("Invalid WishlistItem: missing product_id")
+            if "price" not in data or not isinstance(data["price"], (int, float)):
+                raise DataValidationError(
+                    "Invalid WishlistItem: missing or invalid price"
+                )
 
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
-
-            if isinstance(data["price"], (int, float)):
-                self.price = data["price"]
-            else:
-                raise TypeError(
-                    "Invalid type for int/float [price]: " + str(type(data["price"]))
-                )
+            self.price = data["price"]
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
@@ -116,13 +113,8 @@ class WishlistItem(db.Model, PersistentBase):
 
     @classmethod
     def find_by_product_id_wishlist_id(cls, product_id, wishlist_id):
-        """Returns all WishlistItems with the given product_id and wishlist_id
-
-        Args:
-            product_id (string): the product_id of the WishlistItem you want to match
-            wishlist_id (string): the wishlist_id of the WishlistItem you want to match
-        """
+        """Returns a WishlistItem with the given product_id and wishlist_id"""
         logger.info("Processing product_id query for %s", product_id)
         return cls.query.filter(
             cls.product_id == product_id, cls.wishlist_id == wishlist_id
-        ).all()
+        ).first()
