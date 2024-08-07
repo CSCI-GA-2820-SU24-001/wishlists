@@ -189,15 +189,55 @@ Scenario: Delete All Wishlist by Customer ID
     And I set the "Wishlist Customer ID" to "Explore0001"
     And I press the "Wishlist Create" button
     Then I should see the message "Wishlist has been created!"
+    When I set the "Wishlist Name" to "My Second Wishlist"
+    And I set the "Wishlist Customer ID" to "Explore0001"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Wishlist has been created!"
     When I copy the "Wishlist Customer ID" field
     And I paste the "Wishlist Customer ID" field
-    And I press the "Wishlist Delete" button
+    And I press the "Wishlist Delete All" button
     Then I should see the message "Wishlist has been deleted!"
     When I press the "Wishlist Form Clear" button
     And I paste the "Wishlist Customer ID" field
-    And I press the "Wishlist Retrieve" button
-    Then I should not see "Success"
-    Then I should see the message "404 Not Found"
+    And I press the "Wishlist Search" button
+    Then I should not see "Explore0001" in the "Wishlist" results
+
+Scenario: Search filtered Wishlist Item
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "My First Wishlist"
+    And I set the "Wishlist Customer ID" to "Explore0001"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Wishlist has been created!"
+    When I copy the "Wishlist ID" field
+    And I set the "Item Product ID" to "1234"
+    And I set the "Item Price" to "100"
+    And I set the "Item Description" to "Item with price 100"
+    And I paste the "Item Wishlist ID" field
+    And I press the "Item Create" button
+    Then I should see the message "An item has been created!"
+    When I copy the "Item Wishlist ID" field
+    And I set the "Item Product ID" to "2345"
+    And I set the "Item Price" to "200"
+    And I set the "Item Description" to "Item with price 200"
+    And I paste the "Item Wishlist ID" field
+    And I press the "Item Create" button
+    Then I should see the message "An item has been created!"
+    When I copy the "Item Wishlist ID" field
+    And I set the "Item Product ID" to "3456"
+    And I set the "Item Price" to "300"
+    And I set the "Item Description" to "Item with price 300"
+    And I paste the "Item Wishlist ID" field
+    And I press the "Item Create" button
+    Then I should see the message "An item has been created!"
+    When I copy the "Item Wishlist ID" field
+    And I press the "Item Clear" button
+    And I paste the "Item Wishlist ID" field
+    And I set the "Item Price" to "250"
+    And I press the "Item Search" button
+    Then I should see the message "Success"
+    And I should see "100" in the "Item" results
+    And I should see "200" in the "Item" results
+    And I should not see "300" in the "Item" results
 
 # Scenario: Search for Wishlist by Name
 #     When I visit the "Home Page"
