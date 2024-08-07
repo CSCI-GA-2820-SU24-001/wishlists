@@ -1,19 +1,3 @@
-######################################################################
-# Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-######################################################################
-
 """
 Wishlists Service
 
@@ -27,6 +11,31 @@ from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem
 from service.common import status  # HTTP Status Codes
 from . import api
+
+
+# Utility functions
+def error(status_code, reason):
+    """Logs the error and then aborts"""
+    app.logger.error(reason)
+    api.abort(status_code, reason)
+
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        error(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    error(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
+    )
 
 
 ######################################################################
@@ -465,14 +474,16 @@ class WishlistItemCollection(Resource):
         args = wishlistItem_args.parse_args()
         price = args.get("price")
         sort_by = args.get("sort_by", "price")
+        order = args.get("order", "asc")
         if sort_by:
             sort_by = sort_by.lower()
-        order = args.get("order", "asc").lower()
+        if order:
+            order = order.lower()
 
         items = wishlist.items
         if price:
             app.logger.info("Filtering by price [%s]", price)
-            items = WishlistItem.find_by_price(wishlist_id, price)
+            items = [item for item in items if item.price == price]
 
         if sort_by == "price":
             app.logger.info("Sorting by price in [%s] order", order)
@@ -528,7 +539,8 @@ class WishlistItemCollection(Resource):
             item = WishlistItem()
             data["wishlist_id"] = wishlist_id
             item.deserialize(data)
-            item.create()
+            wishlist.items.append(item)
+            wishlist.update()
 
         app.logger.info(
             "Item with id [%s] saved in Wishlist with id [%s]!", item.id, wishlist_id
@@ -631,6 +643,12 @@ class MoveWishlistItemResource(Resource):
         item.wishlist_id = target_wishlist_id
         item.update()
 
+        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
+        source_wishlist.update()
+
+        target_wishlist.items.append(item)
+        target_wishlist.update()
+
         return item.serialize(), status.HTTP_200_OK
 
 
@@ -661,38 +679,3 @@ class CustomerWishlistResource(Resource):
             wishlist.delete()
 
         return "", status.HTTP_204_NO_CONTENT
-
-
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-
-# ------------------------------------------------------------------
-# Logs error messages before aborting
-# ------------------------------------------------------------------
-def error(status_code, reason):
-    """Logs the error and then aborts"""
-    app.logger.error(reason)
-    api.abort(status_code, reason)
-
-
-# ------------------------------------------------------------------
-# Checks that the media type is correct
-# ------------------------------------------------------------------
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        error(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    error(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
-    )
