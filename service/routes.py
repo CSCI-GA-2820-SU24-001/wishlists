@@ -8,7 +8,7 @@ and Delete for managing wishlists and wishlist items on the eCommerce website.
 from flask import current_app as app  # Import Flask application
 from flask import request
 from flask_restx import Resource, reqparse, fields
-from service.models import Wishlist, WishlistItem
+from service.models import Wishlist, WishlistItem, DataValidationError
 from service.common import status  # HTTP Status Codes
 from . import api
 
@@ -36,6 +36,15 @@ def check_content_type(content_type):
     error(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
+
+
+#
+def validate_wishlist_item_data(data):
+    """Validates the data for a WishlistItem"""
+    if not data.get("wishlist_id"):
+        raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
+    if not data.get("product_id"):
+        raise DataValidationError("Invalid WishlistItem: missing product_id")
 
 
 ######################################################################
@@ -399,6 +408,7 @@ class WishlistItemResource(Resource):
                 f"Item with id [{item_id}] was not found in Wishlist with id [{wishlist_id}].",
             )
 
+        validate_wishlist_item_data(api.payload)
         item.deserialize(api.payload)
         item.update()
 
@@ -526,6 +536,7 @@ class WishlistItemCollection(Resource):
             )
 
         data = api.payload
+        validate_wishlist_item_data(data)
 
         app.logger.info("Processing: %s", data)
 

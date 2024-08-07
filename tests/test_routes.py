@@ -379,7 +379,7 @@ class WishlistService(TestBase):
         self.assertIn("was not found", data["message"])
 
     def test_add_item(self):
-        """It should Add an item to an wishlist"""
+        """It should Add an item to a wishlist"""
         wishlist = self._create_wishlists(1)[0]
         item = WishlistItemFactory()
         item.wishlist_id = wishlist.id  # Ensure wishlist_id is properly set
