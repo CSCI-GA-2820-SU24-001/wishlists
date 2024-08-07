@@ -23,7 +23,7 @@ and Delete for managing wishlists and wishlist items on the eCommerce website
 
 from flask import current_app as app  # Import Flask application
 from flask import request
-from flask_restx import Resource, reqparse
+from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem
 from service.common import status  # HTTP Status Codes
 from . import api
@@ -47,11 +47,66 @@ def health_check():
     return {"status": "OK"}, status.HTTP_200_OK
 
 
+# Define the models so that the docs reflect what can be sent
+create_wishlistItem_model = api.model(
+    "WishlistItem",
+    {
+        "wishlist_id": fields.String(required=True, description="ID of the wishlist"),
+        "name": fields.String(required=True, description="Name of the wishlist item"),
+        "product_id": fields.String(required=True, description="ID of the product"),
+        "quantity": fields.Integer(
+            required=True, description="Quantity of wishlist item"
+        ),
+        "price": fields.Float(required=True, description="Price of the product"),
+    },
+)
+
+wishlistItem_model = api.inherit(
+    "WishlistItemModel",
+    create_wishlistItem_model,
+    {
+        "id": fields.String(
+            readOnly=True,
+            description="The unique ID of the wishlist item assigned internally by the service",
+        ),
+        "wishlist_id": fields.String(
+            readOnly=True,
+            description="The ID of the wishlist to which the wishlist item belongs",
+        ),
+    },
+)
+
+create_wishlist_model = api.model(
+    "Wishlist",
+    {
+        "customer_id": fields.String(
+            required=True, description="ID of the customer owning the wishlist"
+        ),
+        "name": fields.String(required=True, description="Name of the wishlist"),
+        "items": fields.List(
+            fields.Nested(wishlistItem_model),
+            required=False,
+            description="Items in the wishlist",
+        ),
+    },
+)
+
+wishlist_model = api.inherit(
+    "WishlistModel",
+    create_wishlist_model,
+    {
+        "id": fields.String(
+            readOnly=True,
+            description="The unique ID of the wishlist assigned internally by the service",
+        ),
+    },
+)
+
 # query string arguments
 wishlist_args = reqparse.RequestParser()
 wishlist_args.add_argument(
     "customer_id",
-    type=int,
+    type=str,
     location="args",
     required=False,
     help="Customer ID of the Wishlist",
@@ -74,7 +129,6 @@ wishlistItem_args.add_argument(
 wishlistItem_args.add_argument(
     "order", type=str, location="args", required=False, help="Sort order: asc or desc"
 )
-
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
@@ -100,6 +154,7 @@ class WishlistResource(Resource):
     # RETRIEVE A WISHLIST
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist not found")
+    @api.marshal_with(wishlist_model)
     def get(self, wishlist_id):
         """
         Retrieve a single Wishlist
@@ -124,6 +179,8 @@ class WishlistResource(Resource):
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist not found")
     @api.response(400, "The posted Wishlist data was not valid")
+    @api.expect(wishlist_model)
+    @api.marshal_with(wishlist_model)
     def put(self, wishlist_id):
         """
         Update a Wishlist
@@ -180,6 +237,7 @@ class WishlistCollection(Resource):
     # LIST ALL WISHLISTS
     # ------------------------------------------------------------------
     @api.expect(wishlist_args, validate=True)
+    @api.marshal_list_with(wishlist_model)
     def get(self):
         """Returns all of the Wishlists"""
         app.logger.info("Request for Wishlists list")
@@ -208,6 +266,8 @@ class WishlistCollection(Resource):
     # CREATE A NEW WISHLIST
     # ------------------------------------------------------------------
     @api.response(400, "The posted Wishlist data was not valid")
+    @api.expect(create_wishlist_model)
+    @api.marshal_with(wishlist_model, code=201)
     def post(self):
         """
         Creates a Wishlist
@@ -233,7 +293,7 @@ class WishlistCollection(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items/{item_id}
 ######################################################################
-@api.route("/wishlists/<string:wishlist_id>/items/<string:item_id>")
+@api.route("/wishlists/<string:wishlist_id}/items/<string:item_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
 @api.param("item_id", "The Wishlist Item identifier")
 class WishlistItemResource(Resource):
@@ -250,6 +310,7 @@ class WishlistItemResource(Resource):
     # RETRIEVE AN ITEM FROM A WISHLIST
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist Item not found")
+    @api.marshal_with(wishlistItem_model)
     def get(self, wishlist_id, item_id):
         """
         Retrieve a single Item from Wishlist
@@ -287,6 +348,8 @@ class WishlistItemResource(Resource):
     # ------------------------------------------------------------------
     @api.response(404, "Wishlist Item not found")
     @api.response(400, "The posted Wishlist Item data was not valid")
+    @api.expect(wishlistItem_model)
+    @api.marshal_with(wishlistItem_model)
     def put(self, wishlist_id, item_id):
         """
         Update an Item in a Wishlist
@@ -371,6 +434,7 @@ class WishlistItemCollection(Resource):
     # LIST ALL ITEMS IN A WISHLIST
     # ------------------------------------------------------------------
     @api.expect(wishlistItem_args, validate=True)
+    @api.marshal_list_with(wishlistItem_model)
     def get(self, wishlist_id):
         """
         Retrieve all Items in a Wishlist
@@ -417,6 +481,8 @@ class WishlistItemCollection(Resource):
     # ADD AN ITEM TO A WISHLIST
     # ------------------------------------------------------------------
     @api.response(400, "The posted Wishlist Item data was not valid")
+    @api.expect(create_wishlistItem_model)
+    @api.marshal_with(wishlistItem_model, code=201)
     def post(self, wishlist_id):
         """
         Add an Item in a Wishlist
@@ -495,7 +561,7 @@ class WishlistItemCollection(Resource):
 #  PATH: /wishlists/{source_wishlist_id}/items/{item_id}/move-to/{target_wishlist_id}
 ######################################################################
 @api.route(
-    "/wishlists/<string:source_wishlist_id>/items/<string:item_id>/move-to/<string:target_wishlist_id>",
+    "/wishlists/<string:source_wishlist_id}/items/<string:item_id}/move-to/<string:target_wishlist_id>",
     methods=["PUT"],
 )
 @api.param("source_wishlist_id", "The source Wishlist identifier")
@@ -506,6 +572,7 @@ class MoveWishlistItemResource(Resource):
 
     @api.response(404, "Wishlist or Item not found")
     @api.response(403, "Wishlists belong to different customers")
+    @api.marshal_with(wishlistItem_model)
     def put(self, source_wishlist_id, item_id, target_wishlist_id):
         """
         Move an Item from One Wishlist to Another
