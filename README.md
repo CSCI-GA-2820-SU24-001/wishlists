@@ -84,6 +84,8 @@ honcho start
 
 The service will start and be accessible at `http://localhost:8000`.
 
+## Deploy on Kubernetes Locally
+
 
 ## License
 
