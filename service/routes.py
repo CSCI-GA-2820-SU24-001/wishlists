@@ -71,13 +71,10 @@ wishlist_model = api.model(
                             required=True, description="The product id of the item"
                         ),
                         "description": fields.String(
-                            required=True, description="The description of the item"
+                            required=False, description="The description of the item"
                         ),
                         "price": fields.Float(
                             required=True, description="The price of the item"
-                        ),
-                        "quantity": fields.Integer(
-                            required=True, description="The quantity of the item"
                         ),
                         "wishlist_id": fields.String(
                             required=True, description="The id of the wishlist"
@@ -96,12 +93,9 @@ create_wishlistItem_model = api.model(
             required=True, description="The product id of the item"
         ),
         "description": fields.String(
-            required=True, description="The description of the item"
+            required=False, description="The description of the item"
         ),
         "price": fields.Float(required=True, description="The price of the item"),
-        "quantity": fields.Integer(
-            required=True, description="The quantity of the item"
-        ),
     },
 )
 
@@ -307,7 +301,7 @@ class WishlistCollection(Resource):
 
 
 ######################################################################
-#  PATH: /wishlists/{wishlist_id}/items/{item_id}
+#  PATH: /wishlists/<wishlist_id>/items/<item_id>
 ######################################################################
 @api.route("/wishlists/<wishlist_id>/items/<item_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
@@ -439,7 +433,7 @@ class WishlistItemResource(Resource):
 
 
 ######################################################################
-#  PATH: /wishlists/{wishlist_id}/items
+#  PATH: /wishlists/<wishlist_id>/items
 ######################################################################
 @api.route("/wishlists/<wishlist_id>/items", strict_slashes=False)
 @api.param("wishlist_id", "The Wishlist identifier")
@@ -466,7 +460,7 @@ class WishlistItemCollection(Resource):
 
         args = wishlistItem_args.parse_args()
         price = args.get("price")
-        sort_by = args.get("sort_by", "price")
+        sort_by = args.get("sort_by", "price").lower()
         order = args.get("order", "asc").lower()
 
         items = wishlist.items
@@ -606,45 +600,100 @@ class MoveWishlistItemResource(Resource):
         if not source_wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Source Wishlist with id [{source_wishlist_id}] was not found.",
+                f"Source wishlist with id '{source_wishlist_id}' could not be found.",
             )
 
         target_wishlist = Wishlist.find(target_wishlist_id)
         if not target_wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Target Wishlist with id [{target_wishlist_id}] was not found.",
-            )
-
-        if source_wishlist.customer_id != target_wishlist.customer_id:
-            error(
-                status.HTTP_403_FORBIDDEN,
-                "Wishlists belong to different customers.",
+                f"Target wishlist with id '{target_wishlist_id}' could not be found.",
             )
 
         item = WishlistItem.find(item_id)
         if not item or item.wishlist_id != source_wishlist_id:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id [{item_id}] was not found in Wishlist [{source_wishlist_id}].",
+                f"Item with id '{item_id}' could not be found in wishlist '{source_wishlist_id}'.",
+            )
+
+        if target_wishlist.customer_id != source_wishlist.customer_id:
+            error(
+                status.HTTP_403_FORBIDDEN,
+                "Wishlists belong to different customers.",
             )
 
         item.wishlist_id = target_wishlist_id
         item.update()
 
-        app.logger.info(
-            "Item with id [%s] moved from Wishlist with id [%s] to Wishlist with id [%s]",
-            item_id,
-            source_wishlist_id,
-            target_wishlist_id,
-        )
+        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
+        source_wishlist.update()
+
+        target_wishlist.items.append(item)
+        target_wishlist.update()
 
         return item.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
-# Utility functions
+#  PATH: /wishlists/customers/{customer_id}
 ######################################################################
-def error(status_code, message):
-    """Utility function to handle errors"""
-    api.abort(status_code, message)
+@api.route("/wishlists/customers/<customer_id>", strict_slashes=False)
+@api.param("customer_id", "The Customer identifier")
+class CustomerWishlistResource(Resource):
+    """Handles deleting all wishlists for a specific customer"""
+
+    @api.response(204, "All Customer Wishlists deleted")
+    def delete(self, customer_id):
+        """
+        Delete all wishlists for a specific customer
+
+        This endpoint will delete all wishlists for specific customer based on the customer id specified in the path
+        """
+        app.logger.info(
+            "Request to delete all wishlists with customer id: %s", customer_id
+        )
+
+        all_wishlists = Wishlist.find_by_customer_id(customer_id)
+        if not all_wishlists:
+            return "", status.HTTP_204_NO_CONTENT
+
+        for wishlist in all_wishlists:
+            wishlist.delete()
+
+        return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+# ------------------------------------------------------------------
+# Logs error messages before aborting
+# ------------------------------------------------------------------
+def error(status_code, reason):
+    """Logs the error and then aborts"""
+    app.logger.error(reason)
+    api.abort(status_code, reason)
+
+
+# ------------------------------------------------------------------
+# Checks that the media type is correct
+# ------------------------------------------------------------------
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        error(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    error(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
+    )
