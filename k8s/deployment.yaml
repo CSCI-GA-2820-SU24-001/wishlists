@@ -23,7 +23,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: wishlists
-        image: cluster-registry:32000/wishlists:1.0
+        image: cluster-registry:32000/wishlists:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
