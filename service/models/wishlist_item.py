@@ -32,7 +32,9 @@ class WishlistItem(db.Model, PersistentBase):
     description = db.Column(db.String(256))
     price = db.Column(db.Numeric(), nullable=False)
     added_date = db.Column(db.Date(), nullable=False, default=date.today())
-    modified_date = db.Column(db.Date(), nullable=False, default=date.today(), onupdate=date.today())
+    modified_date = db.Column(
+        db.Date(), nullable=False, default=date.today(), onupdate=date.today()
+    )
 
     def __repr__(self):
         return f"<WishlistItem product_id=[{self.product_id}] wishlist_id=[{self.wishlist_id}]>"
@@ -47,9 +49,9 @@ class WishlistItem(db.Model, PersistentBase):
             "wishlist_id": self.wishlist_id,
             "product_id": self.product_id,
             "description": self.description,
-            "price": float(self.price),
+            "price": float(f"{self.price:.2f}"),
             "added_date": self.added_date,
-            "modified_date": self.modified_date
+            "modified_date": self.modified_date,
         }
 
     def deserialize(self, data):

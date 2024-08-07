@@ -9,6 +9,8 @@
         "api",
         "restx",
         "apidocs",
-        "gunicorn"
+        "gunicorn",
+        "reqparse",
+        "Rofrano"
     ]
 }

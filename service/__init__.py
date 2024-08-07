@@ -44,6 +44,8 @@ def create_app():
 
     db.init_app(app)
 
+    app.url_map.strict_slashes = False
+
     ######################################################################
     # Configure Swagger before initializing it
     ######################################################################
@@ -61,7 +63,7 @@ def create_app():
 
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
-        # pylint: disable=wrong-import-position, wrong-import-order, unused-import
+        # pylint: disable=wrong-import-position, wrong-import-order, unused-import, cyclic-import
         from service import routes, models  # noqa: F401 E402
         from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
