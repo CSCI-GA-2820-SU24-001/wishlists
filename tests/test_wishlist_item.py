@@ -20,7 +20,7 @@ Test cases for WishlistItem Model
 
 from unittest.mock import patch
 from service.models import Wishlist, WishlistItem, DataValidationError
-from tests.factories import WishlistFactory, WishlistItemFactory
+from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
 
 
@@ -35,7 +35,7 @@ class TestWishlistItem(TestBase):
     ######################################################################
 
     def test_add_wishlist_item(self):
-        """It should Create an wishlist with an item and add it to the database"""
+        """It should Create a wishlist with an item and add it to the database"""
         wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
         wishlist = WishlistFactory()
@@ -87,7 +87,7 @@ class TestWishlistItem(TestBase):
         self.assertRaises(DataValidationError, item.create)
 
     def test_delete_wishlist_item(self):
-        """It should Delete an wishlist item"""
+        """It should Delete a wishlist item"""
         wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
 
@@ -147,9 +147,12 @@ class TestWishlistItem(TestBase):
         self.assertAlmostEqual(
             serial_wishlist_item["price"], float(wishlist_item.price), places=2
         )
-        self.assertEqual(serial_wishlist_item["added_date"], wishlist_item.added_date)
         self.assertEqual(
-            serial_wishlist_item["modified_date"], wishlist_item.modified_date
+            serial_wishlist_item["added_date"], wishlist_item.added_date.isoformat()
+        )
+        self.assertEqual(
+            serial_wishlist_item["modified_date"],
+            wishlist_item.modified_date.isoformat(),
         )
 
     def test_deserialize_a_wishlist_item(self):

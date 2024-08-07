@@ -81,7 +81,7 @@ class TestWishlist(TestBase):
             created_date=fake_wishlist.created_date,
             modified_date=fake_wishlist.modified_date,
             customer_id=fake_wishlist.customer_id,
-            items=[]
+            items=[],
         )
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.items, [])
@@ -165,7 +165,7 @@ class TestWishlist(TestBase):
         self.assertEqual(wishlists, [])
         for wishlist in WishlistFactory.create_batch(5):
             wishlist.create()
-        # Assert that there are not 5 wishlists in the database
+        # Assert that there are now 5 wishlists in the database
         wishlists = Wishlist.all()
         self.assertEqual(len(wishlists), 5)
 
@@ -178,8 +178,12 @@ class TestWishlist(TestBase):
         self.assertEqual(serial_wishlist["id"], wishlist.id)
         self.assertEqual(serial_wishlist["customer_id"], wishlist.customer_id)
         self.assertEqual(serial_wishlist["name"], wishlist.name)
-        self.assertEqual(serial_wishlist["created_date"], wishlist.created_date)
-        self.assertEqual(serial_wishlist["modified_date"], wishlist.modified_date)
+        self.assertEqual(
+            serial_wishlist["created_date"], wishlist.created_date.isoformat()
+        )
+        self.assertEqual(
+            serial_wishlist["modified_date"], wishlist.modified_date.isoformat()
+        )
         self.assertEqual(len(serial_wishlist["items"]), 1)
         items = serial_wishlist["items"]
         self.assertEqual(items[0]["id"], wishlist_item.id)
