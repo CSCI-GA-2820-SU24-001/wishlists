@@ -467,12 +467,14 @@ class WishlistItemCollection(Resource):
         sort_by = args.get("sort_by", "price")
         if sort_by:
             sort_by = sort_by.lower()
-        order = args.get("order", "asc").lower()
+        order = args.get("order", "asc")
+        if order:
+            order = order.lower()
 
         items = wishlist.items
         if price:
             app.logger.info("Filtering by price [%s]", price)
-            items = WishlistItem.find_by_price(wishlist_id, price)
+            items = [item for item in items if item.price <= price]
 
         if sort_by == "price":
             app.logger.info("Sorting by price in [%s] order", order)
@@ -528,8 +530,7 @@ class WishlistItemCollection(Resource):
             item = WishlistItem()
             data["wishlist_id"] = wishlist_id
             item.deserialize(data)
-            wishlist.items.append(item)
-            wishlist.update()
+            item.create()
 
         app.logger.info(
             "Item with id [%s] saved in Wishlist with id [%s]!", item.id, wishlist_id
@@ -631,12 +632,6 @@ class MoveWishlistItemResource(Resource):
 
         item.wishlist_id = target_wishlist_id
         item.update()
-
-        source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
-        source_wishlist.update()
-
-        target_wishlist.items.append(item)
-        target_wishlist.update()
 
         return item.serialize(), status.HTTP_200_OK
 

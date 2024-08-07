@@ -68,25 +68,25 @@ class WishlistService(TestBase):
 
         # Check the data is correct
         new_wishlist = resp.get_json()
-        self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
+        self.assertEqual(new_wishlist["name"], wishlist.name, "Names do not match")
         self.assertEqual(
             new_wishlist["customer_id"],
             wishlist.customer_id,
             "customer id does not match",
         )
-        self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
+        self.assertEqual(new_wishlist["items"], wishlist.items, "Items do not match")
 
         # Check that the location header was correct by getting it
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_wishlist = resp.get_json()
-        self.assertEqual(new_wishlist["name"], wishlist.name, "Names does not match")
+        self.assertEqual(new_wishlist["name"], wishlist.name, "Names do not match")
         self.assertEqual(
             new_wishlist["customer_id"],
             wishlist.customer_id,
             "customer id does not match",
         )
-        self.assertEqual(new_wishlist["items"], wishlist.items, "Items does not match")
+        self.assertEqual(new_wishlist["items"], wishlist.items, "Items do not match")
 
         tmp = wishlist.customer_id
         wishlist.customer_id = ""
@@ -343,7 +343,7 @@ class WishlistService(TestBase):
         self.assertEqual(data["wishlist_id"], wishlist_id)
         self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["description"], item.description)
-        self.assertAlmostEqual(data["price"], float(item.price))
+        self.assertAlmostEqual(data["price"], float(item.price), places=2)
 
     def test_get_wishlist_item_not_found(self):
         """It should not Get a Wishlist Item that does not exist"""

@@ -5,6 +5,7 @@ Persistent Base class for database CRUD functions
 import logging
 from abc import abstractmethod
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import DataError
 
 logger = logging.getLogger("flask.app")
 
@@ -40,6 +41,10 @@ class PersistentBase:
         try:
             db.session.add(self)
             db.session.commit()
+        except DataError as e:
+            db.session.rollback()
+            logger.error("DataError creating record: %s", self)
+            raise DataValidationError(e.orig) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error creating record: %s", self)
@@ -54,6 +59,10 @@ class PersistentBase:
             raise DataValidationError("Update called with empty ID field")
         try:
             db.session.commit()
+        except DataError as e:
+            db.session.rollback()
+            logger.error("DataError updating record: %s", self)
+            raise DataValidationError(e.orig) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error updating record: %s", self)
@@ -65,6 +74,10 @@ class PersistentBase:
         try:
             db.session.delete(self)
             db.session.commit()
+        except DataError as e:
+            db.session.rollback()
+            logger.error("DataError deleting record: %s", self)
+            raise DataValidationError(e.orig) from e
         except Exception as e:
             db.session.rollback()
             logger.error("Error deleting record: %s", self)
@@ -82,4 +95,4 @@ class PersistentBase:
         """Finds a record by its ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         # pylint: disable=no-member
-        return cls.query.get(by_id)
+        return db.session.get(cls, by_id)
