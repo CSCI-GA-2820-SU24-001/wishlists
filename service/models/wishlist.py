@@ -1,3 +1,10 @@
+"""
+This module contains the model for Wishlists.
+
+The Wishlist model includes the schema for storing wishlists and
+provides methods for serialization, deserialization, and database queries.
+"""
+
 import uuid
 import logging
 from datetime import date
