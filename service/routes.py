@@ -467,14 +467,12 @@ class WishlistItemCollection(Resource):
         sort_by = args.get("sort_by", "price")
         if sort_by:
             sort_by = sort_by.lower()
-        order = args.get("order", "asc")
-        if order:
-            order = order.lower()
+        order = args.get("order", "asc").lower()
 
         items = wishlist.items
         if price:
             app.logger.info("Filtering by price [%s]", price)
-            items = [item for item in items if item.price <= price]
+            items = WishlistItem.find_by_price(wishlist_id, price)
 
         if sort_by == "price":
             app.logger.info("Sorting by price in [%s] order", order)
