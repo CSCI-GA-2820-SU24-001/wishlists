@@ -138,7 +138,7 @@ wishlistItem_args.add_argument(
 ######################################################################
 #  PATH: /wishlists/{id}
 ######################################################################
-@api.route("/wishlists/<string:wishlist_id>")
+@api.route("/wishlists/<wishlist_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
 class WishlistResource(Resource):
     """
@@ -293,7 +293,7 @@ class WishlistCollection(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items/{item_id}
 ######################################################################
-@api.route("/wishlists/<string:wishlist_id}/items/<string:item_id>")
+@api.route("/wishlists/<wishlist_id>/items/<item_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
 @api.param("item_id", "The Wishlist Item identifier")
 class WishlistItemResource(Resource):
@@ -425,7 +425,7 @@ class WishlistItemResource(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items
 ######################################################################
-@api.route("/wishlists/<string:wishlist_id}/items", strict_slashes=False)
+@api.route("/wishlists/<wishlist_id>/items", strict_slashes=False)
 @api.param("wishlist_id", "The Wishlist identifier")
 class WishlistItemCollection(Resource):
     """Handles all interactions with collections of Wishlist Items"""
@@ -561,7 +561,7 @@ class WishlistItemCollection(Resource):
 #  PATH: /wishlists/{source_wishlist_id}/items/{item_id}/move-to/{target_wishlist_id}
 ######################################################################
 @api.route(
-    "/wishlists/<string:source_wishlist_id}/items/<string:item_id}/move-to/<string:target_wishlist_id>",
+    "/wishlists/<source_wishlist_id>/items/<item_id>/move-to/<target_wishlist_id>",
     methods=["PUT"],
 )
 @api.param("source_wishlist_id", "The source Wishlist identifier")
@@ -628,7 +628,7 @@ class MoveWishlistItemResource(Resource):
 ######################################################################
 #  PATH: /wishlists/customers/{customer_id}
 ######################################################################
-@api.route("/wishlists/customers/<string:customer_id>", strict_slashes=False)
+@api.route("/wishlists/customers/<customer_id>", strict_slashes=False)
 @api.param("customer_id", "The Customer identifier")
 class CustomerWishlistResource(Resource):
     """Handles deleting all wishlists for a specific customer"""
