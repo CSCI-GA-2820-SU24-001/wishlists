@@ -27,7 +27,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: postgres-creds
-                  key: SECRET_KEY
+                  key: password
           volumeMounts:
           - name: postgres-storage
             mountPath: /var/lib/postgresql
