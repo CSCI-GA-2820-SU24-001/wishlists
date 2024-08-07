@@ -28,8 +28,8 @@ class WishlistService(TestBase):
         wishlists = []
         for _ in range(count):
             wishlist = WishlistFactory()
-            wishlist.customer_id = (
-                "Customer" + str(uuid.uuid4())[:36]
+            wishlist.customer_id = str(
+                uuid.uuid4()
             )  # Ensure customer_id is a String and within length constraints
             resp = self.client.post(BASE_URL, json=wishlist.serialize())
             self.assertEqual(
@@ -54,9 +54,9 @@ class WishlistService(TestBase):
     def test_create_wishlist(self):
         """It should Accept a POST request and Create a new Wishlist"""
         wishlist = WishlistFactory()
-        wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -114,9 +114,9 @@ class WishlistService(TestBase):
         """It should Delete a wishlist"""
         # create a wishlist to be deleted
         wishlist = WishlistFactory()
-        wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -150,9 +150,9 @@ class WishlistService(TestBase):
         """It should Update an existing Wishlist"""
         # create a Wishlist to update
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        test_wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -169,9 +169,9 @@ class WishlistService(TestBase):
         """It should not Update a Wishlist that does not exist"""
         # create a Wishlist to update
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        test_wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -189,9 +189,9 @@ class WishlistService(TestBase):
         """It should Get an existing Wishlist"""
         # Create a Wishlist to read
         test_wishlist = WishlistFactory()
-        test_wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        test_wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -322,9 +322,9 @@ class WishlistService(TestBase):
         """It should Get an existing Wishlist Item"""
         # Create a Wishlist
         wishlist = WishlistFactory()
-        wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         resp = self.client.post(
             BASE_URL, json=wishlist.serialize(), content_type="application/json"
         )
@@ -357,9 +357,9 @@ class WishlistService(TestBase):
         """It should not Get a Wishlist Item that does not exist"""
         # Create a Wishlist
         wishlist = WishlistFactory()
-        wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         wishlist_id = wishlist.id
 
         # Try to get an item from non-existent wishlist
@@ -517,9 +517,9 @@ class WishlistService(TestBase):
         source_wishlist = WishlistFactory()
         target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
 
-        source_wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        source_wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         target_wishlist.customer_id = (
             source_wishlist.customer_id
         )  # Ensure same customer_id
@@ -580,9 +580,9 @@ class WishlistService(TestBase):
         target_wishlist = WishlistFactory(customer_id=source_wishlist.customer_id)
         other_wishlist = WishlistFactory(customer_id="other_customer")
 
-        source_wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        source_wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         target_wishlist.customer_id = (
             source_wishlist.customer_id
         )  # Ensure same customer_id
@@ -823,7 +823,7 @@ class WishlistService(TestBase):
 
     def test_query_wishlists_by_customer_id(self):
         """It should Query Wishlists by Customer ID"""
-        customer_id = "Customer12345"
+        customer_id = str(uuid.uuid4())
         wishlist1 = WishlistFactory(customer_id=customer_id)
         wishlist2 = WishlistFactory(customer_id=customer_id)
         self.client.post(
@@ -876,7 +876,7 @@ class WishlistService(TestBase):
 
     def test_delete_all_wishlists_by_customer_id(self):
         """It should delete all wishlist for specific customer"""
-        customer_id = "fake_customer_id"
+        customer_id = str(uuid.uuid4())
         for _ in range(5):
             fake_wishlist = WishlistFactory()
             fake_wishlist.customer_id = (
@@ -895,16 +895,16 @@ class WishlistService(TestBase):
         self.assertEqual(len(data), 5)
         response = self.client.delete(f"{BASE_URL}/customers/{customer_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        not_exist_customer_id = "fake_customer_id_2"
+        not_exist_customer_id = str(uuid.uuid4())
         response = self.client.delete(f"{BASE_URL}/customers/{not_exist_customer_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_all_items_by_wishlist_id(self):
         """It should delete all items for a specific wishlist"""
         wishlist = WishlistFactory()
-        wishlist.customer_id = (
-            "Customer" + str(uuid.uuid4())[:36]
-        )  # Ensure customer_id is a String and within length constraints
+        wishlist.customer_id = str(
+            uuid.uuid4()
+        )  # Ensure customer_id is within length constraints
         items = [WishlistItemFactory(), WishlistItemFactory(), WishlistItemFactory()]
         wishlist.items = items
         wishlist.create()
