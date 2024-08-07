@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wishlists
-  namespace: wishlists-ns
+  # namespace: wishlists-ns
   labels:
     app: wishlists
 spec:
