@@ -87,6 +87,7 @@ The service will start and be accessible at `http://localhost:8000`.
 ## Deploy on Kubernetes Locally
 To deploy the shopcarts service on Kubernetes locally, follow these steps:
 
+## Run
 
 ## License
 
