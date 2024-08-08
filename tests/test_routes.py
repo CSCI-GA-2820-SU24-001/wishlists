@@ -136,7 +136,7 @@ class WishlistService(TestBase):
         """It should not delete a wishlist that does not exist"""
         # try to delete a wishlist that doesn't exist
         resp = self.client.delete(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_wishlist_list(self):
         """It should Get a list of Wishlists"""
@@ -183,7 +183,7 @@ class WishlistService(TestBase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
         logging.debug("Response data = %s", data)
-        self.assertIn("was not found", data["message"])
+        self.assertIn("could not be found", data["message"])
 
     def test_get_wishlist(self):
         """It should Get an existing Wishlist"""
@@ -207,7 +207,7 @@ class WishlistService(TestBase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
         logging.debug("Response data = %s", data)
-        self.assertIn("was not found", data["message"])
+        self.assertIn("could not be found", data["message"])
 
     def test_query_wishlists_by_name(self):
         """It should query and return a list of wishlists of the specified name"""
@@ -376,7 +376,7 @@ class WishlistService(TestBase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
         logging.debug("Response data = %s", data)
-        self.assertIn("was not found", data["message"])
+        self.assertIn("could not be found", data["message"])
 
     def test_add_item(self):
         """It should Add an item to a wishlist"""
@@ -683,6 +683,11 @@ class WishlistService(TestBase):
             f"{BASE_URL}/{wishlist.id}/items?sort_by=price&order=asc"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["price"], 10)
+        self.assertEqual(data[1]["price"], 20)
+        self.assertEqual(data[2]["price"], 30)
 
     def test_sort_wishlist_items_by_price_descending(self):
         """Test sorting wishlist items by price in descending order"""
@@ -898,7 +903,7 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         not_exist_customer_id = str(uuid.uuid4())
         response = self.client.delete(f"{BASE_URL}/customers/{not_exist_customer_id}")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_all_items_by_wishlist_id(self):
         """It should delete all items for a specific wishlist"""

@@ -78,9 +78,15 @@ class WishlistItem(db.Model, PersistentBase):
 
             # Handle date fields
             if "added_date" in data:
-                self.added_date = date.fromisoformat(data["added_date"])
+                if isinstance(data["added_date"], str):
+                    self.added_date = date.fromisoformat(data["added_date"])
+                else:
+                    self.added_date = data["added_date"]
             if "modified_date" in data:
-                self.modified_date = date.fromisoformat(data["modified_date"])
+                if isinstance(data["modified_date"], str):
+                    self.modified_date = date.fromisoformat(data["modified_date"])
+                else:
+                    self.modified_date = data["modified_date"]
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error

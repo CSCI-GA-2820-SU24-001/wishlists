@@ -60,10 +60,16 @@ class WishlistItemFactory(Factory):
         model = WishlistItem
 
     id = Sequence(lambda n: f"{n:04d}")
-    wishlist_id = None
+    wishlist_id = None  # This can be assigned dynamically if needed
     product_id = Sequence(lambda n: f"{n:04d}")
     description = Faker("sentence")
     price = FuzzyFloat(1.0, 100.0)
     added_date = FuzzyDate(start_date=date(2000, 1, 1))
     modified_date = FuzzyDate(start_date=date(2000, 1, 1))
     wishlist = SubFactory(WishlistFactory)
+
+    @post_generation
+    def set_wishlist_id(self, create, extracted, **kwargs):
+        """Ensures wishlist_id is set correctly"""
+        if self.wishlist and self.wishlist.id:
+            self.wishlist_id = self.wishlist.id

@@ -367,7 +367,13 @@ class WishlistItemCollection(Resource):
             try:
                 if sort_by == "added_date":
                     items = sorted(
-                        items, key=lambda x: parser.parse(x.added_date), reverse=reverse
+                        items,
+                        key=lambda x: (
+                            parser.parse(x.added_date)
+                            if isinstance(x.added_date, str)
+                            else x.added_date
+                        ),
+                        reverse=reverse,
                     )
                 else:
                     items = sorted(
