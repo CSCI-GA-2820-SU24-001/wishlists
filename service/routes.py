@@ -21,11 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete for managing wishlists and wishlist items on the eCommerce website
 """
 
-from flask import (
-    current_app as app,
-    request,
-    abort,
-)  # Import Flask application and abort
+from flask import current_app as app, request, abort
 from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem, DataValidationError
 from service.common import status  # HTTP Status Codes
@@ -81,7 +77,6 @@ wishlist_model = api.inherit(
     },
 )
 
-
 ######################################################################
 # QUERY STRING ARGUMENTS
 ######################################################################
@@ -131,7 +126,7 @@ def index():
 @app.route("/health", methods=["GET"])
 def health_check():
     """Let them know our heart is still beating"""
-    return {"status": "OK"}, status.HTTP_200_OK
+    return {"status": 200}, status.HTTP_200_OK
 
 
 ######################################################################
@@ -163,7 +158,6 @@ class WishlistResource(Resource):
         """
         app.logger.info("Request to retrieve Wishlist with id [%s]", wishlist_id)
 
-        # Attempt to find the Wishlist and abort if not found
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -191,7 +185,6 @@ class WishlistResource(Resource):
         """
         app.logger.info("Request to update Wishlist with id [%s]", wishlist_id)
 
-        # See if the wishlist exists and abort if it doesn't
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -201,7 +194,6 @@ class WishlistResource(Resource):
 
         app.logger.info("Processing: %s", api.payload)
 
-        # Update from the json in the body of the request
         wishlist.deserialize(api.payload)
         wishlist.id = wishlist_id
         wishlist.update()
@@ -223,7 +215,6 @@ class WishlistResource(Resource):
         """
         app.logger.info("Request to delete Wishlist with id [%s]", wishlist_id)
 
-        # Attempt to find the Wishlist and abort if not found
         wishlist = Wishlist.find(wishlist_id)
         if wishlist:
             wishlist.delete()
@@ -249,7 +240,6 @@ class WishlistCollection(Resource):
         """Returns all of the Wishlists"""
         app.logger.info("Request for Wishlist list")
 
-        # Get the query parameters
         args = wishlist_args.parse_args()
         customer_id = args.get("customer_id")
         name = args.get("name")
@@ -286,7 +276,6 @@ class WishlistCollection(Resource):
         app.logger.info("Request to create a Wishlist")
         app.logger.info("Processing: %s", api.payload)
 
-        # Create the wishlist
         wishlist = Wishlist()
         try:
             wishlist.deserialize(api.payload)
@@ -300,7 +289,6 @@ class WishlistCollection(Resource):
 
         app.logger.info("Wishlist with id [%s] saved!", wishlist.id)
 
-        # Return the location of the new item
         location_url = api.url_for(
             WishlistResource, wishlist_id=wishlist.id, _external=True
         )
@@ -342,7 +330,6 @@ class WishlistItemResource(Resource):
             wishlist_id,
         )
 
-        # Attempt to find the Wishlist and abort if not found
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -385,7 +372,6 @@ class WishlistItemResource(Resource):
             wishlist_id,
         )
 
-        # See if the wishlist exists and abort if it doesn't
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -395,7 +381,6 @@ class WishlistItemResource(Resource):
 
         app.logger.info("Processing: %s", api.payload)
 
-        # Attempt to find the item and abort if not found
         item = WishlistItem.find(item_id)
         if not item:
             abort(
@@ -403,10 +388,7 @@ class WishlistItemResource(Resource):
                 f"Item with id '{item_id}' was not found in Wishlist with id '{wishlist_id}'.",
             )
 
-        # Update the item with the new data
         item.deserialize(api.payload)
-
-        # Save the updates to the database
         item.update()
 
         app.logger.info(
@@ -434,7 +416,6 @@ class WishlistItemResource(Resource):
             wishlist_id,
         )
 
-        # See if the wishlist exists and abort if it doesn't
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -442,7 +423,6 @@ class WishlistItemResource(Resource):
                 f"Wishlist with id '{wishlist_id}' was not found.",
             )
 
-        # See if the item exists and delete it if it does
         item = WishlistItem.find(item_id)
         if item:
             item.delete()
@@ -475,7 +455,6 @@ class WishlistItemCollection(Resource):
         """
         app.logger.info("Request to list Items in Wishlist with id [%s]", wishlist_id)
 
-        # Attempt to find the Wishlist and abort if not found
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -483,7 +462,6 @@ class WishlistItemCollection(Resource):
                 f"Wishlist with id '{wishlist_id}' was not found.",
             )
 
-        # Get the query parameters
         args = wishlist_item_args.parse_args()
         price = args.get("price")
 
@@ -517,7 +495,6 @@ class WishlistItemCollection(Resource):
         """
         app.logger.info("Request to add an Item in Wishlist with id [%s]", wishlist_id)
 
-        # See if the wishlist exists and abort if it doesn't
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -529,26 +506,15 @@ class WishlistItemCollection(Resource):
 
         app.logger.info("Processing: %s", data)
 
-        item = WishlistItem.find_by_product_id_wishlist_id(
-            data["product_id"], wishlist_id
-        )
-        if item:
-            # Update quantity if the item exists in the wishlist
-            item.quantity += data["quantity"]
-            item.update()
-        else:
-            # Add a new item if the item does not exist in the wishlist
-            item = WishlistItem()
-            data["wishlist_id"] = wishlist_id
-            item.deserialize(data)
-            wishlist.items.append(item)
-            wishlist.update()
+        item = WishlistItem()
+        item.deserialize(data)
+        wishlist.items.append(item)
+        wishlist.update()
 
         app.logger.info(
             "Item with id [%s] saved in Wishlist with id [%s]!", item.id, wishlist_id
         )
 
-        # Return the location of the new item
         location_url = api.url_for(
             WishlistItemResource,
             item_id=item.id,
@@ -574,7 +540,6 @@ class WishlistItemCollection(Resource):
             wishlist_id,
         )
 
-        # See if the wishlist exists and abort if it doesn't
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
             abort(
@@ -609,7 +574,6 @@ class DeleteAllWishlists(Resource):
             "Request to delete all wishlists for customer id [%s]", customer_id
         )
 
-        # Retrieve the wishlists to delete and delete them if they exist
         wishlists = Wishlist.find_by_customer_id(customer_id)
         if wishlists:
             for wishlist in wishlists:
@@ -647,7 +611,6 @@ class MoveWishlistItem(Resource):
             target_wishlist_id,
         )
 
-        # Find the source wishlist
         source_wishlist = Wishlist.find(source_wishlist_id)
         if not source_wishlist:
             abort(
@@ -655,7 +618,6 @@ class MoveWishlistItem(Resource):
                 f"Source wishlist with id '{source_wishlist_id}' could not be found.",
             )
 
-        # Find the target wishlist
         target_wishlist = Wishlist.find(target_wishlist_id)
         if not target_wishlist:
             abort(
@@ -663,7 +625,6 @@ class MoveWishlistItem(Resource):
                 f"Target wishlist with id '{target_wishlist_id}' could not be found.",
             )
 
-        # Find the item
         item = WishlistItem.find(item_id)
         if not item or item.wishlist_id != source_wishlist_id:
             abort(
@@ -671,22 +632,18 @@ class MoveWishlistItem(Resource):
                 f"Item with id '{item_id}' could not be found in wishlist '{source_wishlist_id}'.",
             )
 
-        # Check if both wishlists belong to the same customer
         if target_wishlist.customer_id != source_wishlist.customer_id:
             abort(
                 status.HTTP_403_FORBIDDEN,
                 "Wishlists belong to different customers.",
             )
 
-        # Update the item's wishlist_id and save it to the database
         item.wishlist_id = target_wishlist_id
         item.update()
 
-        # Remove the item from the source wishlist
         source_wishlist.items = [i for i in source_wishlist.items if i.id != item_id]
         source_wishlist.update()
 
-        # Add the item to the target wishlist
         target_wishlist.items.append(item)
         target_wishlist.update()
 
