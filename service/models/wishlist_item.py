@@ -61,46 +61,37 @@ class WishlistItem(db.Model, PersistentBase):
         Args:
             data (dict): A dictionary containing the resource data
         """
-        try:
-            if not data.get("wishlist_id"):
-                raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
-            if not data.get("product_id"):
-                raise DataValidationError("Invalid WishlistItem: missing product_id")
-            if "price" not in data or not isinstance(data["price"], (int, float)):
-                raise DataValidationError(
-                    "Invalid WishlistItem: missing or invalid price"
-                )
+        self._validate_data(data)
+        self._deserialize_dates(data)
 
-            self.wishlist_id = data["wishlist_id"]
-            self.product_id = data["product_id"]
-            self.description = data.get("description", "")
-            self.price = data["price"]
-
-            # Handle date fields
-            if "added_date" in data:
-                if isinstance(data["added_date"], str):
-                    self.added_date = date.fromisoformat(data["added_date"])
-                else:
-                    self.added_date = data["added_date"]
-            if "modified_date" in data:
-                if isinstance(data["modified_date"], str):
-                    self.modified_date = date.fromisoformat(data["modified_date"])
-                else:
-                    self.modified_date = data["modified_date"]
-
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid WishlistItem: missing " + error.args[0]
-            ) from error
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid WishlistItem: body of request contained bad or no data "
-                + str(error)
-            ) from error
+        self.wishlist_id = data["wishlist_id"]
+        self.product_id = data["product_id"]
+        self.description = data.get("description", "")
+        self.price = data["price"]
 
         return self
+
+    def _validate_data(self, data):
+        """Validates the incoming data for required fields"""
+        if not data.get("wishlist_id"):
+            raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
+        if not data.get("product_id"):
+            raise DataValidationError("Invalid WishlistItem: missing product_id")
+        if "price" not in data or not isinstance(data["price"], (int, float)):
+            raise DataValidationError("Invalid WishlistItem: missing or invalid price")
+
+    def _deserialize_dates(self, data):
+        """Handles the deserialization of date fields"""
+        if "added_date" in data:
+            self.added_date = self._parse_date(data["added_date"])
+        if "modified_date" in data:
+            self.modified_date = self._parse_date(data["modified_date"])
+
+    def _parse_date(self, date_str):
+        """Parses a date string into a date object"""
+        if isinstance(date_str, str):
+            return date.fromisoformat(date_str)
+        return date_str
 
     @classmethod
     def find_by_price(cls, wishlist_id, price):
