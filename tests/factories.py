@@ -40,14 +40,14 @@ class WishlistFactory(Factory):
 
     @post_generation
     def items(
-        self, create, extracted, **kwargs
+        self, _create, _extracted, **_kwargs
     ):  # pylint: disable=method-hidden, unused-argument
         """Creates the items list"""
-        if not create:
+        if not _create:
             return
 
-        if extracted:
-            self.items = extracted
+        if _extracted:
+            self.items = _extracted
 
 
 class WishlistItemFactory(Factory):
@@ -69,7 +69,7 @@ class WishlistItemFactory(Factory):
     wishlist = SubFactory(WishlistFactory)
 
     @post_generation
-    def set_wishlist_id(self, create, extracted, **kwargs):
+    def set_wishlist_id(self, _create, _extracted, **_kwargs):
         """Ensures wishlist_id is set correctly"""
         if self.wishlist and self.wishlist.id:
             self.wishlist_id = self.wishlist.id
