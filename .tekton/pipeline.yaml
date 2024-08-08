@@ -7,7 +7,7 @@ spec:
     - description: The URL to the git repo
       name: GIT_REPO
       type: string
-    - default: create-cd-pipeline
+    - default: master
       description: The reference (branch or ref)
       name: GIT_REF
       type: string
