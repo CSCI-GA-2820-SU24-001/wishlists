@@ -11,6 +11,7 @@
         "apidocs",
         "gunicorn",
         "reqparse",
-        "Rofrano"
+        "Rofrano",
+        "dateutil"
     ]
 }

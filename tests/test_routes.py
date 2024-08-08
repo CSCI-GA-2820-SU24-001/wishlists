@@ -716,7 +716,7 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(f"/wishlists/{wishlist.id}/items?sort_by=price")
+        response = self.client.get(f"{BASE_URL}/{wishlist.id}/items?sort_by=price")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
@@ -775,7 +775,8 @@ class WishlistService(TestBase):
         wishlist.create()
 
         response = self.client.get(
-            f"{BASE_URL}/{wishlist.id}/items?sort_by=added_date&order=desc"
+            f"{BASE_URL}/{wishlist.id}/items?sort_by=added_date&order=desc",
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()

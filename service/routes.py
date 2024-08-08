@@ -5,6 +5,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete for managing wishlists and wishlist items on the eCommerce website.
 """
 
+from dateutil import parser
 from flask import current_app as app, request
 from flask_restx import Resource, reqparse, fields
 from service.models import Wishlist, WishlistItem, DataValidationError
@@ -40,7 +41,7 @@ def check_content_type(content_type):
 def validate_wishlist_item_data(data):
     """Validates WishlistItem data"""
     if not data.get("wishlist_id"):
-        raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
+        raise DataValidationError("Invalid WishlistItem: missing or empty wishlist_id")
     if not data.get("product_id"):
         raise DataValidationError("Invalid WishlistItem: missing product_id")
 
@@ -95,6 +96,9 @@ wishlist_model = api.model(
                         "wishlist_id": fields.String(
                             required=True, description="The id of the wishlist"
                         ),
+                        "added_date": fields.String(
+                            description="The date the item was added to the wishlist"
+                        ),
                     },
                 )
             )
@@ -124,6 +128,9 @@ wishlistItem_model = api.inherit(
         ),
         "wishlist_id": fields.String(
             required=True, description="The id of the wishlist"
+        ),
+        "added_date": fields.String(
+            description="The date the item was added to the wishlist"
         ),
     },
 )
@@ -193,7 +200,7 @@ class WishlistResource(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         app.logger.info("Returning Wishlist with id [%s]", wishlist_id)
@@ -219,7 +226,7 @@ class WishlistResource(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         app.logger.info("Processing: %s", api.payload)
@@ -347,7 +354,7 @@ class WishlistItemCollection(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         args = wishlistItem_args.parse_args()
@@ -357,7 +364,24 @@ class WishlistItemCollection(Resource):
         items = wishlist.items
         if sort_by:
             reverse = order == "desc"
-            items = sorted(items, key=lambda x: getattr(x, sort_by), reverse=reverse)
+            try:
+                if sort_by == "added_date":
+                    items = sorted(
+                        items, key=lambda x: parser.parse(x.added_date), reverse=reverse
+                    )
+                else:
+                    items = sorted(
+                        items, key=lambda x: getattr(x, sort_by), reverse=reverse
+                    )
+            except AttributeError:
+                error(
+                    status.HTTP_400_BAD_REQUEST,
+                    f"Invalid sort_by parameter: {sort_by}",
+                )
+
+        if args.get("price") is not None:
+            price = args.get("price")
+            items = [item for item in items if item.price <= price]
 
         results = [item.serialize() for item in items]
 
@@ -387,7 +411,7 @@ class WishlistItemCollection(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         app.logger.info("Processing: %s", api.payload)
@@ -428,7 +452,7 @@ class WishlistItemCollection(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         for item in wishlist.items:
@@ -476,14 +500,14 @@ class WishlistItemResource(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         item = WishlistItem.find(item_id)
         if not item or item.wishlist_id != wishlist_id:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id [{item_id}] was not found in wishlist [{wishlist_id}].",
+                f"Item with id [{item_id}] could not be found in wishlist [{wishlist_id}].",
             )
 
         app.logger.info("Returning item [%s]", item_id)
@@ -511,14 +535,14 @@ class WishlistItemResource(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         item = WishlistItem.find(item_id)
         if not item or item.wishlist_id != wishlist_id:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id [{item_id}] was not found in wishlist [{wishlist_id}].",
+                f"Item with id [{item_id}] could not be found in wishlist [{wishlist_id}].",
             )
 
         app.logger.info("Processing: %s", api.payload)
@@ -554,7 +578,7 @@ class WishlistItemResource(Resource):
         if not wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Wishlist with id [{wishlist_id}] was not found.",
+                f"Wishlist with id [{wishlist_id}] could not be found.",
             )
 
         item = WishlistItem.find(item_id)
@@ -606,21 +630,21 @@ class MoveWishlistItemResource(Resource):
         if not source_wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Source wishlist with id [{wishlist_id}] was not found.",
+                f"Source wishlist with id [{wishlist_id}] could not be found.",
             )
 
         target_wishlist = Wishlist.find(target_wishlist_id)
         if not target_wishlist:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Target wishlist with id [{target_wishlist_id}] was not found.",
+                f"Target wishlist with id [{target_wishlist_id}] could not be found.",
             )
 
         item = WishlistItem.find(item_id)
         if not item or item.wishlist_id != wishlist_id:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id [{item_id}] was not found in source wishlist [{wishlist_id}].",
+                f"Item with id [{item_id}] could not be found in source wishlist [{wishlist_id}].",
             )
 
         if source_wishlist.customer_id != target_wishlist.customer_id:
@@ -640,3 +664,37 @@ class MoveWishlistItemResource(Resource):
         )
 
         return item.serialize(), status.HTTP_200_OK
+
+
+######################################################################
+#  PATH: /wishlists/customers/<customer_id>
+######################################################################
+@api.route("/wishlists/customers/<customer_id>")
+@api.param("customer_id", "The Customer identifier")
+class WishlistCustomerCollection(Resource):
+    """Handles deletion of all wishlists for a specific customer"""
+
+    @api.response(204, "All wishlists deleted")
+    def delete(self, customer_id):
+        """
+        Delete all wishlists for a customer
+
+        This endpoint will delete all wishlists associated with a specific customer
+        """
+        app.logger.info(
+            "Request to delete all wishlists for customer [%s]", customer_id
+        )
+
+        wishlists = Wishlist.find_by_customer_id(customer_id)
+        if not wishlists:
+            error(
+                status.HTTP_404_NOT_FOUND,
+                f"No wishlists found for customer with id [{customer_id}]",
+            )
+
+        for wishlist in wishlists:
+            wishlist.delete()
+
+        app.logger.info("All wishlists deleted for customer [%s]", customer_id)
+
+        return "", status.HTTP_204_NO_CONTENT

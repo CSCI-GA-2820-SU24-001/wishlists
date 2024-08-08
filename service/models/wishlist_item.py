@@ -31,9 +31,9 @@ class WishlistItem(db.Model, PersistentBase):
     product_id = db.Column(db.String(36), nullable=False)
     description = db.Column(db.String(256))
     price = db.Column(db.Numeric(), nullable=False)
-    added_date = db.Column(db.Date(), nullable=False, default=date.today())
+    added_date = db.Column(db.Date(), nullable=False, default=date.today)
     modified_date = db.Column(
-        db.Date(), nullable=False, default=date.today(), onupdate=date.today()
+        db.Date(), nullable=False, default=date.today, onupdate=date.today
     )
 
     def __repr__(self):
@@ -62,9 +62,9 @@ class WishlistItem(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            if not data["wishlist_id"]:
+            if not data.get("wishlist_id"):
                 raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
-            if not data["product_id"]:
+            if not data.get("product_id"):
                 raise DataValidationError("Invalid WishlistItem: missing product_id")
             if "price" not in data or not isinstance(data["price"], (int, float)):
                 raise DataValidationError(
@@ -75,6 +75,13 @@ class WishlistItem(db.Model, PersistentBase):
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
             self.price = data["price"]
+
+            # Handle date fields
+            if "added_date" in data:
+                self.added_date = date.fromisoformat(data["added_date"])
+            if "modified_date" in data:
+                self.modified_date = date.fromisoformat(data["modified_date"])
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
