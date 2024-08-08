@@ -242,6 +242,7 @@ class WishlistResource(Resource):
     # ------------------------------------------------------------------
     # DELETE A WISHLIST
     # ------------------------------------------------------------------
+    @api.response(404, "Wishlist not found")
     @api.response(204, "Wishlist deleted")
     def delete(self, wishlist_id):
         """
@@ -252,9 +253,14 @@ class WishlistResource(Resource):
         app.logger.info("Request to delete Wishlist with id [%s]", wishlist_id)
 
         wishlist = Wishlist.find(wishlist_id)
-        if wishlist:
-            wishlist.delete()
-            app.logger.info("Wishlist with id [%s] deleted!", wishlist_id)
+        if not wishlist:
+            error(
+                status.HTTP_404_NOT_FOUND,
+                f"Wishlist with id [{wishlist_id}] could not be found.",
+            )
+
+        wishlist.delete()
+        app.logger.info("Wishlist with id [%s] deleted!", wishlist_id)
 
         return "", status.HTTP_204_NO_CONTENT
 

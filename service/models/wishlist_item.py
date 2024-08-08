@@ -50,8 +50,8 @@ class WishlistItem(db.Model, PersistentBase):
             "product_id": self.product_id,
             "description": self.description,
             "price": float(f"{self.price:.2f}"),
-            "added_date": self.added_date.isoformat(),
-            "modified_date": self.modified_date.isoformat(),
+            "added_date": self.added_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            "modified_date": self.modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
         }
 
     def deserialize(self, data):
@@ -73,6 +73,10 @@ class WishlistItem(db.Model, PersistentBase):
 
     def _validate_data(self, data):
         """Validates the incoming data for required fields"""
+        if not isinstance(data, dict):
+            raise DataValidationError(
+                "Invalid WishlistItem: data should be a dictionary"
+            )
         if not data.get("wishlist_id"):
             raise DataValidationError("Invalid WishlistItem: missing wishlist_id")
         if not data.get("product_id"):
