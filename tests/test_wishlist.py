@@ -81,7 +81,7 @@ class TestWishlist(TestBase):
             created_date=fake_wishlist.created_date,
             modified_date=fake_wishlist.modified_date,
             customer_id=fake_wishlist.customer_id,
-            items=[]
+            items=[],
         )
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.items, [])
