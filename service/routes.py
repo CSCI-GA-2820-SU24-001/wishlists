@@ -349,7 +349,7 @@ class WishlistItemResource(Resource):
 
     @api.doc("delete_wishlist_item")
     @api.response(204, "WishlistItem deleted")
-    def delete(self, wishlist_id, item_id):
+    def delete(self, item_id):
         """
         Delete a WishlistItem
 
