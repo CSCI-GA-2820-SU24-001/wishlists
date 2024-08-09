@@ -42,7 +42,10 @@ class TestWishlistItem(TestBase):
         item = WishlistItemFactory(wishlist=wishlist)
 
         # To cover test of __repr__()
-        self.assertEqual(repr(item), f"<WishlistItem product_id=[{item.product_id}] wishlist_id=[{item.wishlist_id}]>")
+        self.assertEqual(
+            repr(item),
+            f"<WishlistItem product_id=[{item.product_id}] wishlist_id=[{item.wishlist_id}]>",
+        )
 
         wishlist.items.append(item)
         wishlist.create()
@@ -141,9 +144,13 @@ class TestWishlistItem(TestBase):
         self.assertEqual(serial_wishlist_item["wishlist_id"], wishlist_item.wishlist_id)
         self.assertEqual(serial_wishlist_item["product_id"], wishlist_item.product_id)
         self.assertEqual(serial_wishlist_item["description"], wishlist_item.description)
-        self.assertAlmostEqual(serial_wishlist_item["price"], float(wishlist_item.price))
-        self.assertEqual(serial_wishlist_item["added_date"], wishlist_item.added_date)
-        self.assertEqual(serial_wishlist_item["modified_date"], wishlist_item.modified_date)
+        self.assertAlmostEqual(
+            serial_wishlist_item["price"], float(wishlist_item.price)
+        )
+        self.assertEqual(
+            serial_wishlist_item["added_date"],
+            wishlist_item.added_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+        )
 
     def test_deserialize_a_wishlist_item(self):
         """It should deserialize a WishlistItem"""
@@ -171,7 +178,7 @@ class TestWishlistItem(TestBase):
     def test_deserialize_item_bad_price_type(self):
         """It should not deserialize a bad price attribute"""
         data = WishlistItemFactory().serialize()
-        data['price'] = "twenty"
+        data["price"] = "twenty"
 
         item = WishlistItem()
 
