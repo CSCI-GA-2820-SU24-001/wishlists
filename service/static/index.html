@@ -173,10 +173,32 @@
               <!-- SUBMIT BUTTONS -->
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                  <button type="submit" class="btn btn-primary" id="item-search-btn">Search</button>
                   <button type="submit" class="btn btn-primary" id="item-clear-btn">Clear</button>
                   <button type="submit" class="btn btn-success" id="item-create-btn">Create</button>
                   <button type="submit" class="btn btn-warning" id="item-update-btn">Update</button>
+                </div>
+                <br><br> <br><br>
+                <div class="col-sm-offset-2 col-sm-10">
+                  <label for="wishlist_sort_by">Sort by:</label>
+                  <select id="wishlist_sort_by" class="form-control">
+                      <option value="">-- Select an option --</option>
+                      <option value="price">Price</option>
+                      <option value="added_date">Added Date</option>
+                      <!-- Add more sort options as needed -->
+                  </select>
+              </div>
+              <br><br> <br><br>
+              <div class="col-sm-offset-2 col-sm-10">
+                  <label for="wishlist_sort_order">Order by:</label>
+                  <select id="wishlist_sort_order" class="form-control">
+                      <option value="">-- Select an option --</option>
+                      <option value="asc">Ascending</option>
+                      <option value="desc">Descending</option>
+                  </select>
+              </div>
+              <br><br> <br><br>
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary" id="item-search-btn">Search</button>
                 </div>
               </div>
             </div> <!-- form horizontal -->
