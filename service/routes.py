@@ -114,6 +114,9 @@ item_model = api.model(
         "product_id": fields.String(required=True, description="The ID of the product"),
         "description": fields.String(description="Description of the item"),
         "price": fields.Float(required=True, description="Price of the item"),
+        "wishlist_id": fields.String(
+            required=True, description="The ID of the wishlist"
+        ),
     },
 )
 
@@ -266,6 +269,7 @@ class WishlistItemCollection(Resource):
             )
         item = WishlistItem()
         item.deserialize(api.payload)
+        item.wishlist_id = wishlist_id  # Ensure wishlist_id is set
         wishlist.items.append(item)
         wishlist.update()
         location_url = api.url_for(
@@ -287,7 +291,7 @@ class WishlistItemResource(Resource):
     """
     WishlistItemResource class
 
-    Handles all interactions with a single WishlistItem
+    Allows the manipulation of a single WishlistItem
     GET /wishlists/{wishlist_id}/items/{item_id} - Returns a WishlistItem with the id
     PUT /wishlists/{wishlist_id}/items/{item_id} - Update a WishlistItem with the id
     DELETE /wishlists/{wishlist_id}/items/{item_id} -  Deletes a WishlistItem with the id
@@ -300,7 +304,7 @@ class WishlistItemResource(Resource):
         """
         Retrieve a single WishlistItem
 
-        This endpoint will return a WishlistItem based on its id within the specified wishlist
+        This endpoint will return a WishlistItem based on its id
         """
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
@@ -345,7 +349,7 @@ class WishlistItemResource(Resource):
 
     @api.doc("delete_wishlist_item")
     @api.response(204, "WishlistItem deleted")
-    def delete(self, item_id):
+    def delete(self, wishlist_id, item_id):
         """
         Delete a WishlistItem
 
@@ -360,7 +364,7 @@ class WishlistItemResource(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items/{item_id}/move-to/{target_wishlist_id}
 ######################################################################
-@api.route("/wishlists/<wishlist_id>/items/<item_id>/move-to/<target_wishlist_id>")
+@api.route("/wishlists/<wishlist_id}/items/<item_id>/move-to/<target_wishlist_id>")
 @api.param("wishlist_id", "The source Wishlist identifier")
 @api.param("item_id", "The WishlistItem identifier")
 @api.param("target_wishlist_id", "The target Wishlist identifier")
