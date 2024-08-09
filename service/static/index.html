@@ -29,15 +29,14 @@
   </head>
   <body>
     <div class="container">
-      <div class="page-header">
-        <h1>Wishlist REST API Service</h1>
-      </div>
+      <header class="page-header">
+        <h1 class="d-inline">Wishlists REST API Service</h1>
+        <a href="/apidocs" class="btn btn-primary float-right mt-2">API Documentation</a>
+      </header>
 
       <!-- Flash Message -->
-      <div class="table-responsive">
-        <table class="table">
-          <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
-        </table>
+      <div class="alert alert-info text-center" role="alert" id="flash_message_container">
+        <span id="flash_message" style="font-weight: bold; font-size: 2rem;"></span>
       </div>
 
       <!-- FORM -->
