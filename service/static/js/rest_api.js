@@ -445,11 +445,27 @@ $(function () {
 
         let item_wishlist_id = $("#item_wishlist_id").val();
         let item_price = $("#item_price").val();
+        let sort_by = $("#wishlist_sort_by").val(); // Assuming you have an input or select with id "sort_by"
+        let order = $("#wishlist_sort_order").val();
 
         let queryString = ""
 
         if (item_price) {
             queryString += 'price=' + item_price
+        }
+
+        if (sort_by) {
+            if (queryString) {
+                queryString += '&';
+            }
+            queryString += 'sort_by=' + sort_by;
+        }
+        
+        if (order) {
+            if (queryString) {
+                queryString += '&';
+            }
+            queryString += 'order=' + order;
         }
 
         $("#flash_message").empty();

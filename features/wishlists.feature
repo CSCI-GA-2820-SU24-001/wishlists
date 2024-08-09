@@ -14,7 +14,7 @@ Background:
     And the following wishlist items
         | wishlist_id | product_id | price | description      |
         | AAAAA       | 1          | 1.0   | not bad          |
-        | AAAAA       | 2          | 1.0   | good product     |
+        | AAAAA       | 2          | 2.0   | good product     |
         | CCCCC       | 3          | 3.0   | coooooooool      |
         | DDDDD       | 4          | 2.5   | the best product |
 
