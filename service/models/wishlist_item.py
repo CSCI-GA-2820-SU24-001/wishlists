@@ -38,10 +38,18 @@ class WishlistItem(db.Model, PersistentBase):
     )
 
     def __repr__(self):
-        return f"<WishlistItem product_id=[{self.product_id}] wishlist_id=[{self.wishlist_id}]>"
+        return (
+            f"<WishlistItem: item_id: {self.id}, product_id={self.product_id}, Description: {self.description}, "
+            + f"Price: {self.price},  wishlist_id={self.wishlist_id}, "
+            + f"added_date: {self.added_date}, modified_date: {self.modified_date}>"
+        )
 
     def __str__(self):
-        return f"Product ID: {self.product_id}, Description: {self.description}, Price: {self.price}"
+        return (
+            f"Product ID: : item_id: {self.id}, product_id={self.product_id}, Description: {self.description}, "
+            + f"Price: {self.price},  wishlist_id={self.wishlist_id}, "
+            + f"added_date: {self.added_date}, modified_date: {self.modified_date}>"
+        )
 
     def serialize(self) -> dict:
         """Converts a WishlistItem into a dictionary"""
@@ -50,7 +58,7 @@ class WishlistItem(db.Model, PersistentBase):
             "wishlist_id": self.wishlist_id,
             "product_id": self.product_id,
             "description": self.description,
-            "price": float(self.price),
+            "price": round(float(self.price), 2),
             "added_date": self.added_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
             "modified_date": self.modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
         }
@@ -69,14 +77,19 @@ class WishlistItem(db.Model, PersistentBase):
             if data["product_id"] == "":
                 raise DataValidationError("Invalid Wishlist: missing product_id")
 
+            # self.added_date = date.today()
+            # self.modified_date = date.today()
+            # if data["added_date"]:
+            #     self.added_date = data["added_date"]
+            # if data["modified_date"]:
+            #     self.modified_date = data["modified_date"]
+
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
-            self.added_date = data["added_date"]
-            self.modified_date = data["modified_date"]
 
             if isinstance(data["price"], (int, float)):
-                self.price = data["price"]
+                self.price = round(float(data["price"]), 2)
             else:
                 raise TypeError(
                     "Invalid type for int/float [price]: " + str(type(data["price"]))

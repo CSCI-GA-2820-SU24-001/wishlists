@@ -44,7 +44,11 @@ class TestWishlistItem(TestBase):
         # To cover test of __repr__()
         self.assertEqual(
             repr(item),
-            f"<WishlistItem product_id=[{item.product_id}] wishlist_id=[{item.wishlist_id}]>",
+            (
+                f"<WishlistItem: item_id: {item.id}, product_id={item.product_id}, Description: {item.description}, "
+                + f"Price: {item.price},  wishlist_id={item.wishlist_id}, "
+                + f"added_date: {item.added_date}, modified_date: {item.modified_date}>"
+            ),
         )
 
         wishlist.items.append(item)

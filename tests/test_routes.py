@@ -659,6 +659,7 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
+        print(data)
         self.assertEqual(
             data[0]["added_date"],
             date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"),

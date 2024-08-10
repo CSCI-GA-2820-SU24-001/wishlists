@@ -247,9 +247,13 @@ class WishlistItemCollection(Resource):
                 f"Wishlist with id '{wishlist_id}' was not found.",
             )
 
+        max_price = (
+            float(request.args.get("price"))
+            if request.args.get("price")
+            else 9999999.99
+        )
         sort_by = request.args.get("sort_by")
         order = request.args.get("order", "asc")
-
         if sort_by:
             sorted_items = sorted(
                 wishlist.items,
@@ -258,8 +262,11 @@ class WishlistItemCollection(Resource):
             )
         else:
             sorted_items = wishlist.items
+        print("### in route get ###", [item.serialize() for item in sorted_items])
 
-        return [item.serialize() for item in sorted_items], status.HTTP_200_OK
+        return [
+            item.serialize() for item in sorted_items if item.price <= max_price and item.added_date
+        ], status.HTTP_200_OK
 
     @api.doc("create_wishlist_item")
     @api.response(400, "The posted Wishlist Item data was not valid")
@@ -316,7 +323,7 @@ class WishlistItemResource(Resource):
     """
 
     @api.doc("get_wishlist_item")
-    @api.response(404, "WishlistItem not found")
+    @api.response(404, "Not Found")
     @api.marshal_with(item_model)
     def get(self, wishlist_id, item_id):
         """
