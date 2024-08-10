@@ -59,8 +59,8 @@ class WishlistItem(db.Model, PersistentBase):
             "product_id": self.product_id,
             "description": self.description,
             "price": round(float(self.price), 2),
-            "added_date": self.added_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
-            "modified_date": self.modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            "added_date": self.added_date,
+            "modified_date": self.modified_date,
         }
 
     def deserialize(self, data):

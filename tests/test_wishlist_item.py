@@ -153,7 +153,7 @@ class TestWishlistItem(TestBase):
         )
         self.assertEqual(
             serial_wishlist_item["added_date"],
-            wishlist_item.added_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            wishlist_item.added_date,
         )
 
     def test_deserialize_a_wishlist_item(self):

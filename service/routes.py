@@ -68,6 +68,13 @@ create_wishlist_model = api.model(
                         "price": fields.Float(
                             required=True, description="Price of the item"
                         ),
+                        "added_date": fields.DateTime(
+                            required=True, description="The date the item was added"
+                        ),
+                        "modified_date": fields.DateTime(
+                            required=True,
+                            description="The last modified date of the item",
+                        ),
                     },
                 )
             ),
@@ -75,6 +82,7 @@ create_wishlist_model = api.model(
         ),
     },
 )
+
 
 wishlist_model = api.inherit(
     "WishlistModel",
@@ -114,6 +122,12 @@ item_model = api.model(
         "price": fields.Float(required=True, description="Price of the item"),
         "wishlist_id": fields.String(
             required=True, description="The ID of the wishlist"
+        ),
+        "added_date": fields.DateTime(
+            required=False, description="The date the item was added"
+        ),
+        "modified_date": fields.DateTime(
+            required=False, description="The last modified date of the item"
         ),
     },
 )
@@ -252,20 +266,25 @@ class WishlistItemCollection(Resource):
             if request.args.get("price")
             else 9999999.99
         )
-        sort_by = request.args.get("sort_by")
-        order = request.args.get("order", "asc")
-        if sort_by:
-            sorted_items = sorted(
-                wishlist.items,
-                key=lambda x: getattr(x, sort_by),
-                reverse=(order == "desc"),
-            )
-        else:
-            sorted_items = wishlist.items
+
+        sort_by = request.args.get("sort_by", "added_date")
+        # Default to ascending order unless explicitly stated otherwise
+        order = request.args.get("order") or (
+            "desc" if sort_by == "added_date" else "asc"
+        )
+
+        sorted_items = sorted(
+            wishlist.items,
+            key=lambda x: getattr(x, sort_by),
+            reverse=(order == "desc"),
+        )
+
         print("### in route get ###", [item.serialize() for item in sorted_items])
 
         return [
-            item.serialize() for item in sorted_items if item.price <= max_price and item.added_date
+            item.serialize()
+            for item in sorted_items
+            if item.price <= max_price and item.added_date
         ], status.HTTP_200_OK
 
     @api.doc("create_wishlist_item")

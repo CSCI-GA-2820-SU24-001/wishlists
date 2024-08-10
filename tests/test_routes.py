@@ -3,7 +3,7 @@ WishlistModel API Service Test Suite
 """
 
 import logging
-from datetime import date
+from datetime import date, datetime
 from service.common import status
 from .factories import WishlistFactory, WishlistItemFactory
 from .test_base import TestBase
@@ -659,18 +659,19 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
-        print(data)
+
+        # Convert the 'added_date' string back to a date object for comparison
         self.assertEqual(
-            data[0]["added_date"],
-            date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[0]["added_date"]).date(),
+            date(2022, 3, 12),
         )
         self.assertEqual(
-            data[1]["added_date"],
-            date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[1]["added_date"]).date(),
+            date(2022, 3, 13),
         )
         self.assertEqual(
-            data[2]["added_date"],
-            date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[2]["added_date"]).date(),
+            date(2022, 3, 14),
         )
 
     def test_sort_wishlist_items_by_price_descending(self):
@@ -741,17 +742,19 @@ class WishlistService(TestBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 3)
+
+        # Convert the 'added_date' string back to a date object for comparison
         self.assertEqual(
-            data[0]["added_date"],
-            date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[0]["added_date"]).date(),
+            date(2022, 3, 14),
         )
         self.assertEqual(
-            data[1]["added_date"],
-            date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[1]["added_date"]).date(),
+            date(2022, 3, 13),
         )
         self.assertEqual(
-            data[2]["added_date"],
-            date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            datetime.fromisoformat(data[2]["added_date"]).date(),
+            date(2022, 3, 12),
         )
 
     def test_sort_wishlist_items_by_added_date_default_order(self):
@@ -765,24 +768,29 @@ class WishlistService(TestBase):
         wishlist.items = items
         wishlist.create()
 
-        response = self.client.get(
-            f"/api/wishlists/{wishlist.id}/items?sort_by=added_date"
-        )
+        # Log the URL being called
+        url = f"/api/wishlists/{wishlist.id}/items?sort_by=added_date"
+        print(f"Testing URL: {url}")
+
+        response = self.client.get(url)
+
+        # Log the status code to see what was returned
+        print(f"Response status code: {response.status_code}")
+
+        # Assert that the status code is 200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Parse the response data
         data = response.get_json()
-        self.assertEqual(len(data), 3)
-        self.assertEqual(
-            data[0]["added_date"],
-            date(2022, 3, 14).strftime("%a, %d %b %Y %H:%M:%S GMT"),
-        )
-        self.assertEqual(
-            data[1]["added_date"],
-            date(2022, 3, 13).strftime("%a, %d %b %Y %H:%M:%S GMT"),
-        )
-        self.assertEqual(
-            data[2]["added_date"],
-            date(2022, 3, 12).strftime("%a, %d %b %Y %H:%M:%S GMT"),
-        )
+
+        # Ensure the items are sorted by 'added_date' in descending order
+        sorted_dates = [item["added_date"] for item in data]
+        expected_sorted_dates = [
+            "2022-03-14T00:00:00",
+            "2022-03-13T00:00:00",
+            "2022-03-12T00:00:00",
+        ]
+        self.assertEqual(sorted_dates, expected_sorted_dates)
 
     def test_query_wishlists_by_customer_id(self):
         """It should Query Wishlists by Customer ID"""
