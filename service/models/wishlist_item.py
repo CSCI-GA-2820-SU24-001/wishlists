@@ -7,8 +7,9 @@ The models for WishlistItems are stored in this module
 import uuid
 import logging
 from datetime import date
-from .persistent_base import db, PersistentBase, DataValidationError
 from sqlalchemy import func
+from .persistent_base import db, PersistentBase, DataValidationError
+
 
 logger = logging.getLogger("flask.app")
 

@@ -456,7 +456,6 @@ class WishlistService(TestBase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         data = resp.get_json()
-        logging.debug(f"Response data: {data}")
 
         item_id = data["id"]
 

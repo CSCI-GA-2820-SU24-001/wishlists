@@ -20,7 +20,7 @@ Wishlist Service
 This service implements a REST API that allows you to Create, Read, Update
 and Delete Wishlists and Wishlist Items
 """
-import logging
+
 from flask_restx import Resource, fields, reqparse
 from flask import request, current_app as app
 from service.models import Wishlist, WishlistItem
@@ -308,12 +308,8 @@ class WishlistItemCollection(Resource):
         item.deserialize(api.payload)
         item.wishlist_id = wishlist_id  # Ensure wishlist_id is set
 
-        logging.debug(f"Pre-commit Item ID: {item.id}")  # Log before update
-
         wishlist.items.append(item)
         wishlist.update()  # Ensure this correctly commits the transaction
-
-        logging.debug(f"Post-commit Item ID: {item.id}")  # Log after update
 
         location_url = api.url_for(
             WishlistItemResource,
