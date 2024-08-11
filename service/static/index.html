@@ -53,7 +53,7 @@
                 </div>
                 <div class="col-sm-4">
                   <button type="submit" class="btn btn-primary" id="wishlist-retrieve-btn">Retrieve</button>
-                  <button type="submit" class="btn btn-danger" id="wishlist-delete-btn">Delete</button>
+                  <button type="submit" class="btn btn-danger" id="wishlist-delete-btn">Delete</button> <br> <br>
                   <button type="submit" class="btn btn-danger" id="wishlist-delete-all-btn">Delete All Wishlist</button>
                 </div>
               </div>
@@ -101,6 +101,38 @@
                   <button type="submit" class="btn btn-warning" id="wishlist-update-btn">Update</button>
                 </div>
               </div>
+              <br><br>
+
+              <h3>Move An Item To Another Wishlist:</h3>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="source_wishlist_id">Source Wishlist ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="source_wishlist_id" placeholder="Enter ID of Source Wishlist">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="target_wishlist_id">Target Wishlist ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="target_wishlist_id" placeholder="Enter ID of Target Wishlist">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="move_item_id">Item ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="move_item_id" placeholder="Enter ID of Item">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-success" id="wishlist-move-btn">Move</button>
+                </div>
+              </div>
+
+
             </div> <!-- form horizontal -->
           </div> <!-- end well -->
         </div> <!-- end form-container -->

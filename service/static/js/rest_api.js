@@ -437,6 +437,40 @@ $(function () {
         }
     });
 
+
+     // *************************************************
+    //  Move a WishlistItem
+    // *************************************************
+    $("#wishlist-move-btn").click(function () {
+
+        let source_wishlist_id = $("#source_wishlist_id").val();
+        let target_wishlist_id = $("#target_wishlist_id").val();
+        let item_id = $("#move_item_id").val();
+
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/wishlists/${source_wishlist_id}/items/${item_id}/move-to/${target_wishlist_id}`,
+            contentType: "application/json",
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            update_wishlist_item_form_data(res)
+            flash_message("Item has been successfully moved to target wishlist")
+        });
+
+        ajax.fail(function(res){
+            clear_wishlist_item_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+
+
     // ****************************************
     // Search filtered WishlistItem
     // ****************************************
