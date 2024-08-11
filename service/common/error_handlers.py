@@ -19,7 +19,7 @@ Module: error_handlers
 from flask import jsonify
 from flask import current_app as app  # Import Flask application
 from service.models import DataValidationError
-from . import status
+from service.common import status
 
 
 ######################################################################
@@ -50,7 +50,9 @@ def not_found(error):
     message = "The requested resource was not found."
     app.logger.warning(message)
     return (
-        jsonify(status=status.HTTP_404_NOT_FOUND, error="404 Not Found", message=message),
+        jsonify(
+            status=status.HTTP_404_NOT_FOUND, error="404 Not Found", message=message
+        ),
         status.HTTP_404_NOT_FOUND,
     )
 
