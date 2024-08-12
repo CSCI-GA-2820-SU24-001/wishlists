@@ -86,8 +86,35 @@ The service will start and be accessible at `http://localhost:8000`.
 
 ## Deploy on Kubernetes Locally
 To deploy the shopcarts service on Kubernetes locally, follow these steps:
+* Create a Kubernetes cluster:
+```bash
+make cluster
+```
+* Build the Docker image:
+```bash
+docker build -t wishlists:latest .
+```
+* Tag the docker image:
+```bash
+docker tag wishlists:latest cluster-registry:32000/wishlists:latest
+```
+* Push the Docker image to the cluster registry:
+```bash
+docker push cluster-registry:32000/wishlists:latest
+```
+* Apply the Kubernetes configurations:
+```bash
+kubectl apply -f k8s/
+```
+The service will start and be accessible at `http://localhost:8080`.
 
-## Run
+## Openshift Deployment
+The wishlists service is also deployed using an OpenShift pipeline. The deployed application can be accessed at the following URL:
+
+https://wishlists-tw2770-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/
+
+## Swagger API Documentation
+The wishlists service includes Swagger API documentation to help you understand and interact with the API. You can access the Swagger UI at the `/apidocs` endpoint of the deployed service.
 
 ## License
 
