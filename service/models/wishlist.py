@@ -31,7 +31,9 @@ class Wishlist(db.Model, PersistentBase):
     customer_id = db.Column(db.String(36), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     created_date = db.Column(db.Date(), nullable=False, default=date.today())
-    modified_date = db.Column(db.Date(), nullable=False, default=date.today(), onupdate=date.today())
+    modified_date = db.Column(
+        db.Date(), nullable=False, default=date.today(), onupdate=date.today()
+    )
     items = db.relationship("WishlistItem", backref="wishlist", passive_deletes=True)
 
     def __repr__(self):
@@ -113,3 +115,8 @@ class Wishlist(db.Model, PersistentBase):
         """
         logger.info("Processing customer_id query for %s ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id).all()
+
+    @classmethod
+    def find(cls, by_id):
+        """Find a wishlist by its ID."""
+        return cls.query.filter_by(id=by_id).first()

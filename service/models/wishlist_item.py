@@ -7,7 +7,9 @@ The models for WishlistItems are stored in this module
 import uuid
 import logging
 from datetime import date
+from sqlalchemy import func
 from .persistent_base import db, PersistentBase, DataValidationError
+
 
 logger = logging.getLogger("flask.app")
 
@@ -30,15 +32,25 @@ class WishlistItem(db.Model, PersistentBase):
     )
     product_id = db.Column(db.String(36), nullable=False)
     description = db.Column(db.String(256))
-    price = db.Column(db.Numeric(), nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
     added_date = db.Column(db.Date(), nullable=False, default=date.today())
-    modified_date = db.Column(db.Date(), nullable=False, default=date.today(), onupdate=date.today())
+    modified_date = db.Column(
+        db.Date(), nullable=False, default=date.today(), onupdate=date.today()
+    )
 
     def __repr__(self):
-        return f"<WishlistItem product_id=[{self.product_id}] wishlist_id=[{self.wishlist_id}]>"
+        return (
+            f"<WishlistItem: item_id: {self.id}, product_id={self.product_id}, Description: {self.description}, "
+            + f"Price: {self.price},  wishlist_id={self.wishlist_id}, "
+            + f"added_date: {self.added_date}, modified_date: {self.modified_date}>"
+        )
 
     def __str__(self):
-        return f"Product ID: {self.product_id}, Description: {self.description}, Price: {self.price}"
+        return (
+            f"Product ID: : item_id: {self.id}, product_id={self.product_id}, Description: {self.description}, "
+            + f"Price: {self.price},  wishlist_id={self.wishlist_id}, "
+            + f"added_date: {self.added_date}, modified_date: {self.modified_date}>"
+        )
 
     def serialize(self) -> dict:
         """Converts a WishlistItem into a dictionary"""
@@ -47,9 +59,9 @@ class WishlistItem(db.Model, PersistentBase):
             "wishlist_id": self.wishlist_id,
             "product_id": self.product_id,
             "description": self.description,
-            "price": float(self.price),
+            "price": round(float(self.price), 2),
             "added_date": self.added_date,
-            "modified_date": self.modified_date
+            "modified_date": self.modified_date,
         }
 
     def deserialize(self, data):
@@ -66,14 +78,19 @@ class WishlistItem(db.Model, PersistentBase):
             if data["product_id"] == "":
                 raise DataValidationError("Invalid Wishlist: missing product_id")
 
+            # self.added_date = date.today()
+            # self.modified_date = date.today()
+            # if data["added_date"]:
+            #     self.added_date = data["added_date"]
+            # if data["modified_date"]:
+            #     self.modified_date = data["modified_date"]
+
             self.wishlist_id = data["wishlist_id"]
             self.product_id = data["product_id"]
             self.description = data.get("description", "")
-            # self.added_date = data["added_date"]
-            # self.modified_date = data["modified_date"]
 
             if isinstance(data["price"], (int, float)):
-                self.price = data["price"]
+                self.price = round(float(data["price"]), 2)
             else:
                 raise TypeError(
                     "Invalid type for int/float [price]: " + str(type(data["price"]))
@@ -93,6 +110,7 @@ class WishlistItem(db.Model, PersistentBase):
         return self
 
     @classmethod
+    @classmethod
     def find_by_price(cls, wishlist_id, price):
         """Returns all WishlistItems with the given wishlist_id and price
 
@@ -102,7 +120,8 @@ class WishlistItem(db.Model, PersistentBase):
         """
 
         return cls.query.filter(
-            cls.wishlist_id == wishlist_id, cls.price <= float(price)
+            cls.wishlist_id == wishlist_id,
+            func.round(cls.price, 2) <= round(float(price), 2),
         ).all()
 
     @classmethod
