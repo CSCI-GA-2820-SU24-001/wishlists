@@ -161,18 +161,6 @@ Scenario: Delete a Wishlist Item
     # And I press the "Item Retrieve" button
     # Then I should see the message "404 Not Found"
 
-# Scenario: Retrieve a Wishlist
-#     When I visit the "Home Page"
-#     And I press the "Wishlist List" button
-#     Then I should see the message "Success"
-#     When I copy the "Wishlist ID" field
-#     And I press the "Wishlist Form Clear" button
-#     And I paste the "Wishlist ID" field
-#     And I press the "Wishlist Retrieve" button
-#     Then I should see the message "Success"
-#     And I should see "testA" in the "Wishlist Name" field
-#     And I should see "A0001" in the "Customer ID" field
-
 Scenario: Search for Wishlist by Customer ID
     When I visit the "Home Page"
     And I set the "Wishlist Customer ID" to "A0001"
