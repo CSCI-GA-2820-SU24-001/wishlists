@@ -538,7 +538,7 @@ $(function () {
         else {
             let ajax = $.ajax({
                 type: "PUT",
-                url: `/wishlists/${source_wishlist_id}/items/${item_id}/move-to/${target_wishlist_id}`,
+                url: `/api/wishlists/${source_wishlist_id}/items/${item_id}/move-to/${target_wishlist_id}`,
                 contentType: "application/json",
             })
 
@@ -550,7 +550,7 @@ $(function () {
 
             ajax.fail(function(res){
                 clear_wishlist_item_data()
-                flash_message(res.responseJSON.message)
+                flash_message(res.responseJSON.status_code)
             });
         }
 
@@ -573,6 +573,10 @@ $(function () {
 
         if (item_price && (isNaN(item_price) || parseFloat(item_price) < 0)) {
             flash_message("Failed to search: Invalid Price!")
+            return;
+        }
+        if (!item_wishlist_id || item_wishlist_id.trim() === "") {
+            flash_message("Failed to search: Missing Wishlist ID!")
             return;
         }
         if (item_price) {
