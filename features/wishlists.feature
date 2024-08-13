@@ -227,23 +227,115 @@ Scenario: Search filtered Wishlist Item
     And I should see "200" in the "Item" results
     And I should not see "300" in the "Item" results
 
-# Scenario: Search for Wishlist by Name
-#     When I visit the "Home Page"
-#     And I set the "Wishlist Name" to "testA"
-#     And I press the "Wishlist Search" button
-#     Then I should see the message "Success"
-#     And I should see "testA" in the "Wishlist" results
-#     And I should not see "testB" in the "Wishlist" results
-#     And I should not see "testC" in the "Wishlist" results
-#     And I should not see "testD" in the "Wishlist" results
+Scenario: Search for Wishlist by Name
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "testA"
+    And I press the "Wishlist Search" button
+    Then I should see the message "Success"
+    And I should see "testA" in the "Wishlist" results
+    And I should not see "testB" in the "Wishlist" results
+    And I should not see "testC" in the "Wishlist" results
+    And I should not see "testD" in the "Wishlist" results
 
-# Scenario: Search for Wishlist by Customer ID and Name
-#     When I visit the "Home Page"
-#     And I set the "Wishlist Customer ID" to "A0001"
-#     And I set the "Wishlist Name" to "testA"
-#     And I press the "Wishlist Search" button
-#     Then I should see the message "Success"
-#     And I should see "testA" in the "Wishlist" results
-#     And I should not see "testB" in the "Wishlist" results
-#     And I should not see "testC" in the "Wishlist" results
-#     And I should not see "testD" in the "Wishlist" results
+Scenario: Search for Wishlist by Customer ID and Name
+    When I visit the "Home Page"
+    And I set the "Wishlist Customer ID" to "A0001"
+    And I set the "Wishlist Name" to "testA"
+    And I press the "Wishlist Search" button
+    Then I should see the message "Success"
+    And I should see "testA" in the "Wishlist" results
+    And I should not see "testB" in the "Wishlist" results
+    And I should not see "testC" in the "Wishlist" results
+    And I should not see "testD" in the "Wishlist" results
+
+
+Scenario: Display warning message with Empty/Fuzzy fields for Wishlist
+    When I visit the "Home Page"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Failed to create: Invalid Wishlist: Missing Name!"
+    When I set the "Wishlist Name" to "My Second Wishlist"
+    And I press the "Wishlist Create" button
+    Then I should see the message "Failed to create: Invalid Wishlist: Missing Customer ID!"
+
+    When I press the "Wishlist Form Clear" button
+    And I press the "Wishlist Retrieve" button
+    Then I should see the message "Failed to retrieve: Empty Wishlist ID!"
+
+    When I press the "Wishlist Update" button
+    Then I should see the message "Failed to update: Empty Wishlist ID!"
+    When I set the "Wishlist ID" to "Fake ID"
+    And I press the "Wishlist Update" button
+    Then I should see the message "Failed to update: Empty Wishlist Name!"
+    When I set the "Wishlist Name" to "My Second Wishlist"
+    And I press the "Wishlist Update" button
+    Then I should see the message "Failed to update: Empty Customer ID!"
+
+    When I press the "Wishlist Form Clear" button
+    And I press the "Wishlist Delete" button
+    Then I should see the message "Failed to delete: Empty Wishlist ID!"
+
+    When I press the "Wishlist Form Clear" button
+    And I press the "Wishlist Search" button
+    Then I should see the message "Empty search fields: Name and Customer ID. List all wishlists."    
+
+    When I press the "Wishlist Move" button
+    Then I should see the message "Failed to move item: Missing Source Wishlist ID!"
+    When I set the "Source Wishlist ID" to "AnySource"   
+    And I press the "Wishlist Move" button
+    Then I should see the message "Failed to move item: Missing Target Wishlist ID!"
+    When I set the "Target Wishlist ID" to "AnyTarget"   
+    And I press the "Wishlist Move" button
+    Then I should see the message "Failed to move item: Missing Item ID!"
+
+
+Scenario: Display warning message with Empty/Fuzzy fields for WishlistItem
+    When I visit the "Home Page"
+    And I press the "Item Create" button
+    Then I should see the message "Failed to create: Missing Wishlist ID!"
+    When I set the "Item Wishlist ID" to "AnyWID"
+    And I press the "Item Create" button
+    Then I should see the message "Failed to create: Missing Product ID!"
+    When I set the "Item Product ID" to "AnyID"
+    And I press the "Item Create" button
+    Then I should see the message "Failed to create: Invalid Price!"
+
+    When I press the "Item Clear" button
+    And I press the "Item Retrieve" button
+    Then I should see the message "Failed to retrieve: Missing Item ID!"
+    When I set the "Item ID" to "AnyID"
+    And I press the "Item Retrieve" button
+    Then I should see the message "Failed to retrieve: Missing Wishlist ID!"
+
+    When I press the "Item Clear" button
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Missing Item ID!"
+    When I set the "Item ID" to "AnyID"
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Missing Wishlist ID!"
+    When I set the "Item Wishlist ID" to "AnyWID"
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Missing Product ID!"
+    When I set the "Item Product ID" to "AnyID"
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Invalid Price!"
+    When I set the "Item Price" to "-12.5"
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Invalid Price!"
+    When I set the "Item Price" to "xyz"
+    And I press the "Item Update" button
+    Then I should see the message "Failed to update: Invalid Price!"
+
+    When I press the "Item Clear" button
+    And I press the "Item Delete" button
+    Then I should see the message "Failed to delete: Missing Item ID!"
+    When I set the "Item ID" to "AnyID"
+    And I press the "Item Delete" button
+    Then I should see the message "Failed to delete: Missing Wishlist ID!"
+
+    When I press the "Item Clear" button
+    When I set the "Item Price" to "-12.5"
+    And I press the "Item Search" button
+    Then I should see the message "Failed to search: Invalid Price!"
+    When I set the "Item Price" to "xyz"
+    And I press the "Item Search" button
+    Then I should see the message "Failed to search: Invalid Price!"
