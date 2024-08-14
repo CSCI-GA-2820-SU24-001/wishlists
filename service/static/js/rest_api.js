@@ -69,29 +69,38 @@ $(function () {
         let name = $("#wishlist_name").val();
         let customer_id = $("#wishlist_customer_id").val();
 
-        let data = {
-            "name": name,
-            "customer_id": customer_id
-        };
 
-        $("#wishlist_search_results").empty();
-        $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "POST",
-            url: "/api/wishlists",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-        });
+        if (!name || name.trim() === "") {
+            flash_message("Failed to create: Invalid Wishlist: Missing Name!")
+        }
+        else if (!customer_id || customer_id.trim() === "") {
+            flash_message("Failed to create: Invalid Wishlist: Missing Customer ID!")
+        }
+        else {
+            let data = {
+                "name": name,
+                "customer_id": customer_id
+            };
 
-        ajax.done(function(res){
-            update_wishlist_form_data(res)
-            flash_message("Wishlist has been created!")
-        });
+            $("#wishlist_search_results").empty();
+            $("#flash_message").empty();
+            
+            let ajax = $.ajax({
+                type: "POST",
+                url: "/api/wishlists",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+            });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
+            ajax.done(function(res){
+                update_wishlist_form_data(res)
+                flash_message("Wishlist has been created!")
+            });
+
+            ajax.fail(function(res){
+                flash_message(res.responseJSON.message)
+            });
+        }
     });
 
     // ****************************************
@@ -104,23 +113,28 @@ $(function () {
 
         $("#flash_message").empty();
 
-        let ajax = $.ajax({
-            type: "GET",
-            url: `/api/wishlists/${wishlist_id}`,
-            contentType: "application/json",
-            data: ''
-        })
-
-        ajax.done(function(res){
-            //alert(res.toSource())
-            update_wishlist_form_data(res)
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            clear_wishlist_form_data()
-            flash_message(res.responseJSON.message)
-        });
+        if (!wishlist_id && wishlist_id.trim() === "") {
+            flash_message("Failed to retrieve: Empty Wishlist ID!")
+        }
+        else {
+            let ajax = $.ajax({
+                type: "GET",
+                url: `/api/wishlists/${wishlist_id}`,
+                contentType: "application/json",
+                data: ''
+            })
+    
+            ajax.done(function(res){
+                //alert(res.toSource())
+                update_wishlist_form_data(res)
+                flash_message("Success")
+            });
+    
+            ajax.fail(function(res){
+                clear_wishlist_form_data()
+                flash_message(res.responseJSON.message)
+            });
+        }
 
     });
 
@@ -146,21 +160,32 @@ $(function () {
 
         $("#flash_message").empty();
 
-        let ajax = $.ajax({
-                type: "PUT",
-                url: `/api/wishlists/${wishlist_id}`,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+        if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to update: Empty Wishlist ID!")
+        }
+        else if (!wishlist_name || wishlist_name.trim() === "") {
+            flash_message("Failed to update: Empty Wishlist Name!")
+        }
+        else if (!wishlist_customer_id || wishlist_customer_id.trim() === "") {
+            flash_message("Failed to update: Empty Customer ID!")
+        }
+        else {
+            let ajax = $.ajax({
+                    type: "PUT",
+                    url: `/api/wishlists/${wishlist_id}`,
+                    contentType: "application/json",
+                    data: JSON.stringify(data)
+                })
 
-        ajax.done(function(res){
-            update_wishlist_form_data(res)
-            flash_message("Success")
-        });
+            ajax.done(function(res){
+                update_wishlist_form_data(res)
+                flash_message("Success")
+            });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
+            ajax.fail(function(res){
+                flash_message(res.responseJSON.message)
+            });
+        }
 
     });
 
@@ -172,21 +197,26 @@ $(function () {
         let wishlist_id = $("#wishlist_id").val();
         $("#flash_message").empty();
         
-        ajax = $.ajax({
-            type: "DELETE",
-            url: `/api/wishlists/${wishlist_id}`,
-            contentType: "application/json",
-            data: '',
-        })
+        if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to delete: Empty Wishlist ID!");
+        }
+        else {
+            ajax = $.ajax({
+                type: "DELETE",
+                url: `/api/wishlists/${wishlist_id}`,
+                contentType: "application/json",
+                data: '',
+            })
 
-        ajax.done(function(res){
-            clear_wishlist_form_data();
-            flash_message("Wishlist has been deleted!");
-        });
-    
-        ajax.fail(function(res){
-            flash_message("Server error!");
-        });
+            ajax.done(function(res){
+                clear_wishlist_form_data();
+                flash_message("Wishlist has been deleted!");
+            });
+        
+            ajax.fail(function(res){
+                flash_message("Server error!");
+            });
+        }
     });
 
     // ****************************************
@@ -223,6 +253,8 @@ $(function () {
         let customer_id = $("#wishlist_customer_id").val();
         let name = $("#wishlist_name").val();
 
+        let listAll = false;  // A boolean flag denoting if we list all wishlists because all searching fields are empty
+
         let queryString = ""
 
         if (customer_id) {
@@ -244,6 +276,11 @@ $(function () {
             contentType: "application/json",
             data: ''
         })
+
+        if ((!name || name.trim() === "") && (!customer_id || customer_id.trim() === "")) {
+            flash_message("Empty search fields: Name and Customer ID. List all wishlists.")
+            listAll = true
+        }
 
         ajax.done(function(res){
             //alert(res.toSource())
@@ -270,7 +307,12 @@ $(function () {
                 update_wishlist_form_data(firstWishlist)
             }
 
-            flash_message("Success")
+            if (listAll) {
+                flash_message("Empty search fields: Name and Customer ID. List all wishlists.")
+            }
+            else {
+                flash_message("Success")
+            }
         });
 
         ajax.fail(function(res){
@@ -309,24 +351,31 @@ $(function () {
 
         $("#flash_message").empty();
 
-        let ajax = $.ajax({
-            type: "GET",
-            url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
-            contentType: "application/json",
-            data: ''
-        })
+        if (!item_id || item_id.trim() === "") {
+            flash_message("Failed to retrieve: Missing Item ID!")
+        }
+        else if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to retrieve: Missing Wishlist ID!")
+        }
+        else {
+            let ajax = $.ajax({
+                type: "GET",
+                url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
+                contentType: "application/json",
+                data: ''
+            })
 
-        ajax.done(function(res){
-            //alert(res.toSource())
-            update_wishlist_item_form_data(res)
-            flash_message("Success")
-        });
+            ajax.done(function(res){
+                //alert(res.toSource())
+                update_wishlist_item_form_data(res)
+                flash_message("Success")
+            });
 
-        ajax.fail(function(res){
-            clear_wishlist_item_data()
-            flash_message(res.responseJSON.message)
-        });
-
+            ajax.fail(function(res){
+                clear_wishlist_item_data()
+                flash_message(res.responseJSON.message)
+            });
+        }
     });
 
     // ****************************************
@@ -349,22 +398,35 @@ $(function () {
 
         $("#flash_message").empty();
         
-        let ajax = $.ajax({
-            type: "PUT",
-            url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
-            contentType: "application/json",
-            data: JSON.stringify(data),
-        });
+        if (!item_id || item_id.trim() === "") {
+            flash_message("Failed to update: Missing Item ID!")
+        }
+        else if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to update: Missing Wishlist ID!")
+        }
+        else if (!product_id || product_id.trim() === "") {
+            flash_message("Failed to update: Missing Product ID!")
+        }
+        else if (!price || isNaN(price) || price < 0) {
+            flash_message("Failed to update: Invalid Price!")
+        }
+        else {
+            let ajax = $.ajax({
+                type: "PUT",
+                url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+            });
 
-        ajax.done(function(res){
-            update_wishlist_item_form_data(res)
-            flash_message("Success")
-        });
+            ajax.done(function(res){
+                update_wishlist_item_form_data(res)
+                flash_message("Success")
+            });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-        
+            ajax.fail(function(res){
+                flash_message(res.responseJSON.message)
+            });
+        }
     });
 
     // ****************************************
@@ -377,22 +439,30 @@ $(function () {
         let wishlist_id = $("#item_wishlist_id").val();
     
         $("#flash_message").empty();
-    
-        let ajax = $.ajax({
-            type: "DELETE",
-            url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
-            contentType: "application/json",
-            data: '',
-        })
-    
-        ajax.done(function(res){
-            clear_wishlist_item_data()
-            flash_message("Success");
-        });
-    
-        ajax.fail(function(res){
-            flash_message("Server error!");
-        });
+
+        if (!item_id || item_id.trim() === "") {
+            flash_message("Failed to delete: Missing Item ID!")
+        }
+        else if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to delete: Missing Wishlist ID!")
+        }
+        else {
+            let ajax = $.ajax({
+                type: "DELETE",
+                url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
+                contentType: "application/json",
+                data: '',
+            })
+        
+            ajax.done(function(res){
+                clear_wishlist_item_data()
+                flash_message("Success");
+            });
+        
+            ajax.fail(function(res){
+                flash_message("Server error!");
+            });
+        }
     });
 
     // ****************************************
@@ -415,8 +485,14 @@ $(function () {
 
         $("#flash_message").empty();
 
-        if (wishlist_id.trim() === "") {
-            flash_message("Wishlist ID cannot be empty");
+        if (!wishlist_id || wishlist_id.trim() === "") {
+            flash_message("Failed to create: Missing Wishlist ID!")
+        }
+        else if (!product_id || product_id.trim() === "") {
+            flash_message("Failed to create: Missing Product ID!")
+        }
+        else if (!price || isNaN(price) || price < 0) {
+            flash_message("Failed to create: Invalid Price!")
         }
         else {
             let ajax = $.ajax({
@@ -450,22 +526,33 @@ $(function () {
 
         $("#flash_message").empty();
 
-        let ajax = $.ajax({
-            type: "PUT",
-            url: `/wishlists/${source_wishlist_id}/items/${item_id}/move-to/${target_wishlist_id}`,
-            contentType: "application/json",
-        })
+        if (!source_wishlist_id || source_wishlist_id.trim() === "") {
+            flash_message("Failed to move item: Missing Source Wishlist ID!")
+        }
+        else if (!target_wishlist_id || target_wishlist_id.trim() === "") {
+            flash_message("Failed to move item: Missing Target Wishlist ID!")
+        }
+        else if (!item_id || item_id.trim() === "") {
+            flash_message("Failed to move item: Missing Item ID!")
+        }
+        else {
+            let ajax = $.ajax({
+                type: "PUT",
+                url: `/api/wishlists/${source_wishlist_id}/items/${item_id}/move-to/${target_wishlist_id}`,
+                contentType: "application/json",
+            })
 
-        ajax.done(function(res){
-            //alert(res.toSource())
-            update_wishlist_item_form_data(res)
-            flash_message("Item has been successfully moved to target wishlist")
-        });
+            ajax.done(function(res){
+                //alert(res.toSource())
+                update_wishlist_item_form_data(res)
+                flash_message("Item has been successfully moved to target wishlist")
+            });
 
-        ajax.fail(function(res){
-            clear_wishlist_item_data()
-            flash_message(res.responseJSON.message)
-        });
+            ajax.fail(function(res){
+                clear_wishlist_item_data()
+                flash_message(res.responseJSON.status_code)
+            });
+        }
 
     });
 
@@ -484,6 +571,14 @@ $(function () {
 
         let queryString = ""
 
+        if (item_price && (isNaN(item_price) || parseFloat(item_price) < 0)) {
+            flash_message("Failed to search: Invalid Price!")
+            return;
+        }
+        if (!item_wishlist_id || item_wishlist_id.trim() === "") {
+            flash_message("Failed to search: Missing Wishlist ID!")
+            return;
+        }
         if (item_price) {
             queryString += 'price=' + item_price
         }

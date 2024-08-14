@@ -356,7 +356,7 @@ class WishlistItemResource(Resource):
         if not item or item.wishlist_id != wishlist_id:
             error(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id '{item_id}' was not found in wishlist '{wishlist_id}'.",
+                "404 Not Found",
             )
         return item.serialize(), status.HTTP_200_OK
 

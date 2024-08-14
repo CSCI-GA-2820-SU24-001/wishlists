@@ -74,11 +74,11 @@ class Wishlist(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            if data["customer_id"] == "":
-                raise DataValidationError("Invalid Wishlist: missing customer_id")
-
             if data["name"] == "":
-                raise DataValidationError("Invalid Wishlist: missing name")
+                raise DataValidationError("Invalid Wishlist: Missing name")
+
+            if data["customer_id"] == "":
+                raise DataValidationError("Invalid Wishlist: Missing customer_id")
 
             self.customer_id = data["customer_id"]
             self.name = data["name"]
