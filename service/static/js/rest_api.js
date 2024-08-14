@@ -214,7 +214,7 @@ $(function () {
             });
         
             ajax.fail(function(res){
-                flash_message("Server error!");
+                flash_message("Failed to delete: Check Wishlist ID!");
             });
         }
     });
@@ -460,7 +460,7 @@ $(function () {
             });
         
             ajax.fail(function(res){
-                flash_message("Server error!");
+                flash_message("Failed to delete: Check Wishlist ID and Item ID!");
             });
         }
     });
