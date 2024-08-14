@@ -19,7 +19,8 @@ spec:
       description: The name of the image to build
       name: IMAGE_NAME
       type: string
-    - default: 'https://wishlists-tw2770-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com'
+    # - default: 'https://wishlists-tw2770-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com'
+    - default: 'https://wishlist-service-yl10798-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/'
       description: The base URL for the application
       name: BASE_URL
       type: string
